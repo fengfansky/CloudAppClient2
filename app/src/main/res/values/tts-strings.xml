@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tts_intent_empty_error">抱歉这个若琪还不会</string>
+    <string name="tts_nlp_empty_error">抱歉这个若琪还不会</string>
+    <string name="tts_nlp_data_empty_error">抱歉这个若琪还不会</string>
+    <string name="tts_nlp_invalid_error">抱歉这个若琪还不会</string>
+</resources>
