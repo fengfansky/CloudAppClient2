@@ -6,8 +6,9 @@ import com.rokid.cloudappclient.http.HttpClientWrapper;
 import com.rokid.cloudappclient.proto.SendEvent;
 import com.rokid.cloudappclient.proto.SendEventCreator;
 import com.rokid.cloudappclient.util.AppTypeRecorder;
+import com.rokid.cloudappclient.util.DeviceInfoUtil;
 import com.rokid.cloudappclient.util.Logger;
-import com.squareup.okhttp.Response;
+import com.android.okhttp.Response;
 
 import java.io.IOException;
 
@@ -15,6 +16,7 @@ import java.io.IOException;
 /**
  * Created by fanfeng on 2017/5/9.
  */
+
 
 public abstract class BaseReporter implements Runnable {
 
@@ -77,7 +79,7 @@ public abstract class BaseReporter implements Runnable {
         try {
             response = HttpClientWrapper.getInstance().sendRequest(BaseUrlConfig.getUrl(), baseParameter, eventRequest);
         } catch (IOException e) {
-            AppTypeRecorder.getInstance().getAppStateManager().onEventErrorCallback(event, BaseReporter.ReporterResponseCallBack.ERROR_IOEXCEPTION);
+            AppTypeRecorder.getInstance().getAppStateManager().onEventErrorCallback(event, ReporterResponseCallBack.ERROR_IOEXCEPTION);
             Logger.e(" response callback exception !");
         }finally {
             try {
@@ -88,6 +90,7 @@ public abstract class BaseReporter implements Runnable {
                     AppTypeRecorder.getInstance().getAppStateManager().onEventErrorCallback(event, ReporterResponseCallBack.ERROR_RESPONSE_NULL);
                 }
             } catch (IOException e) {
+                AppTypeRecorder.getInstance().getAppStateManager().onEventErrorCallback(event, ReporterResponseCallBack.ERROR_IOEXCEPTION);
                 Logger.e(" response close exception !");
             }
         }

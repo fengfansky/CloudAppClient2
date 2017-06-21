@@ -1,6 +1,7 @@
 package com.rokid.cloudappclient.bean.response.responseinfo.action.voice;
 
 import com.rokid.cloudappclient.bean.base.BaseBean;
+import com.rokid.cloudappclient.util.Logger;
 
 /**
  * Defines the voice interaction of CloudApps, including TTS and Confirmation.

@@ -8,8 +8,6 @@ import com.rokid.cloudappclient.bean.ActionNode;
 
 public interface AppStateCallback {
 
-    void resetAppState();
-
     void onNewActionNode(ActionNode actionNode);
 
     ActionNode getCurrentActionNode();

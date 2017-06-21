@@ -138,29 +138,30 @@ public class CloudActionResponse {
      */
     private boolean checkActionElements(ResponseBean responseBean) {
         ActionBean responseAction = responseBean.getAction();
-        String responseActionType = responseAction.getType();
 
         MediaBean mediaBean = responseAction.getMedia();
         VoiceBean voiceBean = responseAction.getVoice();
 
-        if (mediaBean == null
-                && voiceBean == null && responseAction.getDisplay() == null) {
-            if (!responseActionType.equals(ActionBean.TYPE_EXIT)) {
-                Logger.i("checkCloudAppAction: media, voice and display cannot be null when response action type is not EXIT");
-                return false;
-            } else {
+        if (mediaBean == null && voiceBean == null){
+            Logger.d("media and voice is null! ");
+            return false;
+        }else if (mediaBean == null && voiceBean != null){
+            if (voiceBean.isValid()){
                 return true;
-            }
-        } else {
-            if (mediaBean != null && !mediaBean.isValid()) {
-                Logger.i("media is invalid");
+            }else {
+                Logger.d("media null , voice invalid! ");
                 return false;
             }
-
-            if (voiceBean != null && !voiceBean.isValid()) {
-                Logger.i("voice is invalid");
+        }else if (voiceBean == null && mediaBean != null){
+            if (mediaBean.isValid()){
+                return true;
+            }else {
+                Logger.d(" voice null , media invalid!");
                 return false;
             }
+        }else if (!mediaBean.isValid() && !voiceBean.isValid()){
+            Logger.d(" voice and media invalid !");
+            return false;
         }
 
         return true;

@@ -34,7 +34,7 @@ public class SceneAppStateManager extends BaseAppStateManager{
             MediaAction.getInstance().startAction(currentMediaBean);
             Logger.d("scene: onAppResume resume play audio");
         }
-        if (currentVideoState == VOICE_STATE.VOICE_STOP){
+        if (currentVideoState == VOICE_STATE.VOICE_STOP || currentVideoState == VOICE_STATE.VOICE_CANCLED){
             VoiceAction.getInstance().startAction(currentVoiceBean);
             Logger.d("scene onAppResume play voice");
         }

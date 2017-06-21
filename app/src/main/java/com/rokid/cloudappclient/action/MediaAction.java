@@ -177,5 +177,4 @@ public class MediaAction extends BaseAction<MediaBean> {
             rkAudioPlayer.seekTo(seekTime);
         }
     }
-
 }

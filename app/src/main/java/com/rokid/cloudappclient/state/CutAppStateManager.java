@@ -22,7 +22,7 @@ public class CutAppStateManager extends BaseAppStateManager {
     public void onAppPaused() {
         super.onAppPaused();
         Logger.d(" cut : pause tts and finishActivity");
-        VoiceAction.getInstance().pauseAction();
+        VoiceAction.getInstance().stopAction();
         finishActivity();
     }
 

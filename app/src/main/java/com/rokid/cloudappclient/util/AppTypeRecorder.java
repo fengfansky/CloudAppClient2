@@ -10,15 +10,16 @@ public class AppTypeRecorder {
 
     private BaseAppStateManager appStateManager;
 
-    public static AppTypeRecorder getInstance(){
-        return AppTypeRecorder.AppTypeRecorderHoler.instance;
+    public static AppTypeRecorder getInstance() {
+        return AppTypeRecorderHoler.instance;
     }
 
-    private static class AppTypeRecorderHoler{
+    private static class AppTypeRecorderHoler {
         private static final AppTypeRecorder instance = new AppTypeRecorder();
     }
 
     public BaseAppStateManager getAppStateManager() {
+
         return appStateManager;
     }
 

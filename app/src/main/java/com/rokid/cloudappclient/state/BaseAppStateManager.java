@@ -2,9 +2,10 @@ package com.rokid.cloudappclient.state;
 
 import android.text.TextUtils;
 
-import com.rokid.cloudappclient.bean.ActionNode;
 import com.rokid.cloudappclient.action.MediaAction;
 import com.rokid.cloudappclient.action.VoiceAction;
+import com.rokid.cloudappclient.bean.ActionNode;
+import com.rokid.cloudappclient.bean.response.responseinfo.action.ActionBean;
 import com.rokid.cloudappclient.bean.response.responseinfo.action.media.MediaBean;
 import com.rokid.cloudappclient.bean.response.responseinfo.action.voice.VoiceBean;
 import com.rokid.cloudappclient.parser.ResponseParser;
@@ -14,13 +15,13 @@ import com.rokid.cloudappclient.reporter.ReporterManager;
 import com.rokid.cloudappclient.reporter.VoiceReporter;
 import com.rokid.cloudappclient.util.AppTypeRecorder;
 import com.rokid.cloudappclient.util.Logger;
-import com.squareup.okhttp.Response;
+import com.android.okhttp.Response;
 
 /**
  * Created by fanfeng on 2017/6/16.
  */
 
-public abstract class BaseAppStateManager implements AppStateCallback, MediaStateCallback, VoiceStateCallback, BaseReporter.ReporterResponseCallBack {
+public abstract class BaseAppStateManager implements AppStateCallback, MediaStateCallback, VoiceStateCallback, BaseReporter.ReporterResponseCallBack, ResponseParser.ResponseNullCallback {
 
     public ActionNode mActionNode;
     public String mAppId;
@@ -38,13 +39,6 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
     public ReporterManager reporterManager = ReporterManager.getInstance();
 
     @Override
-    public void resetAppState() {
-        Logger.d("form: " + getFormType() + " resetAppState ");
-        MediaAction.getInstance().stopAction();
-        VoiceAction.getInstance().stopAction();
-    }
-
-    @Override
     public void onNewActionNode(ActionNode actionNode) {
         if (actionNode != null) {
             Logger.d("form:" + getFormType() + " onNewActionNode actionNode ----> " + actionNode.toString());
@@ -53,6 +47,7 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
             this.shouldEndSession = actionNode.isShouldEndSession();
             this.currentMediaBean = actionNode.getMedia();
             this.currentVoiceBean = actionNode.getVoice();
+            processActionNode(actionNode);
         }
     }
 
@@ -86,6 +81,10 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
     public void onMediaStart() {
         Logger.d("form: " + getFormType() + " onMediaStart !");
         currentMediaState = MEDIA_STATE.MEDIA_PLAY;
+        if (TextUtils.isEmpty(mAppId)){
+            Logger.d(" appId is null !");
+            return;
+        }
         reporterManager.executeReporter(new MediaReporter(mAppId, MediaReporter.START));
     }
 
@@ -93,16 +92,21 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
     public void onMediaPause(int position) {
         Logger.d("form: " + getFormType() + " onMediaPause ! position : " + position);
         currentMediaState = MEDIA_STATE.MEDIA_PAUSED;
-        if (mActionNode != null && currentMediaBean!=null && currentMediaBean.isValid()){
+        if (mActionNode != null && currentMediaBean != null && currentMediaBean.isValid()) {
             currentMediaBean.getItem().setOffsetInMilliseconds(position);
         }
+        if (TextUtils.isEmpty(mAppId)){
+            Logger.d(" appId is null !");
+            return;
+        }
+        reporterManager.executeReporter(new MediaReporter(mAppId, MediaReporter.PAUSED));
     }
 
     @Override
     public void onMediaResume() {
         Logger.d("form: " + getFormType() + " onMediaResume ! ");
         currentMediaState = MEDIA_STATE.MEDIA_RESUME;
-        if (mActionNode != null && currentMediaBean != null && currentMediaBean.isValid()){
+        if (mActionNode != null && currentMediaBean != null && currentMediaBean.isValid()) {
             mActionNode.getMedia().getItem().getOffsetInMilliseconds();
         }
     }
@@ -111,14 +115,21 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
     public void onMediaStop() {
         Logger.d("form: " + getFormType() + " onMediaStop !");
         currentMediaState = MEDIA_STATE.MEDIA_STOP;
-        checkAppState();
+        if (shouldEndSession) {
+            checkAppState();
+        } else {
+            if (TextUtils.isEmpty(mAppId)){
+                Logger.d(" appId is null !");
+                return;
+            }
+            reporterManager.executeReporter(new MediaReporter(mAppId, MediaReporter.FINISHED));
+        }
     }
 
     @Override
     public void onMediaError() {
         Logger.d("form: " + getFormType() + " onMediaError !");
         currentMediaState = MEDIA_STATE.MEDIA_ERROR;
-        reporterManager.executeReporter(new MediaReporter(mAppId, MediaReporter.ERROR));
         checkAppState();
     }
 
@@ -126,6 +137,10 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
     public void onVoiceStart() {
         Logger.d("form: " + getFormType() + " onVoiceStart !");
         currentVideoState = VOICE_STATE.VOICE_START;
+        if (TextUtils.isEmpty(mAppId)){
+            Logger.d(" appId is null !");
+            return;
+        }
         reporterManager.executeReporter(new VoiceReporter(mAppId, VoiceReporter.START));
     }
 
@@ -133,19 +148,23 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
     public void onVoiceStop() {
         Logger.d("form: " + getFormType() + " onVoiceStop !");
         currentVideoState = VOICE_STATE.VOICE_STOP;
-        reporterManager.executeReporter(new MediaReporter(mAppId, VoiceReporter.FINISHED));
-        checkAppState();
+        if (shouldEndSession) {
+            checkAppState();
+        } else {
+            if (TextUtils.isEmpty(mAppId)){
+                Logger.d(" appId is null !");
+                checkAppState();
+                return;
+            }
+            reporterManager.executeReporter(new MediaReporter(mAppId, VoiceReporter.FINISHED));
+        }
     }
 
+    //TODO 区分scene和cut异常处理
     private void checkAppState() {
         Logger.d("form: " + getFormType() + "  checkAppState shouldEndSession : " + shouldEndSession + " mediaType : " + currentMediaState + " videoType : " + currentVideoState);
 
-        if (!shouldEndSession){
-            Logger.d(" shouldEndSession : " + shouldEndSession);
-            return;
-        }
-
-        if ((currentMediaState == null || currentMediaState == MEDIA_STATE.MEDIA_STOP || currentMediaState == MEDIA_STATE.MEDIA_ERROR) && (currentVideoState == null || currentVideoState == VOICE_STATE.VOICE_STOP || currentVideoState == VOICE_STATE.VOICE_ERROR)
+        if ((currentMediaState == null || currentMediaState == MEDIA_STATE.MEDIA_STOP || currentMediaState == MEDIA_STATE.MEDIA_ERROR) && (currentVideoState == null || currentVideoState == VOICE_STATE.VOICE_STOP || currentVideoState == VOICE_STATE.VOICE_CANCLED ||  currentVideoState == VOICE_STATE.VOICE_ERROR)
                 && mTaskProcessCallback != null) {
             mTaskProcessCallback.onAllTaskFinished();
             Logger.d("form: " + getFormType() + " voice stop , allTaskFinished ! finish app !");
@@ -156,34 +175,62 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
     public void onVoiceCancled() {
         Logger.d("form: " + getFormType() + " onVoiceCancled !");
         currentVideoState = VOICE_STATE.VOICE_CANCLED;
+        checkAppState();
     }
 
     @Override
     public void onVoiceError() {
         Logger.d("form: " + getFormType() + " onVoiceError !");
         currentVideoState = VOICE_STATE.VOICE_ERROR;
-        reporterManager.executeReporter(new VoiceReporter(mAppId, VoiceReporter.FINISHED));
         checkAppState();
     }
 
     @Override
     public void onEventErrorCallback(String event, int errorCode) {
-        Logger.d("form: " + getFormType() + "  onEventErrorCallback " + " event : " + event + " errorCode " + errorCode);
-        if (TextUtils.isEmpty(event)) {
-            Logger.d(" event is null !");
-            return;
-        }
-        /*if (event.equals(MediaReporter.FINISHED) || event.equals(MediaReporter.NEAR_FINISH)
-                || event.equals(VoiceReporter.FINISHED)){
-            shouldEndSession = true;
-            checkAppState();
-        }*/
+        Logger.e("form: " + getFormType() + "  onEventErrorCallback " + " event : " + event + " errorCode " + errorCode);
+        checkAppState();
+    }
+
+    @Override
+    public void onResponseNull() {
+        Logger.d("form: " + getFormType() + " onResponse Null ");
+        checkAppState();
     }
 
     @Override
     public void responseCallback(String event, Response response) {
         Logger.d("form: " + getFormType() + " responseCallback event : " + event + " response : " + response);
         ResponseParser.getInstance().parseSendEventResponse(event, response);
+    }
+
+    /**
+     * To process real action
+     *
+     * @param actionNode the validated action
+     */
+    private void processActionNode(ActionNode actionNode) {
+        if (actionNode == null){
+            Logger.d(" actionNode is null!");
+            onResponseNull();
+            return;
+        }
+
+        if (ActionBean.TYPE_EXIT.equals(actionNode.getActionType())) {
+            Logger.d("current response is a INTENT EXIT - Finish Activity");
+            finishActivity();
+            return;
+        }
+
+        if (ActionBean.TYPE_NORMAL.equals(actionNode.getActionType())) {
+
+            if (actionNode.getVoice() != null) {
+                VoiceAction.getInstance().startAction(actionNode.getVoice());
+            }
+            if (actionNode.getMedia() != null) {
+                MediaAction.getInstance().startAction(actionNode.getMedia());
+            }
+        }
+
     }
 
     public void finishActivity() {
@@ -193,9 +240,9 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
         }
     }
 
-    public CutAppStateManager.TaskProcessCallback mTaskProcessCallback;
+    public TaskProcessCallback mTaskProcessCallback;
 
-    public void setTaskProcessCallback(CutAppStateManager.TaskProcessCallback taskProcessCallback) {
+    public void setTaskProcessCallback(TaskProcessCallback taskProcessCallback) {
         this.mTaskProcessCallback = taskProcessCallback;
     }
 
@@ -208,7 +255,7 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
 
     public abstract String getFormType();
 
-    public enum APP_STATE{
+    public enum APP_STATE {
         APP_PAUSED,
         APP_RESUME
     }

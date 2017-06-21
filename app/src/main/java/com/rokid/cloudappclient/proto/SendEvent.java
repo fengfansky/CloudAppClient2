@@ -159,7 +159,7 @@ public final class SendEvent {
             return SendEvent.internal_static_proto_SendEventRequest_descriptor;
         }
 
-        protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        protected FieldAccessorTable
         internalGetFieldAccessorTable() {
             return SendEvent.internal_static_proto_SendEventRequest_fieldAccessorTable
                     .ensureFieldAccessorsInitialized(
@@ -475,7 +475,7 @@ public final class SendEvent {
 
         @Override
         protected Builder newBuilderForType(
-                com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+                BuilderParent parent) {
             Builder builder = new Builder(parent);
             return builder;
         }
@@ -491,7 +491,7 @@ public final class SendEvent {
                 return SendEvent.internal_static_proto_SendEventRequest_descriptor;
             }
 
-            protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+            protected FieldAccessorTable
             internalGetFieldAccessorTable() {
                 return SendEvent.internal_static_proto_SendEventRequest_fieldAccessorTable
                         .ensureFieldAccessorsInitialized(
@@ -504,7 +504,7 @@ public final class SendEvent {
             }
 
             private Builder(
-                    com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+                    BuilderParent parent) {
                 super(parent);
                 maybeForceBuilderInitialization();
             }
@@ -987,7 +987,7 @@ public final class SendEvent {
             return SendEvent.internal_static_proto_SendEventResponse_descriptor;
         }
 
-        protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        protected FieldAccessorTable
         internalGetFieldAccessorTable() {
             return SendEvent.internal_static_proto_SendEventResponse_fieldAccessorTable
                     .ensureFieldAccessorsInitialized(
@@ -1187,7 +1187,7 @@ public final class SendEvent {
 
         @Override
         protected Builder newBuilderForType(
-                com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+                BuilderParent parent) {
             Builder builder = new Builder(parent);
             return builder;
         }
@@ -1203,7 +1203,7 @@ public final class SendEvent {
                 return SendEvent.internal_static_proto_SendEventResponse_descriptor;
             }
 
-            protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+            protected FieldAccessorTable
             internalGetFieldAccessorTable() {
                 return SendEvent.internal_static_proto_SendEventResponse_fieldAccessorTable
                         .ensureFieldAccessorsInitialized(
@@ -1216,7 +1216,7 @@ public final class SendEvent {
             }
 
             private Builder(
-                    com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+                    BuilderParent parent) {
                 super(parent);
                 maybeForceBuilderInitialization();
             }

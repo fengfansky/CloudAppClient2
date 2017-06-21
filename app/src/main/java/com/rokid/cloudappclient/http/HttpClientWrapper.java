@@ -1,8 +1,10 @@
 package com.rokid.cloudappclient.http;
-
+import com.rokid.cloudappclient.reporter.BaseReporter;
+import com.rokid.cloudappclient.util.AppTypeRecorder;
 import com.rokid.cloudappclient.proto.SendEvent;
-import com.squareup.okhttp.*;
-import com.squareup.okhttp.OkHttpClient;
+import com.rokid.cloudappclient.util.Logger;
+import com.android.okhttp.*;
+import com.android.okhttp.OkHttpClient;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -12,7 +14,6 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by fanfeng on 2017/5/11.
  */
-
 public class HttpClientWrapper {
 
     private static OkHttpClient okHttpClient;
@@ -56,3 +57,4 @@ public class HttpClientWrapper {
     }
 
 }
+

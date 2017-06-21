@@ -3,19 +3,17 @@ package com.rokid.cloudappclient.parser;
 import android.text.TextUtils;
 
 import com.google.gson.Gson;
-import com.rokid.cloudappclient.action.MediaAction;
-import com.rokid.cloudappclient.action.VoiceAction;
 import com.rokid.cloudappclient.bean.ActionNode;
 import com.rokid.cloudappclient.bean.CommonResponse;
 import com.rokid.cloudappclient.bean.response.CloudActionResponse;
-import com.rokid.cloudappclient.bean.response.responseinfo.action.ActionBean;
 import com.rokid.cloudappclient.proto.SendEvent;
 import com.rokid.cloudappclient.reporter.BaseReporter;
+import com.rokid.cloudappclient.state.BaseAppStateManager;
 import com.rokid.cloudappclient.tts.TTSSpeakInterface;
 import com.rokid.cloudappclient.util.AppTypeRecorder;
 import com.rokid.cloudappclient.util.CommonResponseHelper;
 import com.rokid.cloudappclient.util.Logger;
-import com.squareup.okhttp.Response;
+import com.android.okhttp.Response;
 import java.io.IOException;
 
 /**
@@ -23,6 +21,8 @@ import java.io.IOException;
  */
 
 public class ResponseParser {
+
+    private BaseAppStateManager appStateManager = AppTypeRecorder.getInstance().getAppStateManager();
 
     private static ResponseParser parser;
 
@@ -49,16 +49,10 @@ public class ResponseParser {
         // update current application info for further use. App info consists: DOMAIN and SHOT
         if (actionNode == null) {
             Logger.d("actionNode is null!");
-            return;
+            appStateManager.onResponseNull();
+        }else {
+            appStateManager.onNewActionNode(actionNode);
         }
-
-        String lastAppId = AppTypeRecorder.getInstance().getAppStateManager().getAppId();
-
-        if (!actionNode.getAppId().equals(lastAppId)) {
-            Logger.d("new cloudApp coming , onNewActionNode");
-            AppTypeRecorder.getInstance().getAppStateManager().onNewActionNode(actionNode);
-        }
-        processActionNode(actionNode);
     }
 
     public void parseSendEventResponse(String event, Response response) {
@@ -69,12 +63,12 @@ public class ResponseParser {
             eventResponse = SendEvent.SendEventResponse.parseFrom(response.body().source().readByteArray());
         } catch (IOException e) {
             e.printStackTrace();
-            AppTypeRecorder.getInstance().getAppStateManager().onEventErrorCallback(event, BaseReporter.ReporterResponseCallBack.ERROR_RESPONSE_NULL);
+            appStateManager.onEventErrorCallback(event, BaseReporter.ReporterResponseCallBack.ERROR_RESPONSE_NULL);
         }
 
         if (eventResponse == null) {
             Logger.d(" eventResponse is null");
-            AppTypeRecorder.getInstance().getAppStateManager().onEventErrorCallback(event, BaseReporter.ReporterResponseCallBack.ERROR_RESPONSE_NULL);
+            appStateManager.onEventErrorCallback(event, BaseReporter.ReporterResponseCallBack.ERROR_RESPONSE_NULL);
             return;
         }
 
@@ -82,7 +76,7 @@ public class ResponseParser {
 
         if (eventResponse.getResponse() == null) {
             Logger.d("eventResponse is null !");
-            AppTypeRecorder.getInstance().getAppStateManager().onEventErrorCallback(event, BaseReporter.ReporterResponseCallBack.ERROR_RESPONSE_NULL);
+            appStateManager.onEventErrorCallback(event, BaseReporter.ReporterResponseCallBack.ERROR_RESPONSE_NULL);
             return;
         }
 
@@ -90,7 +84,7 @@ public class ResponseParser {
 
         if (cloudResponse == null) {
             Logger.d("cloudResponse parsed null !");
-            AppTypeRecorder.getInstance().getAppStateManager().onEventErrorCallback(event, BaseReporter.ReporterResponseCallBack.ERROR_RESPONSE_NULL);
+            appStateManager.onEventErrorCallback(event, BaseReporter.ReporterResponseCallBack.ERROR_RESPONSE_NULL);
             return;
         }
         if (TextUtils.isEmpty(cloudResponse.getAppId())) {
@@ -98,45 +92,22 @@ public class ResponseParser {
             return;
         }
 
-        String currentAppId = AppTypeRecorder.getInstance().getAppStateManager().getAppId();
-        //filter the cloudResponse appId that not the same with last app
-        if (!cloudResponse.getAppId().equals(currentAppId)) {
-            Logger.d("eventResponse cloudAppId is not the same with currentAppId ! cloudAppId : " + cloudResponse.getAppId() + " currentAppId : " + currentAppId);
-            return;
-        }
-
         CommonResponse commonResponse = new CommonResponse();
         commonResponse.setAction(cloudResponse);
         ActionNode actionNode = CommonResponseHelper.generateActionNode(commonResponse);
-        processActionNode(actionNode);
 
+        String lastAppId = appStateManager.getAppId();
+        //filter the cloudResponse appId that not the same with last app
+        if (!cloudResponse.getAppId().equals(lastAppId)) {
+            Logger.d("eventResponse cloudAppId is not the same with currentAppId ! cloudAppId : " + cloudResponse.getAppId() + " currentAppId : " + lastAppId);
+            appStateManager.onResponseNull();
+        }else {
+            appStateManager.onNewActionNode(actionNode);
+        }
     }
 
-    /**
-     * To process real action
-     *
-     * @param actionNode the validated action
-     */
-    private void processActionNode(ActionNode actionNode) {
-        if (actionNode == null)
-            return;
-
-        if (ActionBean.TYPE_EXIT.equals(actionNode.getActionType())) {
-            Logger.d("current response is a INTENT EXIT - Finish Activity");
-            AppTypeRecorder.getInstance().getAppStateManager().finishActivity();
-        }
-
-        if (ActionBean.TYPE_NORMAL.equals(actionNode.getActionType())) {
-
-            if (actionNode.getVoice() != null) {
-                VoiceAction.getInstance().startAction(actionNode.getVoice());
-            }
-            if (actionNode.getMedia() != null) {
-                MediaAction.getInstance().startAction(actionNode.getMedia());
-            }
-        }
-
+    public interface ResponseNullCallback{
+        void onResponseNull();
     }
-
 
 }

@@ -1,10 +1,16 @@
 package com.rokid.cloudappclient.http;
 
+import com.rokid.cloudappclient.http.BaseUrlConfig;
+
+import java.io.UnsupportedEncodingException;
+import java.security.GeneralSecurityException;
+import java.security.MessageDigest;
+import java.util.Map;
+
 
 /**
  * Created by fanfeng on 2017/5/11.
  */
-
 public class BaseUrlConfig {
 
     public static final String BASE_URL = "https://apigwrest.open.rokid.com";

@@ -24,6 +24,7 @@ public class BaseParameter {
     private static final String PARAM_KEY_SIGN = "sign";
     private static final String PARAM_KEY_SECRET = "secret";
 
+
     Map<String, String> params;
 
     public void putUnEmptyParam(String key, String value) {

@@ -21,7 +21,6 @@ import com.rokid.cloudappclient.util.Logger;
  * Author: fengfan
  * Modified: 2017/06/01
  */
-
 public abstract class BaseActivity extends Activity implements TTSSpeakInterface, CutAppStateManager.TaskProcessCallback {
 
     IntentParser intentParser = new IntentParser(this);
@@ -121,3 +120,4 @@ public abstract class BaseActivity extends Activity implements TTSSpeakInterface
     public abstract BaseAppStateManager getAppStateManager();
 
 }
+

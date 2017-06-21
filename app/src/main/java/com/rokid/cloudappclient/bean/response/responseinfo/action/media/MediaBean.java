@@ -55,7 +55,7 @@ public class MediaBean extends BaseBean {
     }
 
     public boolean isActionValid() {
-        return !TextUtils.isEmpty(action) && (ACTION_PLAY.equals(action) || ACTION_PAUSE.equals(action));
+        return !TextUtils.isEmpty(action);
     }
 
     public boolean isItemValid() {
