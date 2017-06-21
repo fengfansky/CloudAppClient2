@@ -9,8 +9,6 @@ import com.rokid.cloudappclient.bean.ActionNode;
 import com.rokid.cloudappclient.bean.CommonResponse;
 import com.rokid.cloudappclient.bean.response.CloudActionResponse;
 import com.rokid.cloudappclient.bean.response.responseinfo.action.ActionBean;
-import com.rokid.cloudappclient.bean.transfer.TransferMediaBean;
-import com.rokid.cloudappclient.bean.transfer.TransferVoiceBean;
 import com.rokid.cloudappclient.proto.SendEvent;
 import com.rokid.cloudappclient.reporter.BaseReporter;
 import com.rokid.cloudappclient.tts.TTSSpeakInterface;
@@ -18,7 +16,6 @@ import com.rokid.cloudappclient.util.AppTypeRecorder;
 import com.rokid.cloudappclient.util.CommonResponseHelper;
 import com.rokid.cloudappclient.util.Logger;
 import com.squareup.okhttp.Response;
-
 import java.io.IOException;
 
 /**
@@ -72,12 +69,12 @@ public class ResponseParser {
             eventResponse = SendEvent.SendEventResponse.parseFrom(response.body().source().readByteArray());
         } catch (IOException e) {
             e.printStackTrace();
-            AppTypeRecorder.getInstance().getAppStateManager().onEvnetErrorCallback(event, BaseReporter.ReporterResponseCallBack.ERROR_RESPONSE_NULL);
+            AppTypeRecorder.getInstance().getAppStateManager().onEventErrorCallback(event, BaseReporter.ReporterResponseCallBack.ERROR_RESPONSE_NULL);
         }
 
         if (eventResponse == null) {
             Logger.d(" eventResponse is null");
-            AppTypeRecorder.getInstance().getAppStateManager().onEvnetErrorCallback(event, BaseReporter.ReporterResponseCallBack.ERROR_RESPONSE_NULL);
+            AppTypeRecorder.getInstance().getAppStateManager().onEventErrorCallback(event, BaseReporter.ReporterResponseCallBack.ERROR_RESPONSE_NULL);
             return;
         }
 
@@ -85,7 +82,7 @@ public class ResponseParser {
 
         if (eventResponse.getResponse() == null) {
             Logger.d("eventResponse is null !");
-            AppTypeRecorder.getInstance().getAppStateManager().onEvnetErrorCallback(event, BaseReporter.ReporterResponseCallBack.ERROR_RESPONSE_NULL);
+            AppTypeRecorder.getInstance().getAppStateManager().onEventErrorCallback(event, BaseReporter.ReporterResponseCallBack.ERROR_RESPONSE_NULL);
             return;
         }
 
@@ -93,7 +90,7 @@ public class ResponseParser {
 
         if (cloudResponse == null) {
             Logger.d("cloudResponse parsed null !");
-            AppTypeRecorder.getInstance().getAppStateManager().onEvnetErrorCallback(event, BaseReporter.ReporterResponseCallBack.ERROR_RESPONSE_NULL);
+            AppTypeRecorder.getInstance().getAppStateManager().onEventErrorCallback(event, BaseReporter.ReporterResponseCallBack.ERROR_RESPONSE_NULL);
             return;
         }
         if (TextUtils.isEmpty(cloudResponse.getAppId())) {
@@ -132,10 +129,10 @@ public class ResponseParser {
         if (ActionBean.TYPE_NORMAL.equals(actionNode.getActionType())) {
 
             if (actionNode.getVoice() != null) {
-                VoiceAction.getInstance().startAction(new TransferVoiceBean(actionNode.getVoice()));
+                VoiceAction.getInstance().startAction(actionNode.getVoice());
             }
             if (actionNode.getMedia() != null) {
-                MediaAction.getInstance().startAction(new TransferMediaBean(actionNode.getMedia()));
+                MediaAction.getInstance().startAction(actionNode.getMedia());
             }
         }
 

@@ -5,7 +5,7 @@ import android.text.TextUtils;
 import com.rokid.cloudappclient.util.Logger;
 import com.rokid.cloudappclient.util.MD5Utils;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -24,8 +24,7 @@ public class BaseParameter {
     private static final String PARAM_KEY_SIGN = "sign";
     private static final String PARAM_KEY_SECRET = "secret";
 
-
-    Map<String, String> params = new HashMap<>();
+    Map<String, String> params;
 
     public void putUnEmptyParam(String key, String value) {
         if (TextUtils.isEmpty(key) || TextUtils.isEmpty(value)) {
@@ -49,6 +48,8 @@ public class BaseParameter {
         }
 
         Logger.d(" deviceMap is " + deviceMap.toString());
+
+        params = new LinkedHashMap<>();
 
         putUnEmptyParam(PARAM_KEY_KEY, deviceMap.get(PARAM_KEY_KEY));
         putUnEmptyParam(PARAM_KEY_DEVICE_TYPE_ID, deviceMap.get(PARAM_KEY_DEVICE_TYPE_ID));

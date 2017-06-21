@@ -8,7 +8,7 @@ public interface MediaStateCallback {
 
     void onMediaStart();
 
-    void onMediaPause();
+    void onMediaPause(int position);
 
     void onMediaResume();
 

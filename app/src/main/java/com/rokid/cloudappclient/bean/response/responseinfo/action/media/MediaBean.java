@@ -19,25 +19,12 @@ public class MediaBean extends BaseBean {
      */
     public static final String ACTION_PLAY = "PLAY";
     public static final String ACTION_PAUSE = "PAUSE";
+    public static final String ACTION_STOP = "STOP";
     public static final String ACTION_RESUME = "RESUME";
 
-    public static final String BEHAVIOUR_APPEND = "APPEND";
-    public static final String BEHAVIOUR_REPLACE_ALL = "REPLACE_ALL";
-    public static final String BEHAVIOUR_REPLACE_APPEND = "REPLACE_APPEND";
-    public static final String BEHAVIOUR_CLEAR = "CLEAR";
-
-    private boolean needEventCallback;
     private String action;
     private String behaviour;
     private MediaItemBean item;
-
-    public boolean isNeedEventCallback() {
-        return needEventCallback;
-    }
-
-    public void setNeedEventCallback(boolean needEventCallback) {
-        this.needEventCallback = needEventCallback;
-    }
 
     public String getAction() {
         return action;
@@ -64,17 +51,11 @@ public class MediaBean extends BaseBean {
     }
 
     public boolean isValid() {
-        return isActionValid() && isBehaviourValid() && isItemValid();
+        return isActionValid() && isItemValid();
     }
 
     public boolean isActionValid() {
         return !TextUtils.isEmpty(action) && (ACTION_PLAY.equals(action) || ACTION_PAUSE.equals(action));
-    }
-
-    public boolean isBehaviourValid() {
-        return !TextUtils.isEmpty(behaviour)
-                && (BEHAVIOUR_APPEND.equals(behaviour) || BEHAVIOUR_REPLACE_ALL.equals(behaviour)
-                || BEHAVIOUR_REPLACE_APPEND.equals(behaviour) || BEHAVIOUR_CLEAR.equals(behaviour));
     }
 
     public boolean isItemValid() {

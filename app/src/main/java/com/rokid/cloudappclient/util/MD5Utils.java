@@ -1,7 +1,5 @@
 package com.rokid.cloudappclient.util;
 
-import com.rokid.cloudappclient.http.BaseUrlConfig;
-
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
@@ -19,8 +17,6 @@ public class MD5Utils {
 
     private static final String SECRET_KEY = "secret";
 
-    private static final String SECRET_VALUE_DEV = "rokid_test_secret";
-
     public static String generateMD5(Map<String, String> params, String secretValue) {
 
         String[] keys = params.keySet().toArray(new String[0]);
@@ -33,13 +29,7 @@ public class MD5Utils {
             query.append(key).append("=").append(value).append("&");
         }
 
-        query.append(SECRET_KEY).append("=");
-
-        if (BaseUrlConfig.isDev){
-            query.append(SECRET_VALUE_DEV);
-        }else {
-            query.append(secretValue);
-        }
+        query.append(SECRET_KEY).append("=").append(secretValue);
 
         Logger.d("query str " + query.toString());
         // 第三步：使用MD5加密

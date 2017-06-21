@@ -9,11 +9,11 @@ public class VoiceReporter extends BaseReporter {
     public static String START = "Voice.STARTED";
     public static String FINISHED = "Voice.FINISHED";
 
-    public VoiceReporter(String event){
-        super(event);
+    public VoiceReporter(String appId, String event){
+        super(appId, event);
     }
 
-    public VoiceReporter(String event, String extra) {
-        super(event, extra);
+    public VoiceReporter(String appId, String event, String extra) {
+        super(appId, event, extra);
     }
 }

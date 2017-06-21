@@ -6,14 +6,13 @@ import android.text.TextUtils;
 import com.rokid.cloudappclient.RKCloudAppApplication;
 import com.rokid.cloudappclient.bean.response.responseinfo.action.media.MediaBean;
 import com.rokid.cloudappclient.bean.response.responseinfo.action.media.MediaItemBean;
-import com.rokid.cloudappclient.bean.transfer.TransferMediaBean;
 import com.rokid.cloudappclient.player.RKAudioPlayer;
 import com.rokid.cloudappclient.util.AppTypeRecorder;
 import com.rokid.cloudappclient.util.Logger;
 
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 
-public class MediaAction extends BaseAction<TransferMediaBean> {
+public class MediaAction extends BaseAction<MediaBean> {
 
     private static volatile MediaAction mediaAction;
 
@@ -35,7 +34,6 @@ public class MediaAction extends BaseAction<TransferMediaBean> {
         rkAudioPlayer.setmOnPreparedListener(new IMediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(IMediaPlayer mp) {
-                Logger.d("MediaAction startAction onPrepared");
                 AppTypeRecorder.getInstance().getAppStateManager().onMediaStart();
             }
         });
@@ -51,14 +49,13 @@ public class MediaAction extends BaseAction<TransferMediaBean> {
         rkAudioPlayer.setmOnCompletionListener(new IMediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(IMediaPlayer mp) {
-                Logger.d("MediaAction startAction onCompletion");
                 AppTypeRecorder.getInstance().getAppStateManager().onMediaStop();
             }
         });
         rkAudioPlayer.setmOnPausedListener(new IMediaPlayer.OnPausedListener() {
             @Override
             public void onPaused(IMediaPlayer mp) {
-                AppTypeRecorder.getInstance().getAppStateManager().onMediaPause();
+                AppTypeRecorder.getInstance().getAppStateManager().onMediaPause((int) mp.getCurrentPosition());
             }
         });
 
@@ -74,21 +71,10 @@ public class MediaAction extends BaseAction<TransferMediaBean> {
         return mediaAction;
     }
 
-
     @Override
-    public synchronized void startAction(TransferMediaBean transfer) {
-
-        if (null == transfer || !transfer.isValid()) {
-            Logger.d("Now have a media in running or TransferMediaBean is empty.");
-            return;
-        }
-        mTransfer = transfer;
-        Logger.d(" startAction " + mTransfer.toString());
-
-        MediaBean mediaBean = mTransfer.getMediaBean();
-
-        if (mediaBean == null) {
-            Logger.d("MediaAction startAction mediaBean null!");
+    public synchronized void startAction(MediaBean mediaBean) {
+        if (mediaBean == null || !mediaBean.isValid()) {
+            Logger.d("MediaAction startAction mediaBean invalidate!");
             return;
         }
 
@@ -122,18 +108,12 @@ public class MediaAction extends BaseAction<TransferMediaBean> {
     }
 
     @Override
-    public synchronized void resumeAction() {
-        resumePlay();
-    }
-
-    @Override
     public synchronized void stopAction() {
-        Logger.d("stop play media");
         stopPlay();
     }
 
-    private synchronized void startPlay(MediaBean mediaBean) {
-        if (rkAudioPlayer != null) {
+    private void startPlay(MediaBean mediaBean) {
+        if (rkAudioPlayer != null && mediaBean != null) {
             MediaItemBean mediaBeanItem = mediaBean.getItem();
             if (mediaBeanItem == null) {
                 Logger.d("start play media mediaBeanItem null!");
@@ -147,7 +127,7 @@ public class MediaAction extends BaseAction<TransferMediaBean> {
                 return;
             }
 
-            Logger.d("start play media");
+            Logger.d("start play media url : " + url);
             rkAudioPlayer.setVideoURI(Uri.parse(url));
             rkAudioPlayer.seekTo(mediaBeanItem.getOffsetInMilliseconds());
             rkAudioPlayer.start();
@@ -168,7 +148,7 @@ public class MediaAction extends BaseAction<TransferMediaBean> {
     }
 
     private void resumePlay() {
-        if (rkAudioPlayer != null && !rkAudioPlayer.isPlaying()) {
+        if (rkAudioPlayer != null && !rkAudioPlayer.isPlaying() ) {
             rkAudioPlayer.start();
             AppTypeRecorder.getInstance().getAppStateManager().onMediaResume();
         }

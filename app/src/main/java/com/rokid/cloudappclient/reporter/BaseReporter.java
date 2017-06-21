@@ -6,12 +6,10 @@ import com.rokid.cloudappclient.http.HttpClientWrapper;
 import com.rokid.cloudappclient.proto.SendEvent;
 import com.rokid.cloudappclient.proto.SendEventCreator;
 import com.rokid.cloudappclient.util.AppTypeRecorder;
-import com.rokid.cloudappclient.util.DeviceInfoUtil;
 import com.rokid.cloudappclient.util.Logger;
 import com.squareup.okhttp.Response;
 
 import java.io.IOException;
-import java.net.SocketTimeoutException;
 
 
 /**
@@ -20,15 +18,18 @@ import java.net.SocketTimeoutException;
 
 public abstract class BaseReporter implements Runnable {
 
+    String appId;
     String event;
     String extra;
 
-    public BaseReporter(String event){
+    public BaseReporter(String appId, String event){
+        this.appId = appId;
         this.event = event;
         this.extra = "{}";
     }
 
-    public BaseReporter(String event, String extra) {
+    public BaseReporter(String appId, String event, String extra) {
+        this.appId = appId;
         this.event = event;
         this.extra = extra;
     }
@@ -69,24 +70,29 @@ public abstract class BaseReporter implements Runnable {
         }
 
         SendEvent.SendEventRequest eventRequest =
-                SendEventCreator.generateSendEventRequest(DeviceInfoUtil.getDeviceAppId(), event, extra);
+                SendEventCreator.generateSendEventRequest(appId, event, extra);
+        Logger.d(" eventRequest : " + eventRequest.toString());
         BaseParameter baseParameter = new BaseParameter();
-        Response response = HttpClientWrapper.getInstance().sendRequest(BaseUrlConfig.getUrl(), baseParameter, eventRequest);
-
-        if (response == null || response.body() == null) {
-            AppTypeRecorder.getInstance().getAppStateManager().onEvnetErrorCallback(event, ReporterResponseCallBack.ERROR_RESPONSE_NULL);
-            return;
-        }
-
-        AppTypeRecorder.getInstance().getAppStateManager().responseCallback(event, response);
+        Response response = null;
         try {
-            response.body().close();
-        } catch (SocketTimeoutException socketTimeoutException) {
-            AppTypeRecorder.getInstance().getAppStateManager().onEvnetErrorCallback(event, ReporterResponseCallBack.ERROR_CONNNECTION_TIMEOUT);
+            response = HttpClientWrapper.getInstance().sendRequest(BaseUrlConfig.getUrl(), baseParameter, eventRequest);
         } catch (IOException e) {
-            AppTypeRecorder.getInstance().getAppStateManager().onEvnetErrorCallback(event, ReporterResponseCallBack.ERROR_IOEXCEPTION);
-            e.printStackTrace();
+            AppTypeRecorder.getInstance().getAppStateManager().onEventErrorCallback(event, BaseReporter.ReporterResponseCallBack.ERROR_IOEXCEPTION);
+            Logger.e(" response callback exception !");
+        }finally {
+            try {
+                if (response != null && response.body() != null){
+                    AppTypeRecorder.getInstance().getAppStateManager().responseCallback(event, response);
+                    response.body().close();
+                }else {
+                    AppTypeRecorder.getInstance().getAppStateManager().onEventErrorCallback(event, ReporterResponseCallBack.ERROR_RESPONSE_NULL);
+                }
+            } catch (IOException e) {
+                Logger.e(" response close exception !");
+            }
         }
+
+
     }
 
     public interface ReporterResponseCallBack {
@@ -95,7 +101,7 @@ public abstract class BaseReporter implements Runnable {
         int ERROR_RESPONSE_NULL = 1;
         int ERROR_IOEXCEPTION = 2;
 
-        void onEvnetErrorCallback(String event, int errorCode);
+        void onEventErrorCallback(String event, int errorCode);
 
         void responseCallback(String event, Response response);
     }

@@ -1,7 +1,6 @@
 package com.rokid.cloudappclient.http;
 
 import com.rokid.cloudappclient.proto.SendEvent;
-import com.rokid.cloudappclient.util.Logger;
 import com.squareup.okhttp.*;
 import com.squareup.okhttp.OkHttpClient;
 
@@ -35,14 +34,9 @@ public class HttpClientWrapper {
         return SingleHolder.instance;
     }
 
-    public Response sendRequest(String url, BaseParameter params, SendEvent.SendEventRequest eventRequest) {
+    public Response sendRequest(String url, BaseParameter params, SendEvent.SendEventRequest eventRequest) throws IOException {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        try {
-            eventRequest.writeTo(byteArrayOutputStream);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        Logger.d("authorization " + params.getAuthorization());
+        eventRequest.writeTo(byteArrayOutputStream);
         Request request = new Request.Builder()
                 .url(url)
                 .header("Accept", "text/plain")
@@ -52,18 +46,7 @@ public class HttpClientWrapper {
                 .post(RequestBody.create(MediaType.parse(CONTENT_TYPE)
                         , byteArrayOutputStream.toByteArray()))
                 .build();
-        Response response = null;
-        try {
-            response = okHttpClient.newCall(request).execute();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }finally {
-            try {
-                response.body().close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        Response response = okHttpClient.newCall(request).execute();
 
         return response;
     }

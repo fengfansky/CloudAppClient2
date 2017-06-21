@@ -5,6 +5,8 @@ import android.text.TextUtils;
 import com.rokid.cloudappclient.bean.ActionNode;
 import com.rokid.cloudappclient.action.MediaAction;
 import com.rokid.cloudappclient.action.VoiceAction;
+import com.rokid.cloudappclient.bean.response.responseinfo.action.media.MediaBean;
+import com.rokid.cloudappclient.bean.response.responseinfo.action.voice.VoiceBean;
 import com.rokid.cloudappclient.parser.ResponseParser;
 import com.rokid.cloudappclient.reporter.BaseReporter;
 import com.rokid.cloudappclient.reporter.MediaReporter;
@@ -22,6 +24,8 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
 
     public ActionNode mActionNode;
     public String mAppId;
+    public MediaBean currentMediaBean;
+    public VoiceBean currentVoiceBean;
 
     //表明当此次返回的action执行完后 CloudAppClient 是否要退出，同时，当 shouldEndSession 为 true 时，CloudAppClient 将会忽略 EventRequests，即在action执行过程中不会产生 EventRequest。
     public boolean shouldEndSession;
@@ -47,6 +51,8 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
             this.mActionNode = actionNode;
             this.mAppId = actionNode.getAppId();
             this.shouldEndSession = actionNode.isShouldEndSession();
+            this.currentMediaBean = actionNode.getMedia();
+            this.currentVoiceBean = actionNode.getVoice();
         }
     }
 
@@ -71,29 +77,39 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
 
     @Override
     public void onAppResume() {
-        Logger.d("form: " + getFormType() + " onAppResume storeAppState ");
+        Logger.d("form: " + getFormType() + " onAppResume ");
         AppTypeRecorder.getInstance().storeAppStateManager(this);
         currentAppState = APP_STATE.APP_RESUME;
     }
 
     @Override
     public void onMediaStart() {
+        Logger.d("form: " + getFormType() + " onMediaStart !");
         currentMediaState = MEDIA_STATE.MEDIA_PLAY;
-        reporterManager.executeReporter(new MediaReporter(MediaReporter.START));
+        reporterManager.executeReporter(new MediaReporter(mAppId, MediaReporter.START));
     }
 
     @Override
-    public void onMediaPause() {
+    public void onMediaPause(int position) {
+        Logger.d("form: " + getFormType() + " onMediaPause ! position : " + position);
         currentMediaState = MEDIA_STATE.MEDIA_PAUSED;
+        if (mActionNode != null && currentMediaBean!=null && currentMediaBean.isValid()){
+            currentMediaBean.getItem().setOffsetInMilliseconds(position);
+        }
     }
 
     @Override
     public void onMediaResume() {
+        Logger.d("form: " + getFormType() + " onMediaResume ! ");
         currentMediaState = MEDIA_STATE.MEDIA_RESUME;
+        if (mActionNode != null && currentMediaBean != null && currentMediaBean.isValid()){
+            mActionNode.getMedia().getItem().getOffsetInMilliseconds();
+        }
     }
 
     @Override
     public void onMediaStop() {
+        Logger.d("form: " + getFormType() + " onMediaStop !");
         currentMediaState = MEDIA_STATE.MEDIA_STOP;
         checkAppState();
     }
@@ -102,20 +118,22 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
     public void onMediaError() {
         Logger.d("form: " + getFormType() + " onMediaError !");
         currentMediaState = MEDIA_STATE.MEDIA_ERROR;
-        reporterManager.executeReporter(new MediaReporter(MediaReporter.ERROR));
+        reporterManager.executeReporter(new MediaReporter(mAppId, MediaReporter.ERROR));
         checkAppState();
     }
 
     @Override
     public void onVoiceStart() {
+        Logger.d("form: " + getFormType() + " onVoiceStart !");
         currentVideoState = VOICE_STATE.VOICE_START;
-        reporterManager.executeReporter(new VoiceReporter(VoiceReporter.START));
+        reporterManager.executeReporter(new VoiceReporter(mAppId, VoiceReporter.START));
     }
 
     @Override
     public void onVoiceStop() {
+        Logger.d("form: " + getFormType() + " onVoiceStop !");
         currentVideoState = VOICE_STATE.VOICE_STOP;
-        reporterManager.executeReporter(new MediaReporter(VoiceReporter.FINISHED));
+        reporterManager.executeReporter(new MediaReporter(mAppId, VoiceReporter.FINISHED));
         checkAppState();
     }
 
@@ -136,19 +154,21 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
 
     @Override
     public void onVoiceCancled() {
+        Logger.d("form: " + getFormType() + " onVoiceCancled !");
         currentVideoState = VOICE_STATE.VOICE_CANCLED;
     }
 
     @Override
     public void onVoiceError() {
+        Logger.d("form: " + getFormType() + " onVoiceError !");
         currentVideoState = VOICE_STATE.VOICE_ERROR;
-        reporterManager.executeReporter(new VoiceReporter(VoiceReporter.FINISHED));
+        reporterManager.executeReporter(new VoiceReporter(mAppId, VoiceReporter.FINISHED));
         checkAppState();
     }
 
     @Override
-    public void onEvnetErrorCallback(String event, int errorCode) {
-        Logger.d("form: " + getFormType() + "  onEvnetErrorCallback " + " event : " + event + " errorCode " + errorCode);
+    public void onEventErrorCallback(String event, int errorCode) {
+        Logger.d("form: " + getFormType() + "  onEventErrorCallback " + " event : " + event + " errorCode " + errorCode);
         if (TextUtils.isEmpty(event)) {
             Logger.d(" event is null !");
             return;

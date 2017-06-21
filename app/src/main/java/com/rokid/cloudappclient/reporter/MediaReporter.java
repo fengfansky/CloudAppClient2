@@ -12,11 +12,11 @@ public class MediaReporter extends BaseReporter {
     public static final String NEAR_FINISH = "Media.NEAR_FINISH";
     public static final String ERROR = "Media.ERROR";
 
-    public MediaReporter(String event){
-        super(event);
+    public MediaReporter(String appId, String event){
+        super(appId, event);
     }
 
-    public MediaReporter(String event, String extra) {
-        super(event, extra);
+    public MediaReporter(String appId, String event, String extra) {
+        super(appId, event, extra);
     }
 }

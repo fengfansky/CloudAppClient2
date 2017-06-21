@@ -7,8 +7,6 @@ package com.rokid.cloudappclient.http;
 
 public class BaseUrlConfig {
 
-
-
     public static final String BASE_URL = "https://apigwrest.open.rokid.com";
 
     public static final String BASE_URL_TEST = "https://apigwrest-dev.open.rokid.com";
