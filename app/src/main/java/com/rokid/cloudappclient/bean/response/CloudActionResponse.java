@@ -76,16 +76,23 @@ public class CloudActionResponse {
             return false;
         }
 
+        if (getResponse().getAction() == null){
+            Logger.d("action is null !");
+            return false;
+        }
+
         // check response form
-        String form = getResponse().getAction().getForm().toLowerCase();
+        String form = getResponse().getAction().getForm();
 
         if (TextUtils.isEmpty(form)) {
             Logger.i("checkCloudAppAction: form for response is invalid");
             return false;
         }
 
-        if (!form.equals(ActionBean.FORM_SCENE) && !form.equals(ActionBean.FORM_CUT)) {
-            Logger.i("checkCloudAppAction: form not a scene !" + form );
+        String formLow = form.toLowerCase();
+
+        if (!formLow.equals(ActionBean.FORM_SCENE) && !formLow.equals(ActionBean.FORM_CUT)) {
+            Logger.i("checkCloudAppAction: form not a scene !" + formLow );
             return false;
         }
 
