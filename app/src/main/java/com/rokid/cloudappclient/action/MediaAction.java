@@ -112,13 +112,15 @@ public class MediaAction extends BaseAction<MediaBean> {
         stopPlay();
     }
 
-    private void startPlay(MediaBean mediaBean) {
+    public void startPlay(MediaBean mediaBean) {
         if (rkAudioPlayer != null && mediaBean != null) {
             MediaItemBean mediaBeanItem = mediaBean.getItem();
             if (mediaBeanItem == null) {
                 Logger.d("start play media mediaBeanItem null!");
                 return;
             }
+
+            Logger.d("play mediaBean : " + mediaBean);
 
             String url = mediaBeanItem.getUrl();
 
@@ -129,8 +131,8 @@ public class MediaAction extends BaseAction<MediaBean> {
 
             Logger.d("start play media url : " + url);
             rkAudioPlayer.setVideoURI(Uri.parse(url));
-            rkAudioPlayer.seekTo(mediaBeanItem.getOffsetInMilliseconds());
             rkAudioPlayer.start();
+            rkAudioPlayer.seekTo(mediaBeanItem.getOffsetInMilliseconds());
         }
     }
 

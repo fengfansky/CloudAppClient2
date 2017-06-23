@@ -8,7 +8,6 @@ import com.rokid.cloudappclient.R;
 import com.rokid.cloudappclient.parser.IntentParser;
 import com.rokid.cloudappclient.parser.ResponseParser;
 import com.rokid.cloudappclient.state.BaseAppStateManager;
-import com.rokid.cloudappclient.state.CutAppStateManager;
 import com.rokid.cloudappclient.tts.TTSHelper;
 import com.rokid.cloudappclient.tts.TTSSpeakInterface;
 import com.rokid.cloudappclient.util.AppTypeRecorder;
@@ -21,7 +20,7 @@ import com.rokid.cloudappclient.util.Logger;
  * Author: fengfan
  * Modified: 2017/06/01
  */
-public abstract class BaseActivity extends Activity implements TTSSpeakInterface, CutAppStateManager.TaskProcessCallback {
+public abstract class BaseActivity extends Activity implements TTSSpeakInterface, BaseAppStateManager.TaskProcessCallback {
 
     IntentParser intentParser = new IntentParser(this);
     BaseAppStateManager appStateManager = getAppStateManager();

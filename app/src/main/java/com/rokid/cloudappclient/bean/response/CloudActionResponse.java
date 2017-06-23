@@ -122,12 +122,6 @@ public class CloudActionResponse {
             return false;
         }
 
-        // check response action elements
-        if (!checkActionElements(getResponse())) {
-            Logger.i("checkCloudAppAction: elements are invalid");
-            return false;
-        }
-
         return true;
     }
 

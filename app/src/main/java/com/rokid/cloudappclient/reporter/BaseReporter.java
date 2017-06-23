@@ -6,9 +6,9 @@ import com.rokid.cloudappclient.http.HttpClientWrapper;
 import com.rokid.cloudappclient.proto.SendEvent;
 import com.rokid.cloudappclient.proto.SendEventCreator;
 import com.rokid.cloudappclient.util.AppTypeRecorder;
-import com.rokid.cloudappclient.util.DeviceInfoUtil;
 import com.rokid.cloudappclient.util.Logger;
-import com.android.okhttp.Response;
+//import com.android.okhttp.Response;
+import com.squareup.okhttp.Response;
 
 import java.io.IOException;
 

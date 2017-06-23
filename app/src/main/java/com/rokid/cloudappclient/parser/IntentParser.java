@@ -61,11 +61,6 @@ public class IntentParser {
             return;
         }
 
-        if (!slots.containsKey(KEY_DEVICE_INFO)) {
-            Logger.i("NLP slots has no DEVICE_INFO");
-            ttsSpeakInterface.speakNLPDataEmptyErrorTTS();
-            return;
-        }
 
         if (!slots.containsKey(KEY_COMMON_RESPONSE)) {
             Logger.i("NLP slots has no COMMON_RESPONSE info");

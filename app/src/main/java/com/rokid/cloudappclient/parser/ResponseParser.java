@@ -13,7 +13,8 @@ import com.rokid.cloudappclient.tts.TTSSpeakInterface;
 import com.rokid.cloudappclient.util.AppTypeRecorder;
 import com.rokid.cloudappclient.util.CommonResponseHelper;
 import com.rokid.cloudappclient.util.Logger;
-import com.android.okhttp.Response;
+//import com.android.okhttp.Response;
+import com.squareup.okhttp.Response;
 import java.io.IOException;
 
 /**

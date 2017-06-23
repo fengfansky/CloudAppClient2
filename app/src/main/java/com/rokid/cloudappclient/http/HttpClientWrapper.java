@@ -1,10 +1,7 @@
 package com.rokid.cloudappclient.http;
-import com.rokid.cloudappclient.reporter.BaseReporter;
-import com.rokid.cloudappclient.util.AppTypeRecorder;
 import com.rokid.cloudappclient.proto.SendEvent;
-import com.rokid.cloudappclient.util.Logger;
-import com.android.okhttp.*;
-import com.android.okhttp.OkHttpClient;
+import com.squareup.okhttp.*;
+//import com.android.okhttp.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

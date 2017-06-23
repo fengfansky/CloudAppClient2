@@ -15,7 +15,8 @@ import com.rokid.cloudappclient.reporter.ReporterManager;
 import com.rokid.cloudappclient.reporter.VoiceReporter;
 import com.rokid.cloudappclient.util.AppTypeRecorder;
 import com.rokid.cloudappclient.util.Logger;
-import com.android.okhttp.Response;
+import com.squareup.okhttp.Response;
+//import com.android.okhttp.Response;
 
 /**
  * Created by fanfeng on 2017/6/16.

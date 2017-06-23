@@ -93,12 +93,12 @@ public class TTSHelper {
             return;
         }
 
-        Logger.d(" speak TTS ttiId " + ttsId);
         if (ttsId > 0) {
             mRktts.stop(ttsId);
         }
 
         ttsId = mRktts.speak(ttsContent, rkttsCallback);
+        Logger.d(" speak TTS ttiId " + ttsId);
     }
 
     private RKTTSCallback rkttsCallback = new RKTTSCallback() {
@@ -114,8 +114,13 @@ public class TTSHelper {
             super.onCancel(id);
             Logger.i("TTS is onStop - id: " + id + ", current id: " + ttsId);
 
+            if (id != ttsId) {
+                Logger.i("The new tts is already speaking, previous tts stop should not ttsCallback");
+                return;
+            }
+
+            ttsId = STOP;
             AppTypeRecorder.getInstance().getAppStateManager().onVoiceCancled();
-            speakTTSFromBufferQueue();
         }
 
         @Override
@@ -123,7 +128,6 @@ public class TTSHelper {
             super.onComplete(id);
             Logger.i("TTS is onComplete - id: " + id);
             AppTypeRecorder.getInstance().getAppStateManager().onVoiceStop();
-            speakTTSFromBufferQueue();
         }
 
         @Override
@@ -132,7 +136,6 @@ public class TTSHelper {
             Logger.i("tts onError - id: " + id + ", error: " + err);
             ttsId = STOP;
             AppTypeRecorder.getInstance().getAppStateManager().onVoiceError();
-            speakTTSFromBufferQueue();
         }
     };
 

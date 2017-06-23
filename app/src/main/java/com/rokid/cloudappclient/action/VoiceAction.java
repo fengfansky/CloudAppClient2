@@ -38,13 +38,14 @@ public class VoiceAction extends BaseAction<VoiceBean> {
 
     @Override
     public synchronized void pauseAction() {
-
+        Logger.d("pause play voice");
+        TTSHelper.getInstance().stopTTS();
     }
 
 
     @Override
     public synchronized void stopAction() {
-        Logger.d("stop play voice");
+        Logger.d("stopAction stop play voice");
         TTSHelper.getInstance().stopTTS();
     }
 
