@@ -8,7 +8,9 @@ import com.rokid.cloudappclient.bean.ActionNode;
 
 public interface AppStateCallback {
 
-    void onNewActionNode(ActionNode actionNode);
+    void onNewIntentActionNode(ActionNode actionNode);
+
+    void onNewEventActionNode(ActionNode actionNode);
 
     ActionNode getCurrentActionNode();
 
