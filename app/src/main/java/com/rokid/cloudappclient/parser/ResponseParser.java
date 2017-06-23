@@ -48,12 +48,8 @@ public class ResponseParser {
         ActionNode actionNode = CommonResponseHelper.generateActionNode(commonResponse);
 
         // update current application info for further use. App info consists: DOMAIN and SHOT
-        if (actionNode == null) {
-            Logger.d("actionNode is null!");
-            appStateManager.onResponseNull();
-        }else {
-            appStateManager.onNewActionNode(actionNode);
-        }
+        appStateManager.onNewIntentActionNode(actionNode);
+
     }
 
     public void parseSendEventResponse(String event, Response response) {
@@ -97,18 +93,8 @@ public class ResponseParser {
         commonResponse.setAction(cloudResponse);
         ActionNode actionNode = CommonResponseHelper.generateActionNode(commonResponse);
 
-        String lastAppId = appStateManager.getAppId();
-        //filter the cloudResponse appId that not the same with last app
-        if (!cloudResponse.getAppId().equals(lastAppId)) {
-            Logger.d("eventResponse cloudAppId is not the same with currentAppId ! cloudAppId : " + cloudResponse.getAppId() + " currentAppId : " + lastAppId);
-            appStateManager.onResponseNull();
-        }else {
-            appStateManager.onNewActionNode(actionNode);
-        }
-    }
+        appStateManager.onNewEventActionNode(actionNode);
 
-    public interface ResponseNullCallback{
-        void onResponseNull();
     }
 
 }
