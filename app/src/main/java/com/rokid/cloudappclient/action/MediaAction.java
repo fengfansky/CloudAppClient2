@@ -18,12 +18,6 @@ public class MediaAction extends BaseAction<MediaBean> {
 
     private RKAudioPlayer rkAudioPlayer;
 
-    private static final String STREAMING_PLAY = "PLAY";
-    private static final String STREAMING_PAUSE = "PAUSE";
-    private static final String STREAMING_RESUME = "RESUME";
-    private static final String STREAMING_FORWARD = "FORWARD";
-    private static final String STREAMING_BACKWARD = "BACKWARD";
-
     private MediaAction() {
         initRKAudioPlayer();
     }
@@ -73,28 +67,38 @@ public class MediaAction extends BaseAction<MediaBean> {
 
     @Override
     public synchronized void startAction(MediaBean mediaBean) {
-        if (mediaBean == null || !mediaBean.isValid()) {
-            Logger.d("MediaAction startAction mediaBean invalidate!");
+        Logger.d("start play media");
+
+        if (mediaBean == null ) {
+            Logger.d("MediaAction startAction mediaBean null!");
             return;
         }
 
         String action = mediaBean.getAction();
 
+        if (TextUtils.isEmpty(action)){
+            Logger.d("action is null!");
+            return;
+        }
+
         Logger.d(" startAction action : " + action);
         switch (action) {
-            case STREAMING_PLAY:
+            case MediaBean.ACTION_PLAY:
                 startPlay(mediaBean);
                 break;
-            case STREAMING_PAUSE:
+            case MediaBean.ACTION_PAUSE:
                 pausePlay();
                 break;
-            case STREAMING_RESUME:
+            case MediaBean.ACTION_RESUME:
                 resumePlay();
                 break;
-            case STREAMING_FORWARD:
+            case MediaBean.ACTION_STOP:
+                stopPlay();
+                break;
+            case MediaBean.ACTION_FORWARD:
                 forward();
                 break;
-            case STREAMING_BACKWARD:
+            case MediaBean.ACTION_BACKWARD:
                 backward();
                 break;
             default:

@@ -1,7 +1,6 @@
 package com.rokid.cloudappclient.bean.response.responseinfo.action.voice;
 
-import com.rokid.cloudappclient.bean.base.BaseBean;
-import com.rokid.cloudappclient.util.Logger;
+import com.rokid.cloudappclient.bean.response.responseinfo.action.BaseActionBean;
 
 /**
  * Defines the voice interaction of CloudApps, including TTS and Confirmation.
@@ -9,7 +8,7 @@ import com.rokid.cloudappclient.util.Logger;
  * Author: xupan.shi
  * Version: V0.1 2017/3/9
  */
-public class VoiceBean extends BaseBean {
+public class VoiceBean extends BaseActionBean {
 
     private VoiceItemBean item;
 
@@ -22,7 +21,7 @@ public class VoiceBean extends BaseBean {
     }
 
     public boolean isValid() {
-        return null != item && item.isValid();
+        return null != item && item.isValid() && isActionValid();
     }
 
 }

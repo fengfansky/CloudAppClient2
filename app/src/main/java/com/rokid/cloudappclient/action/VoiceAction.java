@@ -24,17 +24,41 @@ public class VoiceAction extends BaseAction<VoiceBean> {
     public synchronized void startAction(VoiceBean actionBean) {
         Logger.d("start play voice");
 
-        if (actionBean == null || !actionBean.isValid()){
+        if (actionBean == null){
             Logger.d(" startAction voiceBean invalid! ");
             return;
         }
+        String action = actionBean.getAction();
 
-        //TODO To check whether the voiceBean have confirm, if have confirm speak confirm TTS.
-        VoiceItemBean voiceItemBean = actionBean.getItem();
-        String ttsContent;
-        ttsContent = voiceItemBean.getTts();
-        TTSHelper.getInstance().speakTTS(ttsContent);
+        switch (action){
+            case VoiceBean.ACTION_PLAY:
+                startPlayVoice(actionBean);
+                break;
+            case VoiceBean.ACTION_PAUSE:
+                pauseAction();
+                break;
+            case VoiceBean.ACTION_RESUME:
+                startPlayVoice(actionBean);
+                break;
+            case VoiceBean.ACTION_STOP:
+                stopAction();
+                break;
+            default:
+                Logger.d(" unknow action !  : " + action);
+        }
+
     }
+
+    private void startPlayVoice(VoiceBean actionBean) {
+        if (actionBean.isValid()){
+            //TODO To check whether the voiceBean have confirm, if have confirm speak confirm TTS.
+            VoiceItemBean voiceItemBean = actionBean.getItem();
+            String ttsContent;
+            ttsContent = voiceItemBean.getTts();
+            TTSHelper.getInstance().speakTTS(ttsContent);
+        }
+    }
+
 
     @Override
     public synchronized void pauseAction() {

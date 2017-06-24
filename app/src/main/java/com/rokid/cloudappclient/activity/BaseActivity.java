@@ -16,7 +16,7 @@ import com.rokid.cloudappclient.util.Logger;
 /**
  * This is a basic Activity, all the Activity in the project are to extends it.
  * It management common lifecycle and have some common methods to parse intent、NLP and error TTS.
- *
+ * <p>
  * Author: fengfan
  * Modified: 2017/06/01
  */
@@ -25,24 +25,29 @@ public abstract class BaseActivity extends Activity implements TTSSpeakInterface
     IntentParser intentParser = new IntentParser(this);
     BaseAppStateManager appStateManager = getAppStateManager();
 
+    //只有在cut应用入栈的时候才会调onResume
+    boolean isNeedResume;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         AppTypeRecorder.getInstance().storeAppStateManager(appStateManager);
         appStateManager.setTaskProcessCallback(this);
         ResponseParser.getInstance().setTTSSpeakInterface(this);
+        isNeedResume = false;
         intentParser.parseIntent(getIntent());
-        Logger.d( "activity type: " + getAppStateManager().getFormType() + " OnCreated");
+        Logger.d("activity type: " + getAppStateManager().getFormType() + " OnCreated");
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        Logger.d("activity type: " + getAppStateManager().getFormType() +" onNewIntent");
+        Logger.d("activity type: " + getAppStateManager().getFormType() + " onNewIntent");
         if (intent == null) {
             Logger.d("intent null !");
             return;
         }
+        isNeedResume = false;
         intentParser.parseIntent(intent);
         setIntent(intent);
     }
@@ -50,26 +55,29 @@ public abstract class BaseActivity extends Activity implements TTSSpeakInterface
     @Override
     protected void onRestart() {
         super.onRestart();
-        Logger.d("activity type: " + getAppStateManager().getFormType() +" onRestart");
+        Logger.d("activity type: " + getAppStateManager().getFormType() + " onRestart");
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        Logger.d("activity type: " + getAppStateManager().getFormType() +" onStart");
+        Logger.d("activity type: " + getAppStateManager().getFormType() + " onStart");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Logger.d("activity type: " + getAppStateManager().getFormType() +" onResume");
-        appStateManager.onAppResume();
+        Logger.d("activity type: " + getAppStateManager().getFormType() + " onResume " + " isNeedResume : " + isNeedResume);
+        if (isNeedResume) {
+            appStateManager.onAppResume();
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        Logger.d("activity type: " + getAppStateManager().getFormType() +" onPause");
+        isNeedResume = true;
+        Logger.d("activity type: " + getAppStateManager().getFormType() + " onPause");
         appStateManager.onAppPaused();
 
     }
@@ -77,13 +85,13 @@ public abstract class BaseActivity extends Activity implements TTSSpeakInterface
     @Override
     protected void onStop() {
         super.onStop();
-        Logger.d("activity type: " + getAppStateManager().getFormType() +" onStop");
+        Logger.d("activity type: " + getAppStateManager().getFormType() + " onStop");
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Logger.d("activity type: " + getAppStateManager().getFormType() +" onDestroy");
+        Logger.d("activity type: " + getAppStateManager().getFormType() + " onDestroy");
     }
 
     /**

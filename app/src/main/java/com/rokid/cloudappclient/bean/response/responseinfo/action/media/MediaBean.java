@@ -1,8 +1,6 @@
 package com.rokid.cloudappclient.bean.response.responseinfo.action.media;
 
-import android.text.TextUtils;
-
-import com.rokid.cloudappclient.bean.base.BaseBean;
+import com.rokid.cloudappclient.bean.response.responseinfo.action.BaseActionBean;
 
 /**
  * Media is used to play streaming media.
@@ -11,36 +9,14 @@ import com.rokid.cloudappclient.bean.base.BaseBean;
  * Author: xupan.shi
  * Version: V0.1 2017/3/7
  */
-public class MediaBean extends BaseBean {
+public class MediaBean extends BaseActionBean {
 
     /**
      * Defines the action of the media player.
      * ONLY TWO actions are supported, which are PLAY and PAUSE.
      */
-    public static final String ACTION_PLAY = "PLAY";
-    public static final String ACTION_PAUSE = "PAUSE";
-    public static final String ACTION_STOP = "STOP";
-    public static final String ACTION_RESUME = "RESUME";
 
-    private String action;
-    private String behaviour;
     private MediaItemBean item;
-
-    public String getAction() {
-        return action;
-    }
-
-    public void setAction(String action) {
-        this.action = action;
-    }
-
-    public String getBehaviour() {
-        return behaviour;
-    }
-
-    public void setBehaviour(String behaviour) {
-        this.behaviour = behaviour;
-    }
 
     public MediaItemBean getItem() {
         return item;
@@ -52,10 +28,6 @@ public class MediaBean extends BaseBean {
 
     public boolean isValid() {
         return isActionValid() && isItemValid();
-    }
-
-    public boolean isActionValid() {
-        return !TextUtils.isEmpty(action);
     }
 
     public boolean isItemValid() {
