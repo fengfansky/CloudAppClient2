@@ -9,8 +9,6 @@ import android.util.Log;
 import android.widget.MediaController;
 
 import java.io.IOException;
-import java.net.URI;
-import java.util.HashMap;
 import java.util.Map;
 
 import tv.danmaku.ijk.media.player.AndroidMediaPlayer;
@@ -91,8 +89,6 @@ public class RKAudioPlayer implements MediaController.MediaPlayerControl {
      * @param uri the URI of the video.
      */
     public void setVideoURI(Uri uri) {
-        HashMap<String, String> headers = new HashMap<String, String>();
-        headers.put("Host", new URI().getHost());
         setVideoURI(uri, null);
     }
 
@@ -148,7 +144,6 @@ public class RKAudioPlayer implements MediaController.MediaPlayerControl {
                 mMediaPlayer.setDataSource(mAppContext, mUri, mHeaders);
             } else {
                 mMediaPlayer.setDataSource(mUri.toString());
-                mMediaPlayer.setDataSource(,mUri,mHeaders);
             }
         } catch (IOException ex) {
             Log.w(TAG, "Unable to open content: " + mUri, ex);
@@ -228,9 +223,10 @@ public class RKAudioPlayer implements MediaController.MediaPlayerControl {
     @Override
     public void seekTo(int pos) {
         if (isInPlaybackState()) {
-            mSeekStartTime = System.currentTimeMillis();
-            mSeekWhenPrepared = pos;
             mMediaPlayer.seekTo(pos);
+            mSeekWhenPrepared = 0;
+        } else {
+            mSeekWhenPrepared = pos;
         }
     }
 
