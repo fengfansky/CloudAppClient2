@@ -9,15 +9,13 @@
 
     <!-- Needed only if your app targets Android 5.0 (API level 21) or higher. -->
     <application
-        android:name=".RKCloudAppApplication"
-        android:allowBackup="true">
+        android:name=".RKCloudAppApplication">
 
         <activity
             android:name="com.rokid.cloudappclient.activity.CloudSceneActivity"
             android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <action android:name="com.rokid.test.scene"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
@@ -27,7 +25,6 @@
             android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <action android:name="com.rokid.test.cut"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
