@@ -9,7 +9,7 @@
 
     <!-- Needed only if your app targets Android 5.0 (API level 21) or higher. -->
     <application
-        android:name=".RKCloudAppApplication">
+        android:name="com.rokid.cloudappclient.RKCloudAppApplication">
 
         <activity
             android:name="com.rokid.cloudappclient.activity.CloudSceneActivity"
