@@ -1,5 +1,7 @@
 package com.rokid.cloudappclient.bean;
 
+import com.rokid.cloudappclient.bean.base.BaseBean;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -7,7 +9,7 @@ import java.util.Map;
  * Created by showingcp on 3/13/17.
  */
 
-public class NLPBean {
+public class NLPBean extends BaseBean{
 
     /**
      * intent cloudAppId

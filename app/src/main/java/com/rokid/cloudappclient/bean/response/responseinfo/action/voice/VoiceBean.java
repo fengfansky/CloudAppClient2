@@ -1,5 +1,7 @@
 package com.rokid.cloudappclient.bean.response.responseinfo.action.voice;
 
+import android.text.TextUtils;
+
 import com.rokid.cloudappclient.bean.response.responseinfo.action.BaseActionBean;
 
 /**
@@ -20,8 +22,8 @@ public class VoiceBean extends BaseActionBean {
         this.item = item;
     }
 
-    public boolean isValid() {
-        return null != item && item.isValid() && isActionValid();
+    @Override
+    public boolean canPlay() {
+        return item != null && !TextUtils.isEmpty(item.getTts());
     }
-
 }

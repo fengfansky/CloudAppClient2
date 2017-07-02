@@ -1,7 +1,5 @@
 package com.rokid.cloudappclient.bean.response.responseinfo.action.media;
 
-import android.text.TextUtils;
-
 /**
  * Defines the media item information which is required by the media player.
  * Here comes the definition.
@@ -10,9 +8,6 @@ import android.text.TextUtils;
  * Version: V0.1 2017/3/7
  */
 public class MediaItemBean {
-
-    public static final String TYPE_AUDIO = "AUDIO";
-    public static final String TYPE_VIDEO = "VIDEO";
 
     private String token;
     private String type;
@@ -49,18 +44,6 @@ public class MediaItemBean {
 
     public void setOffsetInMilliseconds(int offsetInMilliseconds) {
         this.offsetInMilliseconds = offsetInMilliseconds;
-    }
-
-    public boolean isValid() {
-        return isTypeValid() && isUrlValid();
-    }
-
-    public boolean isTypeValid() {
-        return !TextUtils.isEmpty(type) && (TYPE_AUDIO.equals(type) || TYPE_VIDEO.equals(type));
-    }
-
-    public boolean isUrlValid() {
-        return !TextUtils.isEmpty(url);
     }
 
 }

@@ -1,12 +1,13 @@
 package com.rokid.cloudappclient.bean;
 
+import com.rokid.cloudappclient.bean.base.BaseBean;
 import com.rokid.cloudappclient.bean.response.CloudActionResponse;
 
 /**
  * Created by showingcp on 3/13/17.
  */
 
-public class CommonResponse {
+public class CommonResponse extends BaseBean{
 
     /**
      * corresponding asr result for current response

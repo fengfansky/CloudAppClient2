@@ -3,9 +3,6 @@ package com.rokid.cloudappclient.tts;
 import android.os.RemoteException;
 import android.text.TextUtils;
 
-import com.rokid.cloudappclient.reporter.BaseReporter;
-import com.rokid.cloudappclient.reporter.ReporterManager;
-import com.rokid.cloudappclient.reporter.VoiceReporter;
 import com.rokid.cloudappclient.util.AppTypeRecorder;
 import com.rokid.cloudappclient.util.Logger;
 
@@ -112,13 +109,11 @@ public class TTSHelper {
         @Override
         public void onCancel(int id) {
             super.onCancel(id);
-            Logger.i("TTS is onStop - id: " + id + ", current id: " + ttsId);
-
+            Logger.i("TTS is onCancel - id: " + id + ", current id: " + ttsId);
             if (id != ttsId) {
                 Logger.i("The new tts is already speaking, previous tts stop should not ttsCallback");
                 return;
             }
-
             ttsId = STOP;
             AppTypeRecorder.getInstance().getAppStateManager().onVoiceCancled();
         }
@@ -127,6 +122,7 @@ public class TTSHelper {
         public void onComplete(int id) {
             super.onComplete(id);
             Logger.i("TTS is onComplete - id: " + id);
+            ttsId = STOP;
             AppTypeRecorder.getInstance().getAppStateManager().onVoiceStop();
         }
 

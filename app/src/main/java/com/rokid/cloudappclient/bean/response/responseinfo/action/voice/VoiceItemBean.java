@@ -1,7 +1,5 @@
 package com.rokid.cloudappclient.bean.response.responseinfo.action.voice;
 
-import android.text.TextUtils;
-
 import com.rokid.cloudappclient.bean.base.BaseBean;
 
 /**
@@ -21,9 +19,4 @@ public class VoiceItemBean extends BaseBean {
     public void setTts(String tts) {
         this.tts = tts;
     }
-
-    public boolean isValid() {
-        return !TextUtils.isEmpty(tts);
-    }
-
 }

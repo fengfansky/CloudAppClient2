@@ -65,58 +65,7 @@ public class MediaAction extends BaseAction<MediaBean> {
         return mediaAction;
     }
 
-    @Override
-    public synchronized void startAction(MediaBean mediaBean) {
-        Logger.d("start play media");
-
-        if (mediaBean == null ) {
-            Logger.d("MediaAction startAction mediaBean null!");
-            return;
-        }
-
-        String action = mediaBean.getAction();
-
-        if (TextUtils.isEmpty(action)){
-            Logger.d("action is null!");
-            return;
-        }
-
-        Logger.d(" startAction action : " + action);
-        switch (action) {
-            case MediaBean.ACTION_PLAY:
-                startPlay(mediaBean);
-                break;
-            case MediaBean.ACTION_PAUSE:
-                pausePlay();
-                break;
-            case MediaBean.ACTION_RESUME:
-                resumePlay();
-                break;
-            case MediaBean.ACTION_STOP:
-                stopPlay();
-                break;
-            case MediaBean.ACTION_FORWARD:
-                forward();
-                break;
-            case MediaBean.ACTION_BACKWARD:
-                backward();
-                break;
-            default:
-                Logger.d(" invalidate action ! " + action);
-        }
-    }
-
-    @Override
-    public synchronized void pauseAction() {
-        pausePlay();
-    }
-
-    @Override
-    public synchronized void stopAction() {
-        stopPlay();
-    }
-
-    public void startPlay(MediaBean mediaBean) {
+    public synchronized void startPlay(MediaBean mediaBean) {
         if (rkAudioPlayer != null && mediaBean != null) {
             MediaItemBean mediaBeanItem = mediaBean.getItem();
             if (mediaBeanItem == null) {
@@ -140,27 +89,31 @@ public class MediaAction extends BaseAction<MediaBean> {
         }
     }
 
-    private void pausePlay() {
+    @Override
+    public synchronized void pausePlay() {
         if (rkAudioPlayer != null && rkAudioPlayer.canPause()) {
             rkAudioPlayer.pause();
         }
     }
 
-    private void stopPlay() {
+    @Override
+    public synchronized void stopPlay() {
         if (rkAudioPlayer != null && rkAudioPlayer.canPause()) {
-            rkAudioPlayer.seekTo(rkAudioPlayer.getDuration());
+            rkAudioPlayer.seekTo(0);
             rkAudioPlayer.pause();
         }
     }
 
-    private void resumePlay() {
-        if (rkAudioPlayer != null && !rkAudioPlayer.isPlaying() ) {
+    @Override
+    public synchronized void resumePlay() {
+        if (rkAudioPlayer != null && !rkAudioPlayer.isPlaying()) {
             rkAudioPlayer.start();
             AppTypeRecorder.getInstance().getAppStateManager().onMediaResume();
         }
     }
 
-    private void forward() {
+    @Override
+    public synchronized void forward() {
         if (rkAudioPlayer != null && !rkAudioPlayer.canSeekForward()) {
             int totalTime = rkAudioPlayer.getDuration();
             int currentTime = rkAudioPlayer.getCurrentPosition();
@@ -172,7 +125,8 @@ public class MediaAction extends BaseAction<MediaBean> {
         }
     }
 
-    private void backward() {
+    @Override
+    public synchronized void backward() {
         if (rkAudioPlayer != null && !rkAudioPlayer.canSeekForward()) {
             int totalTime = rkAudioPlayer.getDuration();
             int currentTime = rkAudioPlayer.getCurrentPosition();
@@ -183,4 +137,31 @@ public class MediaAction extends BaseAction<MediaBean> {
             rkAudioPlayer.seekTo(seekTime);
         }
     }
+
+    public int getMediaDuration() {
+        if (rkAudioPlayer == null) {
+            return 0;
+        }
+        return rkAudioPlayer.getDuration();
+    }
+
+    public int getMediaPosition(){
+        if (rkAudioPlayer == null){
+            return 0;
+        }
+        return rkAudioPlayer.getCurrentPosition();
+    }
+
+    public void releasePlayer() {
+        if (rkAudioPlayer != null) {
+            rkAudioPlayer.release(true);
+            rkAudioPlayer = null;
+        }
+    }
+
+    @Override
+    public ACTION_TYPE getActionType() {
+        return ACTION_TYPE.MEDIA;
+    }
+
 }

@@ -129,6 +129,11 @@ public class CloudActionResponse {
             return false;
         }
 
+        if (!isDataValid(getResponse())){
+            Logger.d("media and voice both invalid!");
+            return false;
+        }
+
         return true;
     }
 
@@ -137,14 +142,14 @@ public class CloudActionResponse {
      * Private method to check voice, media and display
      *
      */
-    private boolean checkActionElements(ResponseBean responseBean) {
+    private boolean isDataValid(ResponseBean responseBean) {
         ActionBean responseAction = responseBean.getAction();
 
         MediaBean mediaBean = responseAction.getMedia();
         VoiceBean voiceBean = responseAction.getVoice();
 
         if (mediaBean == null && voiceBean == null){
-            Logger.d("media and voice is null! ");
+            Logger.d("media and voice are null! ");
             return false;
         }else if (mediaBean == null && voiceBean != null){
             if (voiceBean.isValid()){

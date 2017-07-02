@@ -9,6 +9,8 @@ public class VoiceAction extends BaseAction<VoiceBean> {
 
     private static volatile VoiceAction voiceAction;
 
+    private VoiceBean voiceBean;
+
     public static VoiceAction getInstance() {
         if (voiceAction == null) {
             synchronized (VoiceAction.class) {
@@ -21,36 +23,9 @@ public class VoiceAction extends BaseAction<VoiceBean> {
 
 
     @Override
-    public synchronized void startAction(VoiceBean actionBean) {
-        Logger.d("start play voice");
-
-        if (actionBean == null){
-            Logger.d(" startAction voiceBean invalid! ");
-            return;
-        }
-        String action = actionBean.getAction();
-
-        switch (action){
-            case VoiceBean.ACTION_PLAY:
-                startPlayVoice(actionBean);
-                break;
-            case VoiceBean.ACTION_PAUSE:
-                pauseAction();
-                break;
-            case VoiceBean.ACTION_RESUME:
-                startPlayVoice(actionBean);
-                break;
-            case VoiceBean.ACTION_STOP:
-                stopAction();
-                break;
-            default:
-                Logger.d(" unknow action !  : " + action);
-        }
-
-    }
-
-    private void startPlayVoice(VoiceBean actionBean) {
+    public void startPlay(VoiceBean actionBean) {
         if (actionBean.isValid()){
+            this.voiceBean = actionBean;
             //TODO To check whether the voiceBean have confirm, if have confirm speak confirm TTS.
             VoiceItemBean voiceItemBean = actionBean.getItem();
             String ttsContent;
@@ -61,16 +36,40 @@ public class VoiceAction extends BaseAction<VoiceBean> {
 
 
     @Override
-    public synchronized void pauseAction() {
+    public synchronized void pausePlay() {
         Logger.d("pause play voice");
         TTSHelper.getInstance().stopTTS();
     }
 
 
     @Override
-    public synchronized void stopAction() {
-        Logger.d("stopAction stop play voice");
+    public void resumePlay() {
+        if (voiceBean != null){
+            startPlay(voiceBean);
+        }
+    }
+
+    @Override
+    public synchronized void stopPlay() {
+        Logger.d("stopPlay stop play voice");
         TTSHelper.getInstance().stopTTS();
+    }
+
+
+
+    @Override
+    public void forward() {
+
+    }
+
+    @Override
+    public void backward() {
+
+    }
+
+    @Override
+    public ACTION_TYPE getActionType() {
+        return ACTION_TYPE.VOICE;
     }
 
 }

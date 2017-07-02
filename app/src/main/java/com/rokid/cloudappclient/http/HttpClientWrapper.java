@@ -19,6 +19,7 @@ public class HttpClientWrapper {
     private static final int WRITE_TIME_OUT = 3;
 
     private static final String CONTENT_TYPE = "application/octet-stream";
+    private Response response;
 
     public HttpClientWrapper() {
         okHttpClient = new OkHttpClient();
@@ -44,10 +45,21 @@ public class HttpClientWrapper {
                 .post(RequestBody.create(MediaType.parse(CONTENT_TYPE)
                         , byteArrayOutputStream.toByteArray()))
                 .build();
-        Response response = okHttpClient.newCall(request).execute();
+         response = okHttpClient.newCall(request).execute();
 
         return response;
     }
+
+    public void close(){
+        if (response != null && response.body() != null){
+            try {
+                response.body().close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 
     private static class SingleHolder {
         private static final HttpClientWrapper instance = new HttpClientWrapper();

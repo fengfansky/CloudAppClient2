@@ -1,5 +1,7 @@
 package com.rokid.cloudappclient.bean.response.responseinfo.action.media;
 
+import android.text.TextUtils;
+
 import com.rokid.cloudappclient.bean.response.responseinfo.action.BaseActionBean;
 
 /**
@@ -26,12 +28,8 @@ public class MediaBean extends BaseActionBean {
         this.item = item;
     }
 
-    public boolean isValid() {
-        return isActionValid() && isItemValid();
+    @Override
+    public boolean canPlay() {
+        return item != null && !TextUtils.isEmpty(item.getUrl());
     }
-
-    public boolean isItemValid() {
-        return null != item && item.isValid();
-    }
-
 }

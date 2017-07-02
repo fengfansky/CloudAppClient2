@@ -1,5 +1,7 @@
 package com.rokid.cloudappclient.state;
 
+import com.rokid.cloudappclient.action.MediaAction;
+import com.rokid.cloudappclient.bean.ActionNode;
 import com.rokid.cloudappclient.bean.response.responseinfo.action.ActionBean;
 import com.rokid.cloudappclient.action.VoiceAction;
 import com.rokid.cloudappclient.util.Logger;
@@ -19,10 +21,30 @@ public class CutAppStateManager extends BaseAppStateManager {
     }
 
     @Override
-    public void onAppPaused() {
+    public synchronized void onNewIntentActionNode(ActionNode actionNode) {
+        Logger.d("form: " + getFormType() + "onNewIntentActionNode actioNode : " + actionNode);
+        if (actionNode != null) {
+            this.mActionNode = actionNode;
+            this.mAppId = actionNode.getAppId();
+            this.shouldEndSession = actionNode.isShouldEndSession();
+            MediaAction.getInstance().stopPlay();
+            VoiceAction.getInstance().stopPlay();
+            this.currentMediaState = null;
+            this.currentVoiceState = null;
+            this.currentMediaBean = actionNode.getMedia();
+            this.currentVoiceBean = actionNode.getVoice();
+            processActionNode(actionNode);
+        }else {
+            checkAppState();
+        }
+    }
+
+    @Override
+    public synchronized void onAppPaused() {
         super.onAppPaused();
         Logger.d(" cut : pause tts and finishActivity");
-        VoiceAction.getInstance().stopAction();
+        VoiceAction.getInstance().stopPlay();
+        MediaAction.getInstance().stopPlay();
         finishActivity();
     }
 

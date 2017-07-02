@@ -9,38 +9,43 @@ import com.rokid.cloudappclient.bean.NLPBean;
 import com.rokid.cloudappclient.tts.TTSSpeakInterface;
 import com.rokid.cloudappclient.util.Logger;
 
+import java.lang.ref.WeakReference;
 import java.util.Map;
 
 /**
  * Created by fanfeng on 2017/5/8.
  */
 
-public class IntentParser {
+public class IntentParser <T extends TTSSpeakInterface>{
 
     private static final String KEY_NLP = "nlp";
     private static final String KEY_COMMON_RESPONSE = "extra";
     private static final String KEY_DEVICE_INFO = "device";
 
-    TTSSpeakInterface ttsSpeakInterface;
+    WeakReference<T> ttsSpeakReference;
 
-    public IntentParser(TTSSpeakInterface ttsSpeakInterface) {
-        this.ttsSpeakInterface = ttsSpeakInterface;
+    public IntentParser(T ttsSpeakInterface) {
+        this.ttsSpeakReference = new WeakReference<T>(ttsSpeakInterface);
     }
 
     public void parseIntent(Intent intent) {
-        if (ttsSpeakInterface == null){
-            Logger.d("ttsSpeakInterface is null !");
+        if (ttsSpeakReference == null){
+            Logger.d("ttsSpeakReference is null !");
             return;
         }
         if (intent == null) {
             Logger.d("intent null !");
-            ttsSpeakInterface.speakIntentEmptyErrorTTS();
+            if (ttsSpeakReference.get() != null){
+                ttsSpeakReference.get().speakIntentEmptyErrorTTS();
+            }
             return;
         }
         String nlp = intent.getStringExtra(KEY_NLP);
         if (TextUtils.isEmpty(nlp)) {
             Logger.d("NLP is empty!!!");
-            ttsSpeakInterface.speakNLPEmptyErrorTTS();
+            if (ttsSpeakReference.get() != null){
+                ttsSpeakReference.get().speakIntentEmptyErrorTTS();
+            }
             return;
         }
 
@@ -49,7 +54,9 @@ public class IntentParser {
 
         if (null == nlpBean) {
             Logger.d("NLPData is empty!!!");
-            ttsSpeakInterface.speakNLPDataEmptyErrorTTS();
+            if (ttsSpeakReference.get() != null){
+                ttsSpeakReference.get().speakIntentEmptyErrorTTS();
+            }
             return;
         }
 
@@ -57,14 +64,18 @@ public class IntentParser {
 
         if (slots == null || slots.isEmpty()) {
             Logger.i("NLP slots is invalid");
-            ttsSpeakInterface.speakNLPDataEmptyErrorTTS();
+            if (ttsSpeakReference.get() != null){
+                ttsSpeakReference.get().speakIntentEmptyErrorTTS();
+            }
             return;
         }
 
 
         if (!slots.containsKey(KEY_COMMON_RESPONSE)) {
             Logger.i("NLP slots has no COMMON_RESPONSE info");
-            ttsSpeakInterface.speakNLPDataEmptyErrorTTS();
+            if (ttsSpeakReference.get() != null){
+                ttsSpeakReference.get().speakIntentEmptyErrorTTS();
+            }
             return;
         }
 
@@ -72,7 +83,9 @@ public class IntentParser {
 
         if (TextUtils.isEmpty(extraString)) {
             Logger.i("COMMON_RESPONSE info is invalid");
-            ttsSpeakInterface.speakNLPDataEmptyErrorTTS();
+            if (ttsSpeakReference.get() != null){
+                ttsSpeakReference.get().speakIntentEmptyErrorTTS();
+            }
             return;
         }
 
@@ -85,7 +98,9 @@ public class IntentParser {
         }
         if (null == commonResponse) {
             Logger.d("parse common response failed");
-            ttsSpeakInterface.speakNLPDataEmptyErrorTTS();
+            if (ttsSpeakReference.get() != null){
+                ttsSpeakReference.get().speakIntentEmptyErrorTTS();
+            }
             return;
         }
 

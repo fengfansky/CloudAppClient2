@@ -84,7 +84,7 @@ public abstract class BaseReporter implements Runnable {
         }finally {
             try {
                 if (response != null && response.body() != null){
-                    AppTypeRecorder.getInstance().getAppStateManager().responseCallback(event, response);
+                    AppTypeRecorder.getInstance().getAppStateManager().onEventResponseCallback(event, response);
                     response.body().close();
                 }else {
                     AppTypeRecorder.getInstance().getAppStateManager().onEventErrorCallback(event, ReporterResponseCallBack.ERROR_RESPONSE_NULL);
@@ -104,8 +104,13 @@ public abstract class BaseReporter implements Runnable {
         int ERROR_RESPONSE_NULL = 1;
         int ERROR_IOEXCEPTION = 2;
 
+
         void onEventErrorCallback(String event, int errorCode);
 
-        void responseCallback(String event, Response response);
+        void onEventDataInvalid( );
+
+        void onEventAppIdException();
+
+        void onEventResponseCallback(String event, Response response);
     }
 }
