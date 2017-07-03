@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:rokid="http:www.rokid-inc.com" rokid:version="1.0.0">
     <application rokid:isSystem="false">
-        <scene rokid:activity="com.rokid.cloudappclient.activity.CloudSceneActivity" rokid:appID="com.rokid.cloudsceneclient" />
-        <cut rokid:activity="com.rokid.cloudappclient.activity.CloudCutActivity" rokid:appID="com.rokid.cloudcutclient" />
+        <scene rokid:activity="com.rokid.cloudappclient.activity.CloudSceneActivity"
+            rokid:appID="com.rokid.cloudsceneclient" />
+        <cut rokid:activity="com.rokid.cloudappclient.activity.CloudCutActivity"
+            rokid:appID="com.rokid.cloudcutclient" />
     </application>
 </manifest>

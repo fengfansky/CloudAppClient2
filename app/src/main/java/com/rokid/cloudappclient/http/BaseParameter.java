@@ -1,10 +1,12 @@
 package com.rokid.cloudappclient.http;
 
+import android.os.IBinder;
 import android.text.TextUtils;
 
 import com.rokid.cloudappclient.util.Logger;
 import com.rokid.cloudappclient.util.MD5Utils;
 
+import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -35,8 +37,26 @@ public class BaseParameter {
         params.put(key, value);
     }
 
+    private IBinder invokeServiceManager(){
+        try {
+            Class<?> clazz = Class.forName("android.os.ServiceManager");
+            Method method = clazz.getMethod("getService",String.class);
+            return (IBinder) method.invoke(null,"runtime_java");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+
+
+    }
+
     public Map<String, String> generateParams() {
-        rokid.os.IRuntimeService runtime = rokid.os.IRuntimeService.Stub.asInterface(android.os.ServiceManager.getService("runtime_java"));
+        IBinder runtime_binder = invokeServiceManager();
+        if(runtime_binder == null){
+            Logger.d(" runtime binder is null ");
+            return null;
+        }
+        rokid.os.IRuntimeService runtime = rokid.os.IRuntimeService.Stub.asInterface(runtime_binder);
         Map<String, String> deviceMap = null;
         try{
             deviceMap = runtime.getPlatformAccountInfo();
