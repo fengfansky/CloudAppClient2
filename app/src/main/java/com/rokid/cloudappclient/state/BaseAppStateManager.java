@@ -65,7 +65,7 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
                 return;
             }
 
-            if (!actionNode.getAppId().equals(mAppId)){
+            if (!actionNode.getAppId().equals(mAppId)) {
                 Logger.d("onNewEventActionNode the appId is the not the same with lastAppId");
                 checkAppState();
                 return;
@@ -117,13 +117,14 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
             return;
         }
 
-        String token = null;
-        if (currentMediaBean.getItem() != null){
-            token = currentMediaBean.getItem().getToken();
-        }
-        
-        ExtraBean extraBean = new ExtraBean.Builder().token(token).progress(String.valueOf(MediaAction.getInstance().getMediaPosition())).duration(String.valueOf(MediaAction.getInstance().getMediaDuration())).build();
-        reporterManager.executeReporter(new MediaReporter(mAppId, MediaReporter.START, extraBean.toString()));
+        reporterManager.executeReporter(new MediaReporter(mAppId, MediaReporter.START, getExtraBean()));
+    }
+
+    private String getExtraBean() {
+        ExtraBean extraBean = new ExtraBean();
+        extraBean.setMedia(new ExtraBean.MediaExtraBean(MediaAction.getInstance().getCurrentToken(), String.valueOf(MediaAction.getInstance().getMediaPosition()), String.valueOf(MediaAction.getInstance().getMediaDuration())));
+        Logger.d(" extraBean : " + extraBean.toString());
+        return extraBean.toString();
     }
 
     @Override
@@ -138,9 +139,7 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
             Logger.d(" appId is null !");
             return;
         }
-
-        ExtraBean extraBean = new ExtraBean.Builder().token(currentMediaBean.getItem().getToken()).progress(String.valueOf(position)).duration(String.valueOf(MediaAction.getInstance().getMediaDuration())).build();
-        reporterManager.executeReporter(new MediaReporter(mAppId, MediaReporter.PAUSED, extraBean.toString()));
+        reporterManager.executeReporter(new MediaReporter(mAppId, MediaReporter.PAUSED, getExtraBean()));
     }
 
     @Override
@@ -164,8 +163,8 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
                 Logger.d(" appId is null !");
                 return;
             }
-            ExtraBean extraBean = new ExtraBean.Builder().token(currentMediaBean.getItem().getToken()).progress(String.valueOf(MediaAction.getInstance().getMediaDuration())).duration(String.valueOf(MediaAction.getInstance().getMediaDuration())).build();
-            reporterManager.executeReporter(new MediaReporter(mAppId, MediaReporter.FINISHED, extraBean.toString()));
+
+            reporterManager.executeReporter(new MediaReporter(mAppId, MediaReporter.PAUSED, getExtraBean()));
         }
     }
 
@@ -190,7 +189,7 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
     @Override
     public synchronized void onVoiceStop() {
         currentVoiceState = VOICE_STATE.VOICE_STOP;
-        Logger.d("form: " + getFormType() + " onVoiceStop !"+ " currentMediaState: " + currentMediaState + " currentVoiceState " + currentVoiceState);
+        Logger.d("form: " + getFormType() + " onVoiceStop !" + " currentMediaState: " + currentMediaState + " currentVoiceState " + currentVoiceState);
         if (shouldEndSession) {
             checkAppState();
         } else {
@@ -217,14 +216,14 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
     @Override
     public synchronized void onVoiceCancled() {
         currentVoiceState = VOICE_STATE.VOICE_CANCLED;
-        Logger.d("form: " + getFormType() + " onVoiceCancled !"+ " currentMediaState: " + currentMediaState + " currentVoiceState " + currentVoiceState);
+        Logger.d("form: " + getFormType() + " onVoiceCancled !" + " currentMediaState: " + currentMediaState + " currentVoiceState " + currentVoiceState);
         checkAppState();
     }
 
     @Override
     public synchronized void onVoiceError() {
         currentVoiceState = VOICE_STATE.VOICE_ERROR;
-        Logger.d("form: " + getFormType() + " onVoiceError !"+ " currentMediaState: " + currentMediaState + " currentVoiceState " + currentVoiceState);
+        Logger.d("form: " + getFormType() + " onVoiceError !" + " currentMediaState: " + currentMediaState + " currentVoiceState " + currentVoiceState);
         checkAppState();
     }
 

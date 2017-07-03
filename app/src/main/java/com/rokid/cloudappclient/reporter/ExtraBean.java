@@ -1,63 +1,82 @@
 package com.rokid.cloudappclient.reporter;
 
-import com.rokid.cloudappclient.util.Logger;
-import java.util.HashMap;
-import java.util.Map;
+import com.rokid.cloudappclient.bean.base.BaseBean;
 
 /**
  * Created by fanfeng on 2017/6/29.
  */
 
-public class ExtraBean {
+public class ExtraBean extends BaseBean{
 
-    public static final String EXTRA_TOKEN = "MEDIA.TOKEN";
-    public static final String EXTRA_PROGRESS = "MEDIA.PROGRESS";
-    public static final String EXTRA_DURATION = "MEDIA.DURATION";
+    private MediaExtraBean media;
+    private VoiceExtraBean voice;
 
-
-    private Map<String,String> extraMap;
-
-    private ExtraBean(Builder builder) {
-        extraMap = new HashMap<>();
-        extraMap.put(EXTRA_TOKEN, builder.token);
-        extraMap.put(EXTRA_DURATION, builder.progress);
-        extraMap.put(EXTRA_PROGRESS, builder.duration);
+    public MediaExtraBean getMedia() {
+        return media;
     }
 
-    @Override
-    public String toString() {
-        if (extraMap == null || extraMap.isEmpty()){
-            return null;
+    public void setMedia(MediaExtraBean media) {
+        this.media = media;
+    }
+
+    public VoiceExtraBean getVoice() {
+        return voice;
+    }
+
+    public void setVoice(VoiceExtraBean voice) {
+        this.voice = voice;
+    }
+
+    public static class MediaExtraBean extends BaseExtraBean{
+
+        public MediaExtraBean(String token, String progress, String duration) {
+            super(token, progress, duration);
         }
-        Logger.d("event extra : " + extraMap.toString());
-        return extraMap.toString();
     }
 
-    public static final class Builder {
+
+    public static class VoiceExtraBean extends BaseExtraBean{
+
+        public VoiceExtraBean(String token, String progress, String duration) {
+            super(token, progress, duration);
+        }
+    }
+
+    public static abstract class BaseExtraBean{
         private String token;
         private String progress;
         private String duration;
 
-        public Builder() {
+        public BaseExtraBean(String token, String progress, String duration) {
+            this.token = token;
+            this.progress = progress;
+            this.duration = duration;
         }
 
-        public Builder token(String val) {
-            token = val;
-            return this;
+        public String getToken() {
+            return token;
         }
 
-        public Builder progress(String val) {
-            progress = val;
-            return this;
+        public void setToken(String token) {
+            this.token = token;
         }
 
-        public Builder duration(String val) {
-            duration = val;
-            return this;
+        public String getProgress() {
+            return progress;
         }
 
-        public ExtraBean build() {
-            return new ExtraBean(this);
+        public void setProgress(String progress) {
+            this.progress = progress;
+        }
+
+        public String getDuration() {
+            return duration;
+        }
+
+        public void setDuration(String duration) {
+            this.duration = duration;
         }
     }
+
+
 }
