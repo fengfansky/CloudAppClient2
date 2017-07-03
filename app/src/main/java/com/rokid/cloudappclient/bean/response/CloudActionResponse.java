@@ -123,10 +123,9 @@ public class CloudActionResponse {
             return false;
         }
 
-        if (!responseActionType.equals(ActionBean.TYPE_NORMAL)
-                && !responseActionType.equals(ActionBean.TYPE_EXIT)) {
-            Logger.i("checkCloudAppAction: ignore unknown response action type: " + responseActionType);
-            return false;
+        if (responseActionType.equals(ActionBean.TYPE_EXIT)){
+            Logger.d("actionType is EXIT ");
+            return true;
         }
 
         if (!isDataValid(getResponse())){

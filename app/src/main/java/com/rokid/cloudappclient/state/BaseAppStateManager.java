@@ -164,7 +164,7 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
                 return;
             }
 
-            reporterManager.executeReporter(new MediaReporter(mAppId, MediaReporter.PAUSED, getExtraBean()));
+            reporterManager.executeReporter(new MediaReporter(mAppId, MediaReporter.FINISHED, getExtraBean()));
         }
     }
 
