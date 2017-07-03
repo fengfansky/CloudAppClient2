@@ -1,5 +1,7 @@
 package com.rokid.cloudappclient.state;
 
+import android.text.TextUtils;
+
 import com.rokid.cloudappclient.bean.ActionNode;
 import com.rokid.cloudappclient.bean.response.responseinfo.action.ActionBean;
 import com.rokid.cloudappclient.action.MediaAction;
@@ -10,7 +12,7 @@ import com.rokid.cloudappclient.util.Logger;
  * Created by fanfeng on 2017/6/14.
  */
 
-public class SceneAppStateManager extends BaseAppStateManager{
+public class SceneAppStateManager extends BaseAppStateManager {
 
     public static SceneAppStateManager getInstance() {
         return AppStateManagerHolder.instance;
@@ -24,6 +26,18 @@ public class SceneAppStateManager extends BaseAppStateManager{
     public synchronized void onNewIntentActionNode(ActionNode actionNode) {
         Logger.d("form: " + getFormType() + "onNewIntentActionNode actioNode : " + actionNode);
         if (actionNode != null) {
+            if (TextUtils.isEmpty(actionNode.getAppId())) {
+                Logger.d("new cloudAppId is null !");
+                checkAppState();
+                return;
+            }
+
+            if (!actionNode.getAppId().equals(mAppId)) {
+                Logger.d("onNewEventActionNode the appId is the not the same with lastAppId");
+                MediaAction.getInstance().stopPlay();
+                VoiceAction.getInstance().stopPlay();
+            }
+
             this.mActionNode = actionNode;
             this.mAppId = actionNode.getAppId();
             this.shouldEndSession = actionNode.isShouldEndSession();
@@ -32,7 +46,7 @@ public class SceneAppStateManager extends BaseAppStateManager{
             this.currentMediaBean = actionNode.getMedia();
             this.currentVoiceBean = actionNode.getVoice();
             processActionNode(actionNode);
-        }else {
+        } else {
             checkAppState();
         }
     }
@@ -48,11 +62,11 @@ public class SceneAppStateManager extends BaseAppStateManager{
     public synchronized void onAppResume() {
         super.onAppResume();
         Logger.d("scene  onAppResume mediaType: " + currentMediaState + " voiceType : " + currentVoiceState);
-        if (currentMediaState == MEDIA_STATE.MEDIA_PAUSED){
+        if (currentMediaState == MEDIA_STATE.MEDIA_PAUSED) {
             MediaAction.getInstance().processAction(currentMediaBean);
             Logger.d("scene: onAppResume resume play audio");
         }
-        if (currentVoiceState == VOICE_STATE.VOICE_CANCLED){
+        if (currentVoiceState == VOICE_STATE.VOICE_CANCLED) {
             VoiceAction.getInstance().processAction(currentVoiceBean);
             Logger.d("scene onAppResume play voice");
         }

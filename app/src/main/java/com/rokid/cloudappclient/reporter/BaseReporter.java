@@ -104,12 +104,7 @@ public abstract class BaseReporter implements Runnable {
         int ERROR_RESPONSE_NULL = 1;
         int ERROR_IOEXCEPTION = 2;
 
-
         void onEventErrorCallback(String event, int errorCode);
-
-        void onEventDataInvalid( );
-
-        void onEventAppIdException();
 
         void onEventResponseCallback(String event, Response response);
     }

@@ -1,7 +1,5 @@
 package com.rokid.cloudappclient.parser;
 
-import android.text.TextUtils;
-
 import com.google.gson.Gson;
 import com.rokid.cloudappclient.bean.ActionNode;
 import com.rokid.cloudappclient.bean.CommonResponse;
@@ -84,18 +82,6 @@ public class ResponseParser {
         if (cloudResponse == null) {
             Logger.d("cloudResponse parsed null !");
             appStateManager.onEventErrorCallback(event, BaseReporter.ReporterResponseCallBack.ERROR_RESPONSE_NULL);
-            return;
-        }
-
-        if (TextUtils.isEmpty(cloudResponse.getAppId())) {
-            Logger.d("new cloudAppId is null !");
-            return;
-        }
-
-        String lastAppId = appStateManager.getAppId();
-
-        if (!cloudResponse.getAppId().equals(lastAppId)){
-            Logger.d("onNewEventActionNode the appId is the not the same with lastAppId");
             return;
         }
 

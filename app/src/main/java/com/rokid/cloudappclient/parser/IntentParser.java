@@ -20,7 +20,6 @@ public class IntentParser <T extends TTSSpeakInterface>{
 
     private static final String KEY_NLP = "nlp";
     private static final String KEY_COMMON_RESPONSE = "extra";
-    private static final String KEY_DEVICE_INFO = "device";
 
     WeakReference<T> ttsSpeakReference;
 

@@ -11,6 +11,7 @@ import com.rokid.cloudappclient.util.Logger;
 public abstract class BaseAction<T extends BaseActionBean> {
 
     public void processAction(T actionBean){
+        Logger.d(getActionType() + " processAction + actionBean : " + actionBean);
         if (actionBean == null ) {
             Logger.d(getActionType() + " processAction actionBean is  null! " );
             return;

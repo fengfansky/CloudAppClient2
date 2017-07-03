@@ -3,6 +3,7 @@ package com.rokid.cloudappclient.tts;
 import android.os.RemoteException;
 import android.text.TextUtils;
 
+import com.rokid.cloudappclient.state.BaseAppStateManager;
 import com.rokid.cloudappclient.util.AppTypeRecorder;
 import com.rokid.cloudappclient.util.Logger;
 
@@ -95,6 +96,7 @@ public class TTSHelper {
         }
 
         ttsId = mRktts.speak(ttsContent, rkttsCallback);
+        AppTypeRecorder.getInstance().getAppStateManager().setCurrentVoiceState(BaseAppStateManager.VOICE_STATE.VOICE_START);
         Logger.d(" speak TTS ttiId " + ttsId);
     }
 

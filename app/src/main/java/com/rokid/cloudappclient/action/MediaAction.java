@@ -7,6 +7,7 @@ import com.rokid.cloudappclient.RKCloudAppApplication;
 import com.rokid.cloudappclient.bean.response.responseinfo.action.media.MediaBean;
 import com.rokid.cloudappclient.bean.response.responseinfo.action.media.MediaItemBean;
 import com.rokid.cloudappclient.player.RKAudioPlayer;
+import com.rokid.cloudappclient.state.BaseAppStateManager;
 import com.rokid.cloudappclient.util.AppTypeRecorder;
 import com.rokid.cloudappclient.util.Logger;
 
@@ -86,6 +87,7 @@ public class MediaAction extends BaseAction<MediaBean> {
             rkAudioPlayer.setVideoURI(Uri.parse(url));
             rkAudioPlayer.start();
             rkAudioPlayer.seekTo(mediaBeanItem.getOffsetInMilliseconds());
+            AppTypeRecorder.getInstance().getAppStateManager().setCurrentMediaState(BaseAppStateManager.MEDIA_STATE.MEDIA_PLAY);
         }
     }
 

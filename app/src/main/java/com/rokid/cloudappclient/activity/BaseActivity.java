@@ -33,12 +33,12 @@ public abstract class BaseActivity extends Activity implements TTSSpeakInterface
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Logger.d("activity type: " + getAppStateManager().getFormType() + " OnCreated");
         AppTypeRecorder.getInstance().storeAppStateManager(appStateManager);
         appStateManager.setTaskProcessCallback(this);
         ResponseParser.getInstance().setTTSSpeakInterface(this);
         isNeedResume = false;
         intentParser.parseIntent(getIntent());
-        Logger.d("activity type: " + getAppStateManager().getFormType() + " OnCreated");
     }
 
     @Override
@@ -88,7 +88,6 @@ public abstract class BaseActivity extends Activity implements TTSSpeakInterface
     protected void onStop() {
         super.onStop();
         Logger.d("activity type: " + getAppStateManager().getFormType() + " onStop");
-        MediaAction.getInstance().releasePlayer();
         HttpClientWrapper.getInstance().close();
     }
 
