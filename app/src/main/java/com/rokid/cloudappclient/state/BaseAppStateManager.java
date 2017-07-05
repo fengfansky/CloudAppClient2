@@ -1,6 +1,7 @@
 package com.rokid.cloudappclient.state;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.rokid.cloudappclient.action.MediaAction;
 import com.rokid.cloudappclient.action.VoiceAction;
@@ -56,6 +57,7 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
 
     @Override
     public synchronized void onNewEventActionNode(ActionNode actionNode) {
+        Log.d("jiabin","onNewEventActionNode: " + actionNode);
         Logger.d("form: " + getFormType() + "onNewEventActionNode actioNode : " + actionNode + " currentMediaState: " + currentMediaState + " currentVoiceState " + currentVoiceState);
         if (actionNode != null) {
 
@@ -178,6 +180,7 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
     @Override
     public synchronized void onVoiceStart() {
         currentVoiceState = VOICE_STATE.VOICE_START;
+        Log.d("jiabin","onVoiceStart");
         Logger.d("form: " + getFormType() + " onVoiceStart !" + " currentMediaState: " + currentMediaState + " currentVoiceState " + currentVoiceState);
         if (TextUtils.isEmpty(mAppId)) {
             Logger.d(" appId is null !");
