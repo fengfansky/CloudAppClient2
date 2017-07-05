@@ -6,8 +6,6 @@ import com.rokid.cloudappclient.action.MediaAction;
 import com.rokid.cloudappclient.action.VoiceAction;
 import com.rokid.cloudappclient.bean.ActionNode;
 import com.rokid.cloudappclient.bean.response.responseinfo.action.ActionBean;
-import com.rokid.cloudappclient.bean.response.responseinfo.action.media.MediaBean;
-import com.rokid.cloudappclient.bean.response.responseinfo.action.voice.VoiceBean;
 import com.rokid.cloudappclient.parser.ResponseParser;
 import com.rokid.cloudappclient.reporter.BaseReporter;
 import com.rokid.cloudappclient.reporter.ExtraBean;
@@ -27,8 +25,6 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
 
     public ActionNode mActionNode;
     public String mAppId;
-    public MediaBean currentMediaBean;
-    public VoiceBean currentVoiceBean;
 
     //表明当此次返回的action执行完后 CloudAppClient 是否要退出，同时，当 shouldEndSession 为 true 时，CloudAppClient 将会忽略 EventRequests，即在action执行过程中不会产生 EventRequest。
     public boolean shouldEndSession;
@@ -72,12 +68,6 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
             }
 
             this.shouldEndSession = actionNode.isShouldEndSession();
-            if (actionNode.getMedia() != null && actionNode.getMedia().isValid()) {
-                this.currentMediaBean = actionNode.getMedia();
-            }
-            if (actionNode.getVoice() != null && actionNode.getVoice().isValid()) {
-                this.currentVoiceBean = actionNode.getVoice();
-            }
             processActionNode(actionNode);
         } else {
             checkAppState();
@@ -112,10 +102,6 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
             Logger.d(" appId is null !");
             return;
         }
-        if (currentMediaBean == null || !currentMediaBean.isValid()) {
-            Logger.d(" onMediaStart currentMediaBean invalid!");
-            return;
-        }
 
         reporterManager.executeReporter(new MediaReporter(mAppId, MediaReporter.START, getExtraBean()));
     }
@@ -131,10 +117,6 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
     public synchronized void onMediaPause(int position) {
         currentMediaState = MEDIA_STATE.MEDIA_PAUSED;
         Logger.d("form: " + getFormType() + " onMediaPause ! position : " + position + " currentMediaState: " + currentMediaState + " currentVoiceState " + currentVoiceState);
-        if (currentMediaBean == null || !currentMediaBean.isValid()) {
-            Logger.d("onMediaPaused currentMediaBean invalid!");
-            return;
-        }
         if (TextUtils.isEmpty(mAppId)) {
             Logger.d(" appId is null !");
             return;
@@ -155,10 +137,6 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
         if (shouldEndSession) {
             checkAppState();
         } else {
-            if (currentMediaBean == null || !currentMediaBean.isValid()) {
-                Logger.d("onMediaStop currentMediaBean invalid!");
-                return;
-            }
             if (TextUtils.isEmpty(mAppId)) {
                 Logger.d(" appId is null !");
                 return;

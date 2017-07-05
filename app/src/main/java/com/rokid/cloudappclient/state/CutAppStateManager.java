@@ -31,8 +31,6 @@ public class CutAppStateManager extends BaseAppStateManager {
             VoiceAction.getInstance().stopPlay();
             this.currentMediaState = null;
             this.currentVoiceState = null;
-            this.currentMediaBean = actionNode.getMedia();
-            this.currentVoiceBean = actionNode.getVoice();
             processActionNode(actionNode);
         }else {
             checkAppState();

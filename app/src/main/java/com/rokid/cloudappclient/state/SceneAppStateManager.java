@@ -36,16 +36,14 @@ public class SceneAppStateManager extends BaseAppStateManager {
                 Logger.d("onNewEventActionNode the appId is the not the same with lastAppId");
                 MediaAction.getInstance().stopPlay();
                 VoiceAction.getInstance().stopPlay();
+                this.currentMediaState = null;
+                this.currentVoiceState = null;
             }
+                this.mActionNode = actionNode;
+                this.mAppId = actionNode.getAppId();
+                this.shouldEndSession = actionNode.isShouldEndSession();
+                processActionNode(actionNode);
 
-            this.mActionNode = actionNode;
-            this.mAppId = actionNode.getAppId();
-            this.shouldEndSession = actionNode.isShouldEndSession();
-            this.currentMediaState = null;
-            this.currentVoiceState = null;
-            this.currentMediaBean = actionNode.getMedia();
-            this.currentVoiceBean = actionNode.getVoice();
-            processActionNode(actionNode);
         } else {
             checkAppState();
         }
