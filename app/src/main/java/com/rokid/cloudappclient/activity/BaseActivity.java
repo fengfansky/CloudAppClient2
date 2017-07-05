@@ -3,6 +3,7 @@ package com.rokid.cloudappclient.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.rokid.cloudappclient.R;
 import com.rokid.cloudappclient.action.MediaAction;
@@ -25,7 +26,7 @@ import com.rokid.cloudappclient.util.Logger;
 public abstract class BaseActivity extends Activity implements TTSSpeakInterface, BaseAppStateManager.TaskProcessCallback {
 
     IntentParser intentParser = new IntentParser(this);
-    BaseAppStateManager appStateManager = getAppStateManager();
+//    BaseAppStateManager appStateManager = getAppStateManager();
 
     //只有在cut应用入栈的时候才会调onResume
     boolean isNeedResume;
@@ -34,8 +35,8 @@ public abstract class BaseActivity extends Activity implements TTSSpeakInterface
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Logger.d("activity type: " + getAppStateManager().getFormType() + " OnCreated");
-        AppTypeRecorder.getInstance().storeAppStateManager(appStateManager);
-        appStateManager.setTaskProcessCallback(this);
+        AppTypeRecorder.getInstance().storeAppStateManager(getAppStateManager());
+        getAppStateManager().setTaskProcessCallback(this);
         ResponseParser.getInstance().setTTSSpeakInterface(this);
         isNeedResume = false;
         intentParser.parseIntent(getIntent());
@@ -71,7 +72,7 @@ public abstract class BaseActivity extends Activity implements TTSSpeakInterface
         super.onResume();
         Logger.d("activity type: " + getAppStateManager().getFormType() + " onResume " + " isNeedResume : " + isNeedResume);
         if (isNeedResume) {
-            appStateManager.onAppResume();
+            getAppStateManager().onAppResume();
         }
     }
 
@@ -80,7 +81,7 @@ public abstract class BaseActivity extends Activity implements TTSSpeakInterface
         super.onPause();
         isNeedResume = true;
         Logger.d("activity type: " + getAppStateManager().getFormType() + " onPause");
-        appStateManager.onAppPaused();
+        getAppStateManager().onAppPaused();
 
     }
 

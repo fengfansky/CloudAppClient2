@@ -1,6 +1,7 @@
 package com.rokid.cloudappclient.state;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.rokid.cloudappclient.bean.ActionNode;
 import com.rokid.cloudappclient.bean.response.responseinfo.action.ActionBean;
@@ -23,7 +24,20 @@ public class SceneAppStateManager extends BaseAppStateManager {
     }
 
     @Override
+    public void checkAppState() {
+        Log.d("jiabin","scene checkAppState -- " + "currentMediaState:" + currentMediaState + " | currentVoiceState:" + currentVoiceState);
+        super.checkAppState();
+    }
+
+    @Override
+    public synchronized void onNewEventActionNode(ActionNode actionNode) {
+        Log.d("jiabin","scene onNewEventActionNode ------");
+        super.onNewEventActionNode(actionNode);
+    }
+
+    @Override
     public synchronized void onNewIntentActionNode(ActionNode actionNode) {
+        Log.d("jiabin","scene onNewIntentActionNode --- " + "form: " + getFormType() + " | actioNode : " + actionNode);
         Logger.d("form: " + getFormType() + "onNewIntentActionNode actioNode : " + actionNode);
         if (actionNode != null) {
             if (TextUtils.isEmpty(actionNode.getAppId())) {

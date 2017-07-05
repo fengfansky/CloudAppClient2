@@ -1,5 +1,7 @@
 package com.rokid.cloudappclient.parser;
 
+import android.util.Log;
+
 import com.google.gson.Gson;
 import com.rokid.cloudappclient.bean.ActionNode;
 import com.rokid.cloudappclient.bean.CommonResponse;
@@ -21,7 +23,7 @@ import java.io.IOException;
 
 public class ResponseParser {
 
-    private BaseAppStateManager appStateManager = AppTypeRecorder.getInstance().getAppStateManager();
+    //private BaseAppStateManager appStateManager = AppTypeRecorder.getInstance().getAppStateManager();
 
     private static ResponseParser parser;
 
@@ -42,17 +44,20 @@ public class ResponseParser {
     }
 
     public void parseIntentResponse(CommonResponse commonResponse) {
+        Log.d("jiabin","parseIntentResponse----" + "commonResponse:" + commonResponse);
 
         Logger.d(" parse IntentResponse commonResponse : " + commonResponse);
 
         ActionNode actionNode = CommonResponseHelper.generateActionNode(commonResponse);
 
         //update appState
-        appStateManager.onNewIntentActionNode(actionNode);
+        AppTypeRecorder.getInstance().getAppStateManager().onNewIntentActionNode(actionNode);
 
     }
 
     public void parseSendEventResponse(String event, Response response) {
+
+        Log.d("jiabin","parseSendEventResponse----" + "event:" + event + " | response:" + response);
 
         SendEvent.SendEventResponse eventResponse = null;
 
@@ -60,12 +65,12 @@ public class ResponseParser {
             eventResponse = SendEvent.SendEventResponse.parseFrom(response.body().source().readByteArray());
         } catch (IOException e) {
             e.printStackTrace();
-            appStateManager.onEventErrorCallback(event, BaseReporter.ReporterResponseCallBack.ERROR_RESPONSE_NULL);
+            AppTypeRecorder.getInstance().getAppStateManager().onEventErrorCallback(event, BaseReporter.ReporterResponseCallBack.ERROR_RESPONSE_NULL);
         }
 
         if (eventResponse == null) {
             Logger.d(" eventResponse is null");
-            appStateManager.onEventErrorCallback(event, BaseReporter.ReporterResponseCallBack.ERROR_RESPONSE_NULL);
+            AppTypeRecorder.getInstance().getAppStateManager().onEventErrorCallback(event, BaseReporter.ReporterResponseCallBack.ERROR_RESPONSE_NULL);
             return;
         }
 
@@ -73,7 +78,7 @@ public class ResponseParser {
 
         if (eventResponse.getResponse() == null) {
             Logger.d("eventResponse is null !");
-            appStateManager.onEventErrorCallback(event, BaseReporter.ReporterResponseCallBack.ERROR_RESPONSE_NULL);
+            AppTypeRecorder.getInstance().getAppStateManager().onEventErrorCallback(event, BaseReporter.ReporterResponseCallBack.ERROR_RESPONSE_NULL);
             return;
         }
 
@@ -81,7 +86,7 @@ public class ResponseParser {
 
         if (cloudResponse == null) {
             Logger.d("cloudResponse parsed null !");
-            appStateManager.onEventErrorCallback(event, BaseReporter.ReporterResponseCallBack.ERROR_RESPONSE_NULL);
+            AppTypeRecorder.getInstance().getAppStateManager().onEventErrorCallback(event, BaseReporter.ReporterResponseCallBack.ERROR_RESPONSE_NULL);
             return;
         }
 
@@ -90,7 +95,7 @@ public class ResponseParser {
         ActionNode actionNode = CommonResponseHelper.generateActionNode(commonResponse);
 
         //update appState
-        appStateManager.onNewEventActionNode(actionNode);
+        AppTypeRecorder.getInstance().getAppStateManager().onNewEventActionNode(actionNode);
 
     }
 
