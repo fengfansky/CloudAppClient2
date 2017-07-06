@@ -2,6 +2,8 @@ package com.rokid.cloudappclient.action;
 
 import com.rokid.cloudappclient.bean.response.responseinfo.action.voice.VoiceBean;
 import com.rokid.cloudappclient.bean.response.responseinfo.action.voice.VoiceItemBean;
+import com.rokid.cloudappclient.state.BaseAppStateManager;
+import com.rokid.cloudappclient.util.AppTypeRecorder;
 import com.rokid.cloudappclient.tts.TTSHelper;
 import com.rokid.cloudappclient.util.Logger;
 
@@ -31,6 +33,8 @@ public class VoiceAction extends BaseAction<VoiceBean> {
             String ttsContent;
             ttsContent = voiceItemBean.getTts();
             TTSHelper.getInstance().speakTTS(ttsContent);
+            AppTypeRecorder.getInstance().getAppStateManager().setUserVoiceControlType(BaseAppStateManager.USER_VOICE_CONTROL_TYPE.VOICE_START);
+
         }
     }
 
@@ -39,6 +43,7 @@ public class VoiceAction extends BaseAction<VoiceBean> {
     public synchronized void pausePlay() {
         Logger.d("pause play voice");
         TTSHelper.getInstance().stopTTS();
+        AppTypeRecorder.getInstance().getAppStateManager().setUserVoiceControlType(BaseAppStateManager.USER_VOICE_CONTROL_TYPE.VOICE_PAUSE);
     }
 
 
@@ -46,6 +51,7 @@ public class VoiceAction extends BaseAction<VoiceBean> {
     public void resumePlay() {
         if (voiceBean != null){
             startPlay(voiceBean);
+            AppTypeRecorder.getInstance().getAppStateManager().setUserVoiceControlType(BaseAppStateManager.USER_VOICE_CONTROL_TYPE.VOICE_RESUME);
         }
     }
 
@@ -53,6 +59,7 @@ public class VoiceAction extends BaseAction<VoiceBean> {
     public synchronized void stopPlay() {
         Logger.d("stopPlay stop play voice");
         TTSHelper.getInstance().stopTTS();
+        AppTypeRecorder.getInstance().getAppStateManager().setUserVoiceControlType(BaseAppStateManager.USER_VOICE_CONTROL_TYPE.VOICE_STOP);
     }
 
 

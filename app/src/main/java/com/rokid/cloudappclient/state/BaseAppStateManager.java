@@ -33,6 +33,9 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
     public MEDIA_STATE currentMediaState;
     public VOICE_STATE currentVoiceState;
 
+    public USER_MEDIA_CONTROL_TYPE userMediaControlType;
+    public USER_VOICE_CONTROL_TYPE userVoiceControlType;
+
     public ReporterManager reporterManager = ReporterManager.getInstance();
 
     public MEDIA_STATE getCurrentMediaState() {
@@ -268,11 +271,6 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
 
     public abstract String getFormType();
 
-    public enum APP_STATE {
-        APP_PAUSED,
-        APP_RESUME
-    }
-
     public enum VOICE_STATE {
         VOICE_START,
         VOICE_STOP,
@@ -286,6 +284,37 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
         MEDIA_RESUME,
         MEDIA_STOP,
         MEDIA_ERROR
+    }
+
+
+    public USER_MEDIA_CONTROL_TYPE getUserMediaControlType() {
+        return userMediaControlType;
+    }
+
+    public void setUserMediaControlType(USER_MEDIA_CONTROL_TYPE userMediaControlType) {
+        this.userMediaControlType = userMediaControlType;
+    }
+
+    public USER_VOICE_CONTROL_TYPE getUserVoiceControlType() {
+        return userVoiceControlType;
+    }
+
+    public void setUserVoiceControlType(USER_VOICE_CONTROL_TYPE userVoiceControlType) {
+        this.userVoiceControlType = userVoiceControlType;
+    }
+
+    public enum USER_MEDIA_CONTROL_TYPE {
+        MEDIA_PLAY,
+        MEDIA_PAUSE,
+        MEDIA_RESUME,
+        MEDIA_STOP,
+    }
+
+    public enum USER_VOICE_CONTROL_TYPE {
+        VOICE_START,
+        VOICE_PAUSE,
+        VOICE_RESUME,
+        VOICE_STOP
     }
 
 }

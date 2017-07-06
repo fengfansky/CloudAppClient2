@@ -25,19 +25,19 @@ public class SceneAppStateManager extends BaseAppStateManager {
 
     @Override
     public void checkAppState() {
-        Log.d("jiabin","scene checkAppState -- " + "currentMediaState:" + currentMediaState + " | currentVoiceState:" + currentVoiceState);
+        Log.d("jiabin", "scene checkAppState -- " + "currentMediaState:" + currentMediaState + " | currentVoiceState:" + currentVoiceState);
         super.checkAppState();
     }
 
     @Override
     public synchronized void onNewEventActionNode(ActionNode actionNode) {
-        Log.d("jiabin","scene onNewEventActionNode ------");
+        Log.d("jiabin", "scene onNewEventActionNode ------");
         super.onNewEventActionNode(actionNode);
     }
 
     @Override
     public synchronized void onNewIntentActionNode(ActionNode actionNode) {
-        Log.d("jiabin","scene onNewIntentActionNode --- " + "form: " + getFormType() + " | actioNode : " + actionNode);
+        Log.d("jiabin", "scene onNewIntentActionNode --- " + "form: " + getFormType() + " | actioNode : " + actionNode);
         Logger.d("form: " + getFormType() + "onNewIntentActionNode actioNode : " + actionNode);
         if (actionNode != null) {
             if (TextUtils.isEmpty(actionNode.getAppId())) {
@@ -53,10 +53,10 @@ public class SceneAppStateManager extends BaseAppStateManager {
                 this.currentMediaState = null;
                 this.currentVoiceState = null;
             }
-                this.mActionNode = actionNode;
-                this.mAppId = actionNode.getAppId();
-                this.shouldEndSession = actionNode.isShouldEndSession();
-                processActionNode(actionNode);
+            this.mActionNode = actionNode;
+            this.mAppId = actionNode.getAppId();
+            this.shouldEndSession = actionNode.isShouldEndSession();
+            processActionNode(actionNode);
 
         } else {
             checkAppState();
@@ -73,12 +73,15 @@ public class SceneAppStateManager extends BaseAppStateManager {
     @Override
     public synchronized void onAppResume() {
         super.onAppResume();
-        Logger.d("scene  onAppResume mediaType: " + currentMediaState + " voiceType : " + currentVoiceState);
-        if (currentMediaState == MEDIA_STATE.MEDIA_PAUSED) {
+        Logger.d("scene  onAppResume mediaType: " + currentMediaState + " voiceType : " + currentVoiceState + " userMediaControlType: " + userMediaControlType + " userVoiceControlType: " + userVoiceControlType);
+
+        //应用onResume的时候要考虑到用户上次操作是否是暂停
+        if (currentMediaState == MEDIA_STATE.MEDIA_PAUSED && !(userMediaControlType == USER_MEDIA_CONTROL_TYPE.MEDIA_PAUSE)) {
             MediaAction.getInstance().resumePlay();
             Logger.d("scene: onAppResume resume play audio");
         }
-        if (currentVoiceState == VOICE_STATE.VOICE_CANCLED) {
+
+        if (currentVoiceState == VOICE_STATE.VOICE_CANCLED && !(userMediaControlType == USER_MEDIA_CONTROL_TYPE.MEDIA_PAUSE)) {
             VoiceAction.getInstance().resumePlay();
             Logger.d("scene onAppResume play voice");
         }

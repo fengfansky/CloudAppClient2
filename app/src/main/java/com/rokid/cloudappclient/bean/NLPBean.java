@@ -12,6 +12,11 @@ import java.util.Map;
 public class NLPBean extends BaseBean{
 
     /**
+     * asr content
+     */
+    private String asr;
+
+    /**
      * intent cloudAppId
      */
     private String appId;
@@ -65,6 +70,13 @@ public class NLPBean extends BaseBean{
      */
     private boolean cloud;
 
+    public String getAsr() {
+        return asr;
+    }
+
+    public void setAsr(String asr) {
+        this.asr = asr;
+    }
 
     public String getAppId() {
         return appId;
