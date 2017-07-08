@@ -26,16 +26,16 @@ public abstract class BaseAction<T extends BaseActionBean> {
 
         switch (action) {
             case BaseActionBean.ACTION_PLAY:
-                startPlay(actionBean);
+                userStartPlay(actionBean);
                 break;
             case BaseActionBean.ACTION_PAUSE:
-                pausePlay();
+                userPausedPlay();
                 break;
             case BaseActionBean.ACTION_RESUME:
-                resumePlay();
+                userResumePlay();
                 break;
             case BaseActionBean.ACTION_STOP:
-                stopPlay();
+                userStopPlay();
                 break;
             case BaseActionBean.ACTION_FORWARD:
                 forward();
@@ -48,11 +48,17 @@ public abstract class BaseAction<T extends BaseActionBean> {
         }
     }
 
-    public abstract void startPlay(T actionBean);
+    public abstract void userStartPlay(T actionBean);
+
+    public abstract void userPausedPlay();
 
     public abstract void pausePlay();
 
+    public abstract void userStopPlay();
+
     public abstract void stopPlay();
+
+    public abstract void userResumePlay();
 
     public abstract void resumePlay();
 

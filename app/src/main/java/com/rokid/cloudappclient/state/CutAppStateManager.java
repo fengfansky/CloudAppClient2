@@ -62,6 +62,11 @@ public class CutAppStateManager extends BaseAppStateManager {
     }
 
     @Override
+    public void onAppDestory() {
+        super.onAppDestory();
+    }
+
+    @Override
     public String getFormType() {
         return ActionBean.FORM_CUT;
     }

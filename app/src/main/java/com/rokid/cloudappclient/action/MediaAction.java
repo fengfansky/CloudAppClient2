@@ -38,6 +38,7 @@ public class MediaAction extends BaseAction<MediaBean> {
         rkAudioPlayer.setmOnErrorListener(new IMediaPlayer.OnErrorListener() {
             @Override
             public boolean onError(IMediaPlayer mp, int what, int extra) {
+                Logger.d(" onMediaError what : " + what + " extra :" + extra);
                 AppTypeRecorder.getInstance().getAppStateManager().onMediaError();
                 return false;
             }
@@ -68,7 +69,7 @@ public class MediaAction extends BaseAction<MediaBean> {
         return mediaAction;
     }
 
-    public synchronized void startPlay(MediaBean mediaBean) {
+    public synchronized void userStartPlay(MediaBean mediaBean) {
         if (rkAudioPlayer != null && mediaBean != null) {
             MediaItemBean mediaBeanItem = mediaBean.getItem();
             if (mediaBeanItem == null) {
@@ -87,11 +88,11 @@ public class MediaAction extends BaseAction<MediaBean> {
             }
 
             Logger.d("start play media url : " + url);
+            AppTypeRecorder.getInstance().getAppStateManager().setUserMediaControlType(BaseAppStateManager.USER_MEDIA_CONTROL_TYPE.MEDIA_PLAY);
+            AppTypeRecorder.getInstance().getAppStateManager().setCurrentMediaState(BaseAppStateManager.MEDIA_STATE.MEDIA_PLAY);
             rkAudioPlayer.setVideoURI(Uri.parse(url));
             rkAudioPlayer.start();
             rkAudioPlayer.seekTo(mediaBeanItem.getOffsetInMilliseconds());
-            AppTypeRecorder.getInstance().getAppStateManager().setCurrentMediaState(BaseAppStateManager.MEDIA_STATE.MEDIA_PLAY);
-            AppTypeRecorder.getInstance().getAppStateManager().setUserMediaControlType(BaseAppStateManager.USER_MEDIA_CONTROL_TYPE.MEDIA_PLAY);
         }
     }
 
@@ -99,16 +100,13 @@ public class MediaAction extends BaseAction<MediaBean> {
     public synchronized void pausePlay() {
         if (rkAudioPlayer != null && rkAudioPlayer.canPause()) {
             rkAudioPlayer.pause();
-            AppTypeRecorder.getInstance().getAppStateManager().setUserMediaControlType(BaseAppStateManager.USER_MEDIA_CONTROL_TYPE.MEDIA_PAUSE);
         }
     }
 
     @Override
     public synchronized void stopPlay() {
         if (rkAudioPlayer != null && rkAudioPlayer.canPause()) {
-            rkAudioPlayer.seekTo(0);
-            rkAudioPlayer.pause();
-            AppTypeRecorder.getInstance().getAppStateManager().setUserMediaControlType(BaseAppStateManager.USER_MEDIA_CONTROL_TYPE.MEDIA_STOP);
+            rkAudioPlayer.release(true);
         }
     }
 
@@ -117,8 +115,25 @@ public class MediaAction extends BaseAction<MediaBean> {
         if (rkAudioPlayer != null && !rkAudioPlayer.isPlaying()) {
             rkAudioPlayer.start();
             AppTypeRecorder.getInstance().getAppStateManager().onMediaResume();
-            AppTypeRecorder.getInstance().getAppStateManager().setUserMediaControlType(BaseAppStateManager.USER_MEDIA_CONTROL_TYPE.MEDIA_RESUME);
         }
+    }
+
+    @Override
+    public synchronized void userPausedPlay() {
+        pausePlay();
+        AppTypeRecorder.getInstance().getAppStateManager().setUserMediaControlType(BaseAppStateManager.USER_MEDIA_CONTROL_TYPE.MEDIA_PAUSE);
+    }
+
+    @Override
+    public synchronized void userStopPlay() {
+        stopPlay();
+        AppTypeRecorder.getInstance().getAppStateManager().setUserMediaControlType(BaseAppStateManager.USER_MEDIA_CONTROL_TYPE.MEDIA_STOP);
+    }
+
+    @Override
+    public synchronized void userResumePlay() {
+        resumePlay();
+        AppTypeRecorder.getInstance().getAppStateManager().setUserMediaControlType(BaseAppStateManager.USER_MEDIA_CONTROL_TYPE.MEDIA_RESUME);
     }
 
     @Override

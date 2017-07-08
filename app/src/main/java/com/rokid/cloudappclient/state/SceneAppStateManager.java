@@ -7,6 +7,7 @@ import com.rokid.cloudappclient.bean.ActionNode;
 import com.rokid.cloudappclient.bean.response.responseinfo.action.ActionBean;
 import com.rokid.cloudappclient.action.MediaAction;
 import com.rokid.cloudappclient.action.VoiceAction;
+import com.rokid.cloudappclient.http.HttpClientWrapper;
 import com.rokid.cloudappclient.util.Logger;
 
 /**
@@ -81,11 +82,17 @@ public class SceneAppStateManager extends BaseAppStateManager {
             Logger.d("scene: onAppResume resume play audio");
         }
 
-        if (currentVoiceState == VOICE_STATE.VOICE_CANCLED && !(userMediaControlType == USER_MEDIA_CONTROL_TYPE.MEDIA_PAUSE)) {
+        if (currentVoiceState == VOICE_STATE.VOICE_CANCLED && !(userVoiceControlType == USER_VOICE_CONTROL_TYPE.VOICE_PAUSE)) {
             VoiceAction.getInstance().resumePlay();
             Logger.d("scene onAppResume play voice");
         }
+    }
 
+    @Override
+    public void onAppDestory() {
+        super.onAppDestory();
+        MediaAction.getInstance().releasePlayer();
+        HttpClientWrapper.getInstance().close();
     }
 
     @Override

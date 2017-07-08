@@ -26,7 +26,6 @@ import com.rokid.cloudappclient.util.Logger;
 public abstract class BaseActivity extends Activity implements TTSSpeakInterface, BaseAppStateManager.TaskProcessCallback {
 
     IntentParser intentParser = new IntentParser(this);
-//    BaseAppStateManager appStateManager = getAppStateManager();
 
     //只有在cut应用入栈的时候才会调onResume
     boolean isNeedResume;
@@ -89,12 +88,12 @@ public abstract class BaseActivity extends Activity implements TTSSpeakInterface
     protected void onStop() {
         super.onStop();
         Logger.d("activity type: " + getAppStateManager().getFormType() + " onStop");
-        HttpClientWrapper.getInstance().close();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        getAppStateManager().onAppDestory();
         Logger.d("activity type: " + getAppStateManager().getFormType() + " onDestroy");
     }
 

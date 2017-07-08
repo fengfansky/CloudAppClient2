@@ -17,4 +17,6 @@ public interface AppStateCallback {
     void onAppPaused();
 
     void onAppResume();
+
+    void onAppDestory();
 }

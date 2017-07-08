@@ -25,16 +25,16 @@ public class VoiceAction extends BaseAction<VoiceBean> {
 
 
     @Override
-    public void startPlay(VoiceBean actionBean) {
+    public void userStartPlay(VoiceBean actionBean) {
         if (actionBean.isValid()){
+            AppTypeRecorder.getInstance().getAppStateManager().setCurrentVoiceState(BaseAppStateManager.VOICE_STATE.VOICE_START);
+            AppTypeRecorder.getInstance().getAppStateManager().setUserVoiceControlType(BaseAppStateManager.USER_VOICE_CONTROL_TYPE.VOICE_START);
             this.voiceBean = actionBean;
             //TODO To check whether the voiceBean have confirm, if have confirm speak confirm TTS.
             VoiceItemBean voiceItemBean = actionBean.getItem();
             String ttsContent;
             ttsContent = voiceItemBean.getTts();
             TTSHelper.getInstance().speakTTS(ttsContent);
-            AppTypeRecorder.getInstance().getAppStateManager().setUserVoiceControlType(BaseAppStateManager.USER_VOICE_CONTROL_TYPE.VOICE_START);
-
         }
     }
 
@@ -43,22 +43,40 @@ public class VoiceAction extends BaseAction<VoiceBean> {
     public synchronized void pausePlay() {
         Logger.d("pause play voice");
         TTSHelper.getInstance().stopTTS();
-        AppTypeRecorder.getInstance().getAppStateManager().setUserVoiceControlType(BaseAppStateManager.USER_VOICE_CONTROL_TYPE.VOICE_PAUSE);
     }
 
 
     @Override
-    public void resumePlay() {
+    public synchronized void resumePlay() {
+        Logger.d("resume play voiceBean " + voiceBean);
         if (voiceBean != null){
-            startPlay(voiceBean);
-            AppTypeRecorder.getInstance().getAppStateManager().setUserVoiceControlType(BaseAppStateManager.USER_VOICE_CONTROL_TYPE.VOICE_RESUME);
+            userStartPlay(voiceBean);
         }
     }
 
     @Override
     public synchronized void stopPlay() {
-        Logger.d("stopPlay stop play voice");
+        Logger.d("stop play voice");
+        voiceBean = null;
         TTSHelper.getInstance().stopTTS();
+    }
+
+    @Override
+    public synchronized void userPausedPlay() {
+        pausePlay();
+        AppTypeRecorder.getInstance().getAppStateManager().setUserVoiceControlType(BaseAppStateManager.USER_VOICE_CONTROL_TYPE.VOICE_PAUSE);
+    }
+
+
+    @Override
+    public void userResumePlay() {
+        resumePlay();
+        AppTypeRecorder.getInstance().getAppStateManager().setUserVoiceControlType(BaseAppStateManager.USER_VOICE_CONTROL_TYPE.VOICE_RESUME);
+    }
+
+    @Override
+    public synchronized void userStopPlay() {
+        stopPlay();
         AppTypeRecorder.getInstance().getAppStateManager().setUserVoiceControlType(BaseAppStateManager.USER_VOICE_CONTROL_TYPE.VOICE_STOP);
     }
 

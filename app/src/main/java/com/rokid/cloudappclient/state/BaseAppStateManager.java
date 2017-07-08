@@ -100,6 +100,12 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
     }
 
     @Override
+    public void onAppDestory() {
+        AppTypeRecorder.getInstance().storeAppStateManager(null);
+        Logger.d("form: " + getFormType() + " onAppDestory " + " currentMediaState: " + currentMediaState + " currentVoiceState: " + currentVoiceState);
+    }
+
+    @Override
     public synchronized void onMediaStart() {
         currentMediaState = MEDIA_STATE.MEDIA_PLAY;
         Logger.d("form: " + getFormType() + " onMediaStart ! " + " currentMediaState: " + currentMediaState + " currentVoiceState " + currentVoiceState);

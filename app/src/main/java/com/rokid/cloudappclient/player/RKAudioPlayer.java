@@ -5,14 +5,18 @@ import android.content.Context;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.MediaController;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
 import tv.danmaku.ijk.media.player.AndroidMediaPlayer;
+import tv.danmaku.ijk.media.player.FileMediaDataSource;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
+import tv.danmaku.ijk.media.player.misc.IMediaDataSource;
 
 
 /**
@@ -134,12 +138,11 @@ public class RKAudioPlayer implements MediaController.MediaPlayerControl {
         mCurrentBufferPercentage = 0;
         String scheme = mUri.getScheme();
         try {
-            /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
-                   *//* mSettings.getUsingMediaDataSource() &&*//*
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
                     (TextUtils.isEmpty(scheme) || scheme.equalsIgnoreCase("file"))) {
                 IMediaDataSource dataSource = new FileMediaDataSource(new File(mUri.toString()));
                 mMediaPlayer.setDataSource(dataSource);
-            } else*/
+            } else
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
                 mMediaPlayer.setDataSource(mAppContext, mUri, mHeaders);
             } else {
