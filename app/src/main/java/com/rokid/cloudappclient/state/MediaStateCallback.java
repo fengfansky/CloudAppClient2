@@ -14,5 +14,5 @@ public interface MediaStateCallback {
 
     void onMediaStop();
 
-    void onMediaError();
+    void onMediaError(int errorCode);
 }

@@ -20,6 +20,7 @@ package tv.danmaku.ijk.media.player;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.res.AssetFileDescriptor;
 import android.media.AudioManager;
 import android.media.MediaDataSource;
 import android.media.MediaPlayer;
@@ -96,6 +97,11 @@ public class AndroidMediaPlayer extends AbstractMediaPlayer {
     public void setDataSource(FileDescriptor fd)
             throws IOException, IllegalArgumentException, IllegalStateException {
         mInternalMediaPlayer.setDataSource(fd);
+    }
+
+    @Override
+    public void setDataSource(AssetFileDescriptor afd) throws IOException {
+        mInternalMediaPlayer.setDataSource(afd.getFileDescriptor(),afd.getStartOffset(),afd.getLength());
     }
 
     @Override

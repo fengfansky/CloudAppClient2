@@ -19,6 +19,7 @@ package tv.danmaku.ijk.media.player;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.res.AssetFileDescriptor;
 import android.net.Uri;
 import android.os.Build;
 import android.view.Surface;
@@ -51,6 +52,11 @@ public class MediaPlayerProxy implements IMediaPlayer {
     @Override
     public void setSurface(Surface surface) {
         mBackEndMediaPlayer.setSurface(surface);
+    }
+
+    @Override
+    public void setDataSource(AssetFileDescriptor afd) throws IOException{
+        mBackEndMediaPlayer.setDataSource(afd);
     }
 
     @Override

@@ -6,6 +6,7 @@ import com.rokid.cloudappclient.action.MediaAction;
 import com.rokid.cloudappclient.bean.ActionNode;
 import com.rokid.cloudappclient.bean.response.responseinfo.action.ActionBean;
 import com.rokid.cloudappclient.action.VoiceAction;
+import com.rokid.cloudappclient.player.ErrorPromoter;
 import com.rokid.cloudappclient.util.Logger;
 
 /**
@@ -48,7 +49,7 @@ public class CutAppStateManager extends BaseAppStateManager {
             this.currentVoiceState = null;
             processActionNode(actionNode);
         }else {
-            checkAppState();
+            promoteErrorInfo(ErrorPromoter.ERROR_TYPE.DATA_INVALID);
         }
     }
 

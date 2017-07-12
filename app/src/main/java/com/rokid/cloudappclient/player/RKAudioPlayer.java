@@ -2,6 +2,7 @@ package com.rokid.cloudappclient.player;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.res.AssetFileDescriptor;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
@@ -16,6 +17,7 @@ import java.util.Map;
 import tv.danmaku.ijk.media.player.AndroidMediaPlayer;
 import tv.danmaku.ijk.media.player.FileMediaDataSource;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
+import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 import tv.danmaku.ijk.media.player.misc.IMediaDataSource;
 
 
@@ -40,6 +42,12 @@ public class RKAudioPlayer implements MediaController.MediaPlayerControl {
     private static final int STATE_PLAYING = 3;
     private static final int STATE_PAUSED = 4;
     private static final int STATE_PLAYBACK_COMPLETED = 5;
+
+    //all media error state
+    public static final int MEDIA_ERROR_TIME_OUT = -110;
+    public static final int MEDIA_ERROR_IO = -1004;
+    public static final int MEDIA_ERROR_MALFORMED = -1007;
+    public static final int MEDIA_ERROR_UNSUPPORTED = -1010;
 
     // mCurrentState is a VideoView object's current state.
     // mTargetState is the state that a method caller intends to reach.
@@ -76,6 +84,47 @@ public class RKAudioPlayer implements MediaController.MediaPlayerControl {
 
     private void initPlayer(Context mAppContext) {
         this.mAppContext = mAppContext;
+    }
+
+
+    private void initPlayer() {
+        // we shouldn't clear the target state, because somebody might have
+        // called start() previously
+        release(false);
+
+        AudioManager am = (AudioManager) mAppContext.getSystemService(Context.AUDIO_SERVICE);
+        am.requestAudioFocus(null, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+
+        mMediaPlayer = createPlayer();
+
+        // REMOVED: mAudioSession
+        mMediaPlayer.setOnPreparedListener(mPreparedListener);
+        mMediaPlayer.setOnCompletionListener(mCompletionListener);
+        mMediaPlayer.setOnErrorListener(mErrorListener);
+        mMediaPlayer.setOnInfoListener(mInfoListener);
+        mMediaPlayer.setOnBufferingUpdateListener(mBufferingUpdateListener);
+        mMediaPlayer.setOnSeekCompleteListener(mSeekCompleteListener);
+        mCurrentBufferPercentage = 0;
+    }
+
+    /**
+     *Sets video asset path using assetFileDescriptor
+     *
+     * @param assetFileDescriptor the filePath of the video.
+     */
+    public void setAssetVideo(AssetFileDescriptor assetFileDescriptor) throws IOException {
+        if (assetFileDescriptor == null){
+            return;
+        }
+        initPlayer();
+        Log.d(TAG," fileDescriptor : " + assetFileDescriptor);
+        mMediaPlayer.setDataSource(assetFileDescriptor);
+        mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        mMediaPlayer.setScreenOnWhilePlaying(true);
+        mPrepareStartTime = System.currentTimeMillis();
+        mMediaPlayer.prepareAsync();
+
+        mCurrentState = STATE_PREPARING;
     }
 
     /**
@@ -119,23 +168,8 @@ public class RKAudioPlayer implements MediaController.MediaPlayerControl {
             // not ready for playback just yet, will try again later
             return;
         }
-        // we shouldn't clear the target state, because somebody might have
-        // called start() previously
-        release(false);
+        initPlayer();
 
-        AudioManager am = (AudioManager) mAppContext.getSystemService(Context.AUDIO_SERVICE);
-        am.requestAudioFocus(null, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
-
-        mMediaPlayer = createPlayer();
-
-        // REMOVED: mAudioSession
-        mMediaPlayer.setOnPreparedListener(mPreparedListener);
-        mMediaPlayer.setOnCompletionListener(mCompletionListener);
-        mMediaPlayer.setOnErrorListener(mErrorListener);
-        mMediaPlayer.setOnInfoListener(mInfoListener);
-        mMediaPlayer.setOnBufferingUpdateListener(mBufferingUpdateListener);
-        mMediaPlayer.setOnSeekCompleteListener(mSeekCompleteListener);
-        mCurrentBufferPercentage = 0;
         String scheme = mUri.getScheme();
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&

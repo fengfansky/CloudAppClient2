@@ -7,6 +7,7 @@ import com.rokid.cloudappclient.bean.ActionNode;
 import com.rokid.cloudappclient.bean.response.responseinfo.action.ActionBean;
 import com.rokid.cloudappclient.action.MediaAction;
 import com.rokid.cloudappclient.action.VoiceAction;
+import com.rokid.cloudappclient.player.ErrorPromoter;
 import com.rokid.cloudappclient.http.HttpClientWrapper;
 import com.rokid.cloudappclient.util.Logger;
 
@@ -60,7 +61,7 @@ public class SceneAppStateManager extends BaseAppStateManager {
             processActionNode(actionNode);
 
         } else {
-            checkAppState();
+            promoteErrorInfo(ErrorPromoter.ERROR_TYPE.DATA_INVALID);
         }
     }
 

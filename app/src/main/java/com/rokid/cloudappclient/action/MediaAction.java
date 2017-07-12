@@ -39,7 +39,7 @@ public class MediaAction extends BaseAction<MediaBean> {
             @Override
             public boolean onError(IMediaPlayer mp, int what, int extra) {
                 Logger.d(" onMediaError what : " + what + " extra :" + extra);
-                AppTypeRecorder.getInstance().getAppStateManager().onMediaError();
+                AppTypeRecorder.getInstance().getAppStateManager().onMediaError(extra);
                 return false;
             }
         });
@@ -70,30 +70,37 @@ public class MediaAction extends BaseAction<MediaBean> {
     }
 
     public synchronized void userStartPlay(MediaBean mediaBean) {
-        if (rkAudioPlayer != null && mediaBean != null) {
-            MediaItemBean mediaBeanItem = mediaBean.getItem();
-            if (mediaBeanItem == null) {
-                Logger.d("start play media mediaBeanItem null!");
-                return;
-            }
-
-            Logger.d("play mediaBean : " + mediaBean);
-            currentToken = mediaBeanItem.getToken();
-
-            String url = mediaBeanItem.getUrl();
-
-            if (TextUtils.isEmpty(url)) {
-                Logger.d("media url invalidate!");
-                return;
-            }
-
-            Logger.d("start play media url : " + url);
-            AppTypeRecorder.getInstance().getAppStateManager().setUserMediaControlType(BaseAppStateManager.USER_MEDIA_CONTROL_TYPE.MEDIA_PLAY);
-            AppTypeRecorder.getInstance().getAppStateManager().setCurrentMediaState(BaseAppStateManager.MEDIA_STATE.MEDIA_PLAY);
-            rkAudioPlayer.setVideoURI(Uri.parse(url));
-            rkAudioPlayer.start();
-            rkAudioPlayer.seekTo(mediaBeanItem.getOffsetInMilliseconds());
+        Logger.d(" rkAudioPlayer is null ? " + (rkAudioPlayer == null));
+        if (mediaBean == null) {
+            Logger.d(" userStartPlay mediaBean is null ");
+            return;
         }
+
+        if (rkAudioPlayer == null) {
+            initRKAudioPlayer();
+        }
+        MediaItemBean mediaBeanItem = mediaBean.getItem();
+        if (mediaBeanItem == null) {
+            Logger.d("start play media mediaBeanItem null!");
+            return;
+        }
+
+        Logger.d("play mediaBean : " + mediaBean);
+        currentToken = mediaBeanItem.getToken();
+
+        String url = mediaBeanItem.getUrl();
+
+        if (TextUtils.isEmpty(url)) {
+            Logger.d("media url invalidate!");
+            return;
+        }
+
+        Logger.d("start play media url : " + url);
+        AppTypeRecorder.getInstance().getAppStateManager().setUserMediaControlType(BaseAppStateManager.USER_MEDIA_CONTROL_TYPE.MEDIA_PLAY);
+        AppTypeRecorder.getInstance().getAppStateManager().setCurrentMediaState(BaseAppStateManager.MEDIA_STATE.MEDIA_PLAY);
+        rkAudioPlayer.setVideoURI(Uri.parse(url));
+        rkAudioPlayer.start();
+        rkAudioPlayer.seekTo(mediaBeanItem.getOffsetInMilliseconds());
     }
 
     @Override
@@ -169,8 +176,8 @@ public class MediaAction extends BaseAction<MediaBean> {
         return rkAudioPlayer.getDuration();
     }
 
-    public int getMediaPosition(){
-        if (rkAudioPlayer == null){
+    public int getMediaPosition() {
+        if (rkAudioPlayer == null) {
             return 0;
         }
         return rkAudioPlayer.getCurrentPosition();

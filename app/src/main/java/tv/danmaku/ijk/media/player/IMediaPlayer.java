@@ -19,6 +19,7 @@ package tv.danmaku.ijk.media.player;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.res.AssetFileDescriptor;
 import android.net.Uri;
 import android.os.Build;
 import android.view.Surface;
@@ -62,6 +63,8 @@ public interface IMediaPlayer {
     int MEDIA_ERROR_TIMED_OUT = -110;
 
     void setDisplay(SurfaceHolder sh);
+
+    void setDataSource(AssetFileDescriptor afd) throws IOException;
 
     void setDataSource(Context context, Uri uri)
             throws IOException, IllegalArgumentException, SecurityException, IllegalStateException;

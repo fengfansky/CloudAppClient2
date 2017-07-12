@@ -3,11 +3,8 @@ package com.rokid.cloudappclient.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.rokid.cloudappclient.R;
-import com.rokid.cloudappclient.action.MediaAction;
-import com.rokid.cloudappclient.http.HttpClientWrapper;
 import com.rokid.cloudappclient.parser.IntentParser;
 import com.rokid.cloudappclient.parser.ResponseParser;
 import com.rokid.cloudappclient.state.BaseAppStateManager;

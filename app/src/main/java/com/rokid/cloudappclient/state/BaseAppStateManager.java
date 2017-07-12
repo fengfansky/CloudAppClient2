@@ -7,7 +7,9 @@ import com.rokid.cloudappclient.action.MediaAction;
 import com.rokid.cloudappclient.action.VoiceAction;
 import com.rokid.cloudappclient.bean.ActionNode;
 import com.rokid.cloudappclient.bean.response.responseinfo.action.ActionBean;
+import com.rokid.cloudappclient.player.ErrorPromoter;
 import com.rokid.cloudappclient.parser.ResponseParser;
+import com.rokid.cloudappclient.player.RKAudioPlayer;
 import com.rokid.cloudappclient.reporter.BaseReporter;
 import com.rokid.cloudappclient.reporter.ExtraBean;
 import com.rokid.cloudappclient.reporter.MediaReporter;
@@ -16,6 +18,8 @@ import com.rokid.cloudappclient.reporter.VoiceReporter;
 import com.rokid.cloudappclient.util.AppTypeRecorder;
 import com.rokid.cloudappclient.util.Logger;
 import com.squareup.okhttp.Response;
+
+import java.io.IOException;
 //import com.android.okhttp.Response;
 
 /**
@@ -158,10 +162,14 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
     }
 
     @Override
-    public synchronized void onMediaError() {
+    public synchronized void onMediaError(int errorCode) {
         currentMediaState = MEDIA_STATE.MEDIA_ERROR;
-        Logger.d("form: " + getFormType() + " onMediaError !" + " currentMediaState: " + currentMediaState + " currentVoiceState " + currentVoiceState);
-        checkAppState();
+        Logger.d("form: " + getFormType() + " onMediaError ! errorCode : " + errorCode + " currentMediaState: " + currentMediaState + " currentVoiceState " + currentVoiceState);
+        if (errorCode == RKAudioPlayer.MEDIA_ERROR_TIME_OUT){
+            promoteErrorInfo(ErrorPromoter.ERROR_TYPE.MEDIA_TIME_OUT);
+        }else {
+            promoteErrorInfo(ErrorPromoter.ERROR_TYPE.MEDIA_ERROR);
+        }
     }
 
     @Override
@@ -192,15 +200,35 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
         }
     }
 
-    //TODO 区分scene和cut异常处理
-    public void checkAppState() {
-        Logger.d("form: " + getFormType() + "  checkAppState shouldEndSession : " + shouldEndSession + " mediaType : " + currentMediaState + " videoType : " + currentVoiceState);
-
-        if ((currentMediaState == null || currentMediaState == MEDIA_STATE.MEDIA_STOP || currentMediaState == MEDIA_STATE.MEDIA_ERROR) && (currentVoiceState == null || currentVoiceState == VOICE_STATE.VOICE_STOP || currentVoiceState == VOICE_STATE.VOICE_CANCLED || currentVoiceState == VOICE_STATE.VOICE_ERROR)
-                && mTaskProcessCallback != null) {
-            mTaskProcessCallback.onAllTaskFinished();
-            Logger.d("form: " + getFormType() + " voice stop , allTaskFinished ! finish app !");
+    public void promoteErrorInfo(ErrorPromoter.ERROR_TYPE errorType){
+        Logger.d(" promoteErrorInfo isStateInvalid : " + isStateInvalid());
+        if (isStateInvalid()){
+            try {
+                ErrorPromoter.getInstance().speakErrorPromote(errorType, new ErrorPromoter.ErrorPromoteCallback() {
+                    @Override
+                    public void onPromoteFinished() {
+                        if (mTaskProcessCallback != null){
+                            mTaskProcessCallback.onAllTaskFinished();
+                        }
+                    }
+                });
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+    }
+
+    public void checkAppState() {
+        if (isStateInvalid()){
+            Logger.d("form: " + getFormType() + " voice stop , allTaskFinished ! finish app !");
+            mTaskProcessCallback.onAllTaskFinished();
+        }
+    }
+
+    private boolean isStateInvalid() {
+        Logger.d("form: " + getFormType() + " isStateInvalid shouldEndSession : " + shouldEndSession + " mediaType : " + currentMediaState + " videoType : " + currentVoiceState);
+        return (currentMediaState == null || currentMediaState == MEDIA_STATE.MEDIA_STOP || currentMediaState == MEDIA_STATE.MEDIA_ERROR) && (currentVoiceState == null || currentVoiceState == VOICE_STATE.VOICE_STOP || currentVoiceState == VOICE_STATE.VOICE_CANCLED || currentVoiceState == VOICE_STATE.VOICE_ERROR)
+                && mTaskProcessCallback != null;
     }
 
     @Override
@@ -214,7 +242,7 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
     public synchronized void onVoiceError() {
         currentVoiceState = VOICE_STATE.VOICE_ERROR;
         Logger.d("form: " + getFormType() + " onVoiceError !" + " currentMediaState: " + currentMediaState + " currentVoiceState " + currentVoiceState);
-        checkAppState();
+        promoteErrorInfo(ErrorPromoter.ERROR_TYPE.TTS_ERROR);
     }
 
     @Override
@@ -313,7 +341,7 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
         MEDIA_PLAY,
         MEDIA_PAUSE,
         MEDIA_RESUME,
-        MEDIA_STOP,
+        MEDIA_STOP
     }
 
     public enum USER_VOICE_CONTROL_TYPE {

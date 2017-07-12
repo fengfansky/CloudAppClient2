@@ -306,6 +306,11 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
         updateSurfaceScreenOn();
     }
 
+    @Override
+    public void setDataSource(AssetFileDescriptor afd) {
+        throw new UnsupportedOperationException();
+    }
+
     /**
      * Sets the data source as a content Uri.
      *
