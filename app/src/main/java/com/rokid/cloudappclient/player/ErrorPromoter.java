@@ -49,6 +49,7 @@ public class ErrorPromoter {
         Logger.d(" speakErrorPromote errorType is " + errorType);
         this.errorPromoteCallback = errorPromoteCallback;
         switch (errorType) {
+            //突然卡了一下，稍后再试吧。
             case MEDIA_TIME_OUT:
                 rkAudioPlayer.setAssetVideo(assetManager.openFd("media_timeout.mp3"));
                 break;
@@ -57,6 +58,7 @@ public class ErrorPromoter {
                 break;
             case DATA_INVALID:
             case TTS_ERROR:
+                //遇到了一点小问题，稍后再试一下吧
                 rkAudioPlayer.setAssetVideo(assetManager.openFd("common_error.mp3"));
                 break;
         }
