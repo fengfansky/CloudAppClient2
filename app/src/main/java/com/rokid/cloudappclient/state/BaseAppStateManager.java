@@ -59,6 +59,33 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
     }
 
     @Override
+    public synchronized void onNewIntentActionNode(ActionNode actionNode) {
+        Logger.d("form: " + getFormType() + "onNewIntentActionNode actioNode : " + actionNode);
+        if (actionNode != null) {
+            if (TextUtils.isEmpty(actionNode.getAppId())) {
+                Logger.d("new cloudAppId is null !");
+                checkAppState();
+                return;
+            }
+
+            if (!actionNode.getAppId().equals(mAppId)) {
+                Logger.d("onNewEventActionNode the appId is the not the same with lastAppId");
+                MediaAction.getInstance().stopPlay();
+                VoiceAction.getInstance().stopPlay();
+                this.currentMediaState = null;
+                this.currentVoiceState = null;
+            }
+            this.mActionNode = actionNode;
+            this.mAppId = actionNode.getAppId();
+            this.shouldEndSession = actionNode.isShouldEndSession();
+            processActionNode(actionNode);
+
+        } else {
+            promoteErrorInfo(ErrorPromoter.ERROR_TYPE.DATA_INVALID);
+        }
+    }
+
+    @Override
     public synchronized void onNewEventActionNode(ActionNode actionNode) {
         Log.d("jiabin","onNewEventActionNode: " + actionNode);
         Logger.d("form: " + getFormType() + "onNewEventActionNode actioNode : " + actionNode + " currentMediaState: " + currentMediaState + " currentVoiceState " + currentVoiceState);

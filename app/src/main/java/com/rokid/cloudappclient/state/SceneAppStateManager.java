@@ -1,13 +1,8 @@
 package com.rokid.cloudappclient.state;
 
-import android.text.TextUtils;
-import android.util.Log;
-
-import com.rokid.cloudappclient.bean.ActionNode;
 import com.rokid.cloudappclient.bean.response.responseinfo.action.ActionBean;
 import com.rokid.cloudappclient.action.MediaAction;
 import com.rokid.cloudappclient.action.VoiceAction;
-import com.rokid.cloudappclient.player.ErrorPromoter;
 import com.rokid.cloudappclient.http.HttpClientWrapper;
 import com.rokid.cloudappclient.util.Logger;
 
@@ -23,46 +18,6 @@ public class SceneAppStateManager extends BaseAppStateManager {
 
     private static class AppStateManagerHolder {
         private static final SceneAppStateManager instance = new SceneAppStateManager();
-    }
-
-    @Override
-    public void checkAppState() {
-        Log.d("jiabin", "scene checkAppState -- " + "currentMediaState:" + currentMediaState + " | currentVoiceState:" + currentVoiceState);
-        super.checkAppState();
-    }
-
-    @Override
-    public synchronized void onNewEventActionNode(ActionNode actionNode) {
-        Log.d("jiabin", "scene onNewEventActionNode ------");
-        super.onNewEventActionNode(actionNode);
-    }
-
-    @Override
-    public synchronized void onNewIntentActionNode(ActionNode actionNode) {
-        Log.d("jiabin", "scene onNewIntentActionNode --- " + "form: " + getFormType() + " | actioNode : " + actionNode);
-        Logger.d("form: " + getFormType() + "onNewIntentActionNode actioNode : " + actionNode);
-        if (actionNode != null) {
-            if (TextUtils.isEmpty(actionNode.getAppId())) {
-                Logger.d("new cloudAppId is null !");
-                checkAppState();
-                return;
-            }
-
-            if (!actionNode.getAppId().equals(mAppId)) {
-                Logger.d("onNewEventActionNode the appId is the not the same with lastAppId");
-                MediaAction.getInstance().stopPlay();
-                VoiceAction.getInstance().stopPlay();
-                this.currentMediaState = null;
-                this.currentVoiceState = null;
-            }
-            this.mActionNode = actionNode;
-            this.mAppId = actionNode.getAppId();
-            this.shouldEndSession = actionNode.isShouldEndSession();
-            processActionNode(actionNode);
-
-        } else {
-            promoteErrorInfo(ErrorPromoter.ERROR_TYPE.DATA_INVALID);
-        }
     }
 
     @Override
