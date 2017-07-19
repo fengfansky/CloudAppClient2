@@ -30,6 +30,7 @@ public abstract class AbstractMediaPlayer implements IMediaPlayer {
     private OnInfoListener mOnInfoListener;
     private OnTimedTextListener mOnTimedTextListener;
     private OnPausedListener mOnPausedListener;
+    private OnStopedListener mOnStopedListener;
 
     public final void setOnPreparedListener(OnPreparedListener listener) {
         mOnPreparedListener = listener;
@@ -68,6 +69,11 @@ public abstract class AbstractMediaPlayer implements IMediaPlayer {
     @Override
     public void setOnPausedListener(OnPausedListener listener) {
         mOnPausedListener = listener;
+    }
+
+    @Override
+    public void setOnStopedListener(OnStopedListener listener) {
+        mOnStopedListener = listener;
     }
 
     public void resetListeners() {

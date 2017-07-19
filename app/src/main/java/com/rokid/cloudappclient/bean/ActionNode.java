@@ -1,17 +1,15 @@
 package com.rokid.cloudappclient.bean;
 
-import android.text.TextUtils;
-
-import com.rokid.cloudappclient.bean.response.responseinfo.action.ActionBean;
+import com.rokid.cloudappclient.bean.base.BaseBean;
+import com.rokid.cloudappclient.bean.response.responseinfo.action.confirm.ConfirmBean;
 import com.rokid.cloudappclient.bean.response.responseinfo.action.media.MediaBean;
 import com.rokid.cloudappclient.bean.response.responseinfo.action.voice.VoiceBean;
-import com.rokid.cloudappclient.util.Logger;
 
 /**
  * Created by showingcp on 3/16/17.
  */
 
-public class ActionNode {
+public class ActionNode extends BaseBean{
     private String asr;
     private NLPBean nlp;
     private String respId;
@@ -22,6 +20,7 @@ public class ActionNode {
     private boolean shouldEndSession;
     private VoiceBean voice;
     private MediaBean media;
+    private ConfirmBean confirmBean;
 
     public String getAsr() {
         return asr;
@@ -103,36 +102,13 @@ public class ActionNode {
         this.media = media;
     }
 
-    public boolean isValid(){
-        if (TextUtils.isEmpty(appId)){
-            Logger.d("appId is null !");
-            return false;
-        }
-        if (TextUtils.isEmpty(form) || !ActionBean.FORM_SCENE.equals(form)){
-            Logger.d("form invalid or form not scene!  form: " + form);
-            return false;
-        }
-        if (voice == null && media == null){
-            Logger.d("voice and media null ! invalid");
-            return false;
-        }
-
-        return true;
+    public ConfirmBean getConfirmBean() {
+        return confirmBean;
     }
 
-    @Override
-    public String toString() {
-        return "ActionNode{" +
-                "asr='" + asr + '\'' +
-                ", nlp=" + nlp +
-                ", respId='" + respId + '\'' +
-                ", resType='" + resType + '\'' +
-                ", appId='" + appId + '\'' +
-                ", form='" + form + '\'' +
-                ", actionType='" + actionType + '\'' +
-                ", shouldEndSession=" + shouldEndSession +
-                ", voice=" + voice +
-                ", media=" + media +
-                '}';
+    public void setConfirmBean(ConfirmBean confirmBean) {
+        this.confirmBean = confirmBean;
     }
+
+
 }

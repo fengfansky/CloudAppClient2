@@ -1,7 +1,6 @@
 package com.rokid.cloudappclient.state;
 
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.rokid.cloudappclient.action.MediaAction;
 import com.rokid.cloudappclient.action.VoiceAction;
@@ -20,6 +19,7 @@ import com.rokid.cloudappclient.util.Logger;
 import com.squareup.okhttp.Response;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 //import com.android.okhttp.Response;
 
 /**
@@ -87,7 +87,6 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
 
     @Override
     public synchronized void onNewEventActionNode(ActionNode actionNode) {
-        Log.d("jiabin","onNewEventActionNode: " + actionNode);
         Logger.d("form: " + getFormType() + "onNewEventActionNode actioNode : " + actionNode + " currentMediaState: " + currentMediaState + " currentVoiceState " + currentVoiceState);
         if (actionNode != null) {
 
@@ -132,7 +131,6 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
 
     @Override
     public void onAppDestory() {
-        AppTypeRecorder.getInstance().storeAppStateManager(null);
         Logger.d("form: " + getFormType() + " onAppDestory " + " currentMediaState: " + currentMediaState + " currentVoiceState: " + currentVoiceState);
     }
 
@@ -202,7 +200,6 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
     @Override
     public synchronized void onVoiceStart() {
         currentVoiceState = VOICE_STATE.VOICE_START;
-        Log.d("jiabin","onVoiceStart");
         Logger.d("form: " + getFormType() + " onVoiceStart !" + " currentMediaState: " + currentMediaState + " currentVoiceState " + currentVoiceState);
         if (TextUtils.isEmpty(mAppId)) {
             Logger.d(" appId is null !");
@@ -234,8 +231,8 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
                 ErrorPromoter.getInstance().speakErrorPromote(errorType, new ErrorPromoter.ErrorPromoteCallback() {
                     @Override
                     public void onPromoteFinished() {
-                        if (mTaskProcessCallback != null){
-                            mTaskProcessCallback.onAllTaskFinished();
+                        if (mTaskProcessCallback != null && mTaskProcessCallback.get() != null){
+                            mTaskProcessCallback.get().onAllTaskFinished();
                         }
                     }
                 });
@@ -246,9 +243,9 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
     }
 
     public void checkAppState() {
-        if (isStateInvalid()){
+        if (isStateInvalid() && mTaskProcessCallback != null && mTaskProcessCallback.get() != null){
             Logger.d("form: " + getFormType() + " voice stop , allTaskFinished ! finish app !");
-            mTaskProcessCallback.onAllTaskFinished();
+            mTaskProcessCallback.get().onAllTaskFinished();
         }
     }
 
@@ -302,28 +299,32 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
 
             if (actionNode.getVoice() != null) {
                 VoiceAction.getInstance().processAction(actionNode.getVoice());
+                if (actionNode.getConfirmBean() != null && mTaskProcessCallback != null && mTaskProcessCallback.get() != null){
+                   mTaskProcessCallback.get().openSiren();
+                }
             }
             if (actionNode.getMedia() != null) {
                 MediaAction.getInstance().processAction(actionNode.getMedia());
             }
         }
-
     }
 
     public void finishActivity() {
-        if (mTaskProcessCallback != null) {
+        if (mTaskProcessCallback != null && mTaskProcessCallback.get() != null) {
             Logger.d("form: " + getFormType() + " onExitCallback finishActivity");
-            mTaskProcessCallback.onExitCallback();
+            mTaskProcessCallback.get().onExitCallback();
         }
     }
 
-    public TaskProcessCallback mTaskProcessCallback;
+    public WeakReference<TaskProcessCallback> mTaskProcessCallback;
 
     public void setTaskProcessCallback(TaskProcessCallback taskProcessCallback) {
-        this.mTaskProcessCallback = taskProcessCallback;
+        this.mTaskProcessCallback = new WeakReference<>(taskProcessCallback);
     }
 
     public interface TaskProcessCallback {
+
+        void openSiren();
 
         void onAllTaskFinished();
 

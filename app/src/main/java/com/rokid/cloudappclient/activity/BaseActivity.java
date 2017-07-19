@@ -1,17 +1,16 @@
 package com.rokid.cloudappclient.activity;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.rokid.cloudappclient.R;
 import com.rokid.cloudappclient.parser.IntentParser;
-import com.rokid.cloudappclient.parser.ResponseParser;
 import com.rokid.cloudappclient.state.BaseAppStateManager;
-import com.rokid.cloudappclient.tts.TTSHelper;
-import com.rokid.cloudappclient.tts.TTSSpeakInterface;
 import com.rokid.cloudappclient.util.AppTypeRecorder;
 import com.rokid.cloudappclient.util.Logger;
+
+import java.io.IOException;
 
 /**
  * This is a basic Activity, all the Activity in the project are to extends it.
@@ -20,9 +19,9 @@ import com.rokid.cloudappclient.util.Logger;
  * Author: fengfan
  * Modified: 2017/06/01
  */
-public abstract class BaseActivity extends Activity implements TTSSpeakInterface, BaseAppStateManager.TaskProcessCallback {
+public abstract class BaseActivity extends Activity implements BaseAppStateManager.TaskProcessCallback {
 
-    IntentParser intentParser = new IntentParser(this);
+    IntentParser intentParser = new IntentParser();
 
     //只有在cut应用入栈的时候才会调onResume
     boolean isNeedResume;
@@ -33,9 +32,12 @@ public abstract class BaseActivity extends Activity implements TTSSpeakInterface
         Logger.d("activity type: " + getAppStateManager().getFormType() + " OnCreated");
         AppTypeRecorder.getInstance().storeAppStateManager(getAppStateManager());
         getAppStateManager().setTaskProcessCallback(this);
-        ResponseParser.getInstance().setTTSSpeakInterface(this);
         isNeedResume = false;
-        intentParser.parseIntent(getIntent());
+        try {
+            intentParser.parseIntent(getIntent());
+        } catch (IOException e) {
+            Logger.e("exception : promote error data invalid ");
+        }
     }
 
     @Override
@@ -47,7 +49,11 @@ public abstract class BaseActivity extends Activity implements TTSSpeakInterface
             return;
         }
         isNeedResume = false;
-        intentParser.parseIntent(intent);
+        try {
+            intentParser.parseIntent(intent);
+        } catch (IOException e) {
+            Logger.e("exception : promote error data invalid ");
+        }
         setIntent(intent);
     }
 
@@ -94,24 +100,17 @@ public abstract class BaseActivity extends Activity implements TTSSpeakInterface
         Logger.d("activity type: " + getAppStateManager().getFormType() + " onDestroy");
     }
 
-    /**
-     * ------------------TTS REFERENCE START--------------------
-     **/
-    TTSHelper ttsHelper = TTSHelper.getInstance();
-
     @Override
-    public void speakIntentEmptyErrorTTS() {
-        ttsHelper.speakTTSError(getResources().getString(R.string.tts_intent_empty_error));
-    }
-
-    @Override
-    public void speakNLPEmptyErrorTTS() {
-        ttsHelper.speakTTSError(getResources().getString(R.string.tts_nlp_empty_error));
-    }
-
-    @Override
-    public void speakNLPDataEmptyErrorTTS() {
-        ttsHelper.speakTTSError(getResources().getString(R.string.tts_nlp_data_empty_error));
+    public void openSiren() {
+        Logger.d(" process confirm ");
+        Intent intent = new Intent();
+        ComponentName compontent = new ComponentName("com.rokid.activation", "com.rokid.activation.service.CoreService");
+        intent.setComponent(compontent);
+        intent.putExtra("InputAction", "confirmEvent");
+        Bundle bundle = new Bundle();
+        bundle.putInt("isConfirm", 1);   //isConfirm  参数 目前支持 1: 打开拾音 , 0: 关闭拾音
+        intent.putExtra("intent", bundle);
+        startService(intent);
     }
 
     @Override

@@ -1,15 +1,11 @@
 package com.rokid.cloudappclient.parser;
 
-import android.util.Log;
-
 import com.google.gson.Gson;
 import com.rokid.cloudappclient.bean.ActionNode;
-import com.rokid.cloudappclient.bean.CommonResponse;
-import com.rokid.cloudappclient.bean.response.CloudActionResponse;
+import com.rokid.cloudappclient.bean.CommonResponseBean;
+import com.rokid.cloudappclient.bean.response.CloudActionResponseBean;
 import com.rokid.cloudappclient.proto.SendEvent;
 import com.rokid.cloudappclient.reporter.BaseReporter;
-import com.rokid.cloudappclient.state.BaseAppStateManager;
-import com.rokid.cloudappclient.tts.TTSSpeakInterface;
 import com.rokid.cloudappclient.util.AppTypeRecorder;
 import com.rokid.cloudappclient.util.CommonResponseHelper;
 import com.rokid.cloudappclient.util.Logger;
@@ -37,14 +33,7 @@ public class ResponseParser {
         return parser;
     }
 
-    TTSSpeakInterface mTtsSpeakInterface;
-
-    public void setTTSSpeakInterface(TTSSpeakInterface ttsSpeakInterface) {
-        mTtsSpeakInterface = ttsSpeakInterface;
-    }
-
-    public void parseIntentResponse(CommonResponse commonResponse) {
-        Log.d("jiabin","parseIntentResponse----" + "commonResponse:" + commonResponse);
+    public void parseIntentResponse(CommonResponseBean commonResponse) {
 
         Logger.d(" parse IntentResponse commonResponse : " + commonResponse);
 
@@ -56,8 +45,6 @@ public class ResponseParser {
     }
 
     public void parseSendEventResponse(String event, Response response) {
-
-        Log.d("jiabin","parseSendEventResponse----" + "event:" + event + " | response:" + response);
 
         SendEvent.SendEventResponse eventResponse = null;
 
@@ -82,7 +69,7 @@ public class ResponseParser {
             return;
         }
 
-        CloudActionResponse cloudResponse = new Gson().fromJson(eventResponse.getResponse(), CloudActionResponse.class);
+        CloudActionResponseBean cloudResponse = new Gson().fromJson(eventResponse.getResponse(), CloudActionResponseBean.class);
 
         if (cloudResponse == null) {
             Logger.d("cloudResponse parsed null !");
@@ -90,7 +77,7 @@ public class ResponseParser {
             return;
         }
 
-        CommonResponse commonResponse = new CommonResponse();
+        CommonResponseBean commonResponse = new CommonResponseBean();
         commonResponse.setAction(cloudResponse);
         ActionNode actionNode = CommonResponseHelper.generateActionNode(commonResponse);
 

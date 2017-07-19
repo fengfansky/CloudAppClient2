@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import com.rokid.cloudappclient.bean.request.session.SessionBean;
 import com.rokid.cloudappclient.bean.response.responseinfo.ResponseBean;
 import com.rokid.cloudappclient.bean.response.responseinfo.action.ActionBean;
+import com.rokid.cloudappclient.bean.response.responseinfo.action.confirm.ConfirmBean;
 import com.rokid.cloudappclient.bean.response.responseinfo.action.media.MediaBean;
 import com.rokid.cloudappclient.bean.response.responseinfo.action.voice.VoiceBean;
 import com.rokid.cloudappclient.util.Logger;
@@ -15,7 +16,7 @@ import com.rokid.cloudappclient.util.Logger;
  * Author: xupan.shi
  * Version: V0.1 2017/3/7
  */
-public class CloudActionResponse {
+public class CloudActionResponseBean {
 
     private static final String PROTOCOL_VERSION = "2.0.0";
 
@@ -146,30 +147,22 @@ public class CloudActionResponse {
 
         MediaBean mediaBean = responseAction.getMedia();
         VoiceBean voiceBean = responseAction.getVoice();
+        ConfirmBean confirmBean = responseAction.getConfirm();
 
-        if (mediaBean == null && voiceBean == null){
-            Logger.d("media and voice are null! ");
-            return false;
-        }else if (mediaBean == null && voiceBean != null){
-            if (voiceBean.isValid()){
-                return true;
-            }else {
-                Logger.d("media null , voice invalid! ");
-                return false;
-            }
-        }else if (voiceBean == null && mediaBean != null){
-            if (mediaBean.isValid()){
-                return true;
-            }else {
-                Logger.d(" voice null , media invalid!");
-                return false;
-            }
-        }else if (!mediaBean.isValid() && !voiceBean.isValid()){
-            Logger.d(" voice and media invalid !");
-            return false;
+        if (mediaBean != null && mediaBean.isValid()){
+            Logger.d("mediaBean valid ");
+            return true;
         }
 
-        return true;
+        if (voiceBean != null && voiceBean.isValid()){
+            return true;
+        }
+
+        if (confirmBean != null){
+            return true;
+        }
+
+        return false;
     }
 
 }

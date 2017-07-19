@@ -30,7 +30,9 @@ public class ErrorPromoter {
         rkAudioPlayer.setmOnCompletionListener(new IMediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(IMediaPlayer mp) {
-                errorPromoteCallback.onPromoteFinished();
+                if (errorPromoteCallback != null){
+                    errorPromoteCallback.onPromoteFinished();
+                }
             }
         });
     }
@@ -49,11 +51,12 @@ public class ErrorPromoter {
         Logger.d(" speakErrorPromote errorType is " + errorType);
         this.errorPromoteCallback = errorPromoteCallback;
         switch (errorType) {
-            //突然卡了一下，稍后再试吧。
             case MEDIA_TIME_OUT:
+                //突然卡了一下，稍后再试吧。
                 rkAudioPlayer.setAssetVideo(assetManager.openFd("media_timeout.mp3"));
                 break;
             case MEDIA_ERROR:
+                //找不到要播放的文件，换一个试试吧。
                 rkAudioPlayer.setAssetVideo(assetManager.openFd("media_error.mp3"));
                 break;
             case DATA_INVALID:

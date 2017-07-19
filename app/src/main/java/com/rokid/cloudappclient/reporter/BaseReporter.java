@@ -41,7 +41,6 @@ public abstract class BaseReporter implements Runnable {
         this.event = event;
     }
 
-    //TODO set extra value
     public void setExtra(String extra) {
         this.extra = extra;
     }

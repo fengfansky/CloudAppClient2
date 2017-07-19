@@ -52,10 +52,6 @@ public class TextureMediaPlayer extends MediaPlayerProxy implements IMediaPlayer
         releaseSurfaceTexture();
     }
 
-    @Override
-    public void setOnPausedListener(OnPausedListener listener) {
-
-    }
 
     @Override
     public void release() {

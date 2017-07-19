@@ -56,7 +56,12 @@ public class MediaAction extends BaseAction<MediaBean> {
                 AppTypeRecorder.getInstance().getAppStateManager().onMediaPause((int) mp.getCurrentPosition());
             }
         });
-
+        rkAudioPlayer.setmOnStopedListener(new IMediaPlayer.OnStopedListener() {
+            @Override
+            public void onStoped(IMediaPlayer mp) {
+                AppTypeRecorder.getInstance().getAppStateManager().onMediaStop();
+            }
+        });
     }
 
     public static MediaAction getInstance() {
@@ -112,8 +117,8 @@ public class MediaAction extends BaseAction<MediaBean> {
 
     @Override
     public synchronized void stopPlay() {
-        if (rkAudioPlayer != null && rkAudioPlayer.canPause()) {
-            rkAudioPlayer.release(true);
+        if (rkAudioPlayer != null) {
+            rkAudioPlayer.stop();
         }
     }
 

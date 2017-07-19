@@ -15,7 +15,6 @@ public class MediaBean extends BaseActionBean {
 
     /**
      * Defines the action of the media player.
-     * ONLY TWO actions are supported, which are PLAY and PAUSE.
      */
 
     private MediaItemBean item;

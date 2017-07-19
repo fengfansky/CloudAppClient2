@@ -1,13 +1,13 @@
 package com.rokid.cloudappclient.bean;
 
 import com.rokid.cloudappclient.bean.base.BaseBean;
-import com.rokid.cloudappclient.bean.response.CloudActionResponse;
+import com.rokid.cloudappclient.bean.response.CloudActionResponseBean;
 
 /**
  * Created by showingcp on 3/13/17.
  */
 
-public class CommonResponse extends BaseBean{
+public class CommonResponseBean extends BaseBean{
 
     /**
      * corresponding asr result for current response
@@ -20,9 +20,9 @@ public class CommonResponse extends BaseBean{
     private NLPBean nlp;
 
     /**
-     * corresponding CloudActionResponse for current response
+     * corresponding CloudActionResponseBean for current response
      */
-    private CloudActionResponse action;
+    private CloudActionResponseBean action;
 
     public String getAsr() {
         return asr;
@@ -40,11 +40,11 @@ public class CommonResponse extends BaseBean{
         this.nlp = nlp;
     }
 
-    public CloudActionResponse getAction() {
+    public CloudActionResponseBean getAction() {
         return action;
     }
 
-    public void setAction(CloudActionResponse action) {
+    public void setAction(CloudActionResponseBean action) {
         this.action = action;
     }
 }

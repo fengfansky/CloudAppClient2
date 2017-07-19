@@ -9,7 +9,7 @@ import java.util.Map;
  * Author: xupan.shi
  * Version: V0.1 2017/3/7
  */
-public class SessionBean<T> {
+public class SessionBean {
 
     private String sessionId;
     /**

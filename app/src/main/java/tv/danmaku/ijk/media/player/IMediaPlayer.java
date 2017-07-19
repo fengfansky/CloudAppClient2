@@ -124,6 +124,8 @@ public interface IMediaPlayer {
 
     void setOnPausedListener(OnPausedListener listener);
 
+    void setOnStopedListener(OnStopedListener listener);
+
     void setOnCompletionListener(OnCompletionListener listener);
 
     void setOnBufferingUpdateListener(
@@ -150,6 +152,10 @@ public interface IMediaPlayer {
 
     interface OnPausedListener{
         void onPaused(IMediaPlayer mp);
+    }
+
+    interface OnStopedListener{
+        void onStoped(IMediaPlayer mp);
     }
 
     interface OnCompletionListener {

@@ -143,6 +143,6 @@ public class ActionBean {
     }
 
     public boolean isConfirmValid(){
-        return null != confirm && confirm.isValid();
+        return null != confirm;
     }
 }

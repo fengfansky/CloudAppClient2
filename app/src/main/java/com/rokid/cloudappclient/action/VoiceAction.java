@@ -30,7 +30,6 @@ public class VoiceAction extends BaseAction<VoiceBean> {
             AppTypeRecorder.getInstance().getAppStateManager().setCurrentVoiceState(BaseAppStateManager.VOICE_STATE.VOICE_START);
             AppTypeRecorder.getInstance().getAppStateManager().setUserVoiceControlType(BaseAppStateManager.USER_VOICE_CONTROL_TYPE.VOICE_START);
             this.voiceBean = actionBean;
-            //TODO To check whether the voiceBean have confirm, if have confirm speak confirm TTS.
             VoiceItemBean voiceItemBean = actionBean.getItem();
             String ttsContent;
             ttsContent = voiceItemBean.getTts();

@@ -10,6 +10,8 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.MediaController;
 
+import com.rokid.cloudappclient.util.Logger;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
@@ -42,6 +44,7 @@ public class RKAudioPlayer implements MediaController.MediaPlayerControl {
     private static final int STATE_PLAYING = 3;
     private static final int STATE_PAUSED = 4;
     private static final int STATE_PLAYBACK_COMPLETED = 5;
+    private static final int STATE_STOPED = 6;
 
     //all media error state
     public static final int MEDIA_ERROR_TIME_OUT = -110;
@@ -61,6 +64,7 @@ public class RKAudioPlayer implements MediaController.MediaPlayerControl {
 
     private IMediaPlayer.OnCompletionListener mOnCompletionListener;
     private IMediaPlayer.OnPausedListener mOnPausedListener;
+    private IMediaPlayer.OnStopedListener mOnStopedListener;
     private IMediaPlayer.OnPreparedListener mOnPreparedListener;
     private int mCurrentBufferPercentage;
     private IMediaPlayer.OnErrorListener mOnErrorListener;
@@ -108,16 +112,16 @@ public class RKAudioPlayer implements MediaController.MediaPlayerControl {
     }
 
     /**
-     *Sets video asset path using assetFileDescriptor
+     * Sets video asset path using assetFileDescriptor
      *
      * @param assetFileDescriptor the filePath of the video.
      */
     public void setAssetVideo(AssetFileDescriptor assetFileDescriptor) throws IOException {
-        if (assetFileDescriptor == null){
+        if (assetFileDescriptor == null) {
             return;
         }
         initPlayer();
-        Log.d(TAG," fileDescriptor : " + assetFileDescriptor);
+        Log.d(TAG, " fileDescriptor : " + assetFileDescriptor);
         mMediaPlayer.setDataSource(assetFileDescriptor);
         mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         mMediaPlayer.setScreenOnWhilePlaying(true);
@@ -176,8 +180,7 @@ public class RKAudioPlayer implements MediaController.MediaPlayerControl {
                     (TextUtils.isEmpty(scheme) || scheme.equalsIgnoreCase("file"))) {
                 IMediaDataSource dataSource = new FileMediaDataSource(new File(mUri.toString()));
                 mMediaPlayer.setDataSource(dataSource);
-            } else
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
                 mMediaPlayer.setDataSource(mAppContext, mUri, mHeaders);
             } else {
                 mMediaPlayer.setDataSource(mUri.toString());
@@ -239,6 +242,17 @@ public class RKAudioPlayer implements MediaController.MediaPlayerControl {
             }
         }
         mTargetState = STATE_PAUSED;
+    }
+
+    public void stop() {
+        if (isInPlaybackState()) {
+            mMediaPlayer.stop();
+            mCurrentState = STATE_STOPED;
+            if (mOnStopedListener != null) {
+                Logger.d("player stopPlay ");
+                mOnStopedListener.onStoped(mMediaPlayer);
+            }
+        }
     }
 
     @Override
@@ -313,6 +327,10 @@ public class RKAudioPlayer implements MediaController.MediaPlayerControl {
 
     public void setmOnPausedListener(IMediaPlayer.OnPausedListener mOnPausedListener) {
         this.mOnPausedListener = mOnPausedListener;
+    }
+
+    public void setmOnStopedListener(IMediaPlayer.OnStopedListener mOnStopedListener) {
+        this.mOnStopedListener = mOnStopedListener;
     }
 
     public void setmOnPreparedListener(IMediaPlayer.OnPreparedListener mOnPreparedListener) {
