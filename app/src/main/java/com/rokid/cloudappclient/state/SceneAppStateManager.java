@@ -47,6 +47,7 @@ public class SceneAppStateManager extends BaseAppStateManager {
     @Override
     public void onAppDestory() {
         MediaAction.getInstance().stopPlay();
+        VoiceAction.getInstance().stopPlay();
         HttpClientWrapper.getInstance().close();
         super.onAppDestory();
     }

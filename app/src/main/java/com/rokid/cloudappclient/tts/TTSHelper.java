@@ -59,7 +59,7 @@ public class TTSHelper {
         @Override
         public void onCancel(int id) {
             super.onCancel(id);
-            Logger.i("TTS is onCancel - id: " + id + ", current id: " + ttsId);
+            Logger.i("TTS is onCancel - id: " + id + ", current id: " + ttsId + " isPaused : " + isPaused);
             if (id != ttsId) {
                 Logger.i("The new tts is already speaking, previous tts stop should not ttsCallback");
                 return;
