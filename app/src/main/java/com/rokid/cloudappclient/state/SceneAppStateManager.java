@@ -34,13 +34,13 @@ public class SceneAppStateManager extends BaseAppStateManager {
 
         //应用onResume的时候要考虑到用户上次操作是否是暂停
         if (currentMediaState == MEDIA_STATE.MEDIA_PAUSED && !(userMediaControlType == USER_MEDIA_CONTROL_TYPE.MEDIA_PAUSE)) {
-            MediaAction.getInstance().resumePlay();
             Logger.d("scene: onAppResume resume play audio");
+            MediaAction.getInstance().resumePlay();
         }
 
-        if (currentVoiceState == VOICE_STATE.VOICE_CANCLED && !(userVoiceControlType == USER_VOICE_CONTROL_TYPE.VOICE_PAUSE)) {
-            VoiceAction.getInstance().resumePlay();
+        if (currentVoiceState == VOICE_STATE.VOICE_PAUSED && !(userVoiceControlType == USER_VOICE_CONTROL_TYPE.VOICE_PAUSE)) {
             Logger.d("scene onAppResume play voice");
+            VoiceAction.getInstance().resumePlay();
         }
     }
 

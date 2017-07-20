@@ -256,6 +256,12 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
     }
 
     @Override
+    public void onVoicePaused() {
+        currentVoiceState = VOICE_STATE.VOICE_PAUSED;
+        Logger.d("form: " + getFormType() + " onVoiceCancled !" + " currentMediaState: " + currentMediaState + " currentVoiceState " + currentVoiceState);
+    }
+
+    @Override
     public synchronized void onVoiceCancled() {
         currentVoiceState = VOICE_STATE.VOICE_CANCLED;
         Logger.d("form: " + getFormType() + " onVoiceCancled !" + " currentMediaState: " + currentMediaState + " currentVoiceState " + currentVoiceState);
@@ -335,6 +341,7 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
 
     public enum VOICE_STATE {
         VOICE_START,
+        VOICE_PAUSED,
         VOICE_STOP,
         VOICE_CANCLED,
         VOICE_ERROR

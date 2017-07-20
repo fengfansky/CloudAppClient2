@@ -10,6 +10,8 @@ public interface VoiceStateCallback {
 
     void onVoiceStop();
 
+    void onVoicePaused();
+
     void onVoiceCancled();
 
     void onVoiceError();
