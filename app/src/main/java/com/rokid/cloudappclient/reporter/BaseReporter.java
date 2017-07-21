@@ -17,7 +17,6 @@ import java.io.IOException;
  * Created by fanfeng on 2017/5/9.
  */
 
-
 public abstract class BaseReporter implements Runnable {
 
     String appId;
@@ -34,23 +33,6 @@ public abstract class BaseReporter implements Runnable {
         this.appId = appId;
         this.event = event;
         this.extra = extra;
-    }
-
-
-    public void setEvent(String event) {
-        this.event = event;
-    }
-
-    public void setExtra(String extra) {
-        this.extra = extra;
-    }
-
-    public String getEvent() {
-        return event;
-    }
-
-    public String getExtra() {
-        return extra;
     }
 
     @Override

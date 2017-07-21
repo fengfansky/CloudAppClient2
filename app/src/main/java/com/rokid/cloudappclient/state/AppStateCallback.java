@@ -12,11 +12,9 @@ public interface AppStateCallback {
 
     void onNewEventActionNode(ActionNode actionNode);
 
-    ActionNode getCurrentActionNode();
+    void onAppResume();
 
     void onAppPaused();
-
-    void onAppResume();
 
     void onAppDestory();
 }

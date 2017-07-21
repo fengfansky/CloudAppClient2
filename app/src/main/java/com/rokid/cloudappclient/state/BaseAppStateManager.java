@@ -113,10 +113,6 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
         return shouldEndSession;
     }
 
-    @Override
-    public synchronized ActionNode getCurrentActionNode() {
-        return mActionNode;
-    }
 
     @Override
     public synchronized void onAppPaused() {
