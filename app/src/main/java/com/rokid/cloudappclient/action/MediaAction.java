@@ -101,8 +101,8 @@ public class MediaAction extends BaseAction<MediaBean> {
         }
 
         Logger.d("start play media url : " + url);
-        AppTypeRecorder.getInstance().getAppStateManager().setUserMediaControlType(BaseAppStateManager.USER_MEDIA_CONTROL_TYPE.MEDIA_PLAY);
-        AppTypeRecorder.getInstance().getAppStateManager().setCurrentMediaState(BaseAppStateManager.MEDIA_STATE.MEDIA_PLAY);
+        AppTypeRecorder.getInstance().getAppStateManager().setUserMediaControlType(BaseAppStateManager.USER_MEDIA_CONTROL_TYPE.MEDIA_START);
+        AppTypeRecorder.getInstance().getAppStateManager().setCurrentMediaState(BaseAppStateManager.MEDIA_STATE.MEDIA_START);
         rkAudioPlayer.setVideoURI(Uri.parse(url));
         rkAudioPlayer.start();
         rkAudioPlayer.seekTo(mediaBeanItem.getOffsetInMilliseconds());

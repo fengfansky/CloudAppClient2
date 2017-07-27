@@ -50,7 +50,7 @@ public class BaseParameter {
 
     }
 
-    public Map<String, String> generateParams() {
+    private Map<String, String> generateParams() {
         IBinder runtime_binder = invokeServiceManager();
         if(runtime_binder == null){
             Logger.d(" runtime binder is null ");

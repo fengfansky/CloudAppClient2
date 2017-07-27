@@ -27,6 +27,14 @@ public class ErrorPromoter {
     private void initRKAudioPlayer() {
         assetManager = RKCloudAppApplication.getInstance().getAssets();
         rkAudioPlayer = new RKAudioPlayer(RKCloudAppApplication.getInstance());
+        rkAudioPlayer.setmOnPreparedListener(new IMediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(IMediaPlayer mp) {
+                if (errorPromoteCallback != null){
+                    errorPromoteCallback.onPrmoteStarted();
+                }
+            }
+        });
         rkAudioPlayer.setmOnCompletionListener(new IMediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(IMediaPlayer mp) {
@@ -59,7 +67,7 @@ public class ErrorPromoter {
                 //找不到要播放的文件，换一个试试吧。
                 rkAudioPlayer.setAssetVideo(assetManager.openFd("media_error.mp3"));
                 break;
-            case DATA_INVALID:
+            case NO_TASK_PROCESS:
             case TTS_ERROR:
                 //遇到了一点小问题，稍后再试一下吧
                 rkAudioPlayer.setAssetVideo(assetManager.openFd("common_error.mp3"));
@@ -69,11 +77,12 @@ public class ErrorPromoter {
     }
 
     public interface ErrorPromoteCallback {
+        void onPrmoteStarted();
         void onPromoteFinished();
     }
 
     public enum ERROR_TYPE {
-        DATA_INVALID,
+        NO_TASK_PROCESS,
         MEDIA_TIME_OUT,
         MEDIA_ERROR,
         TTS_ERROR

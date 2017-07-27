@@ -25,13 +25,13 @@ public class IntentParser {
 
         if (intent == null) {
             Logger.d("intent null !");
-            ErrorPromoter.getInstance().speakErrorPromote(ErrorPromoter.ERROR_TYPE.DATA_INVALID,null);
+            ErrorPromoter.getInstance().speakErrorPromote(ErrorPromoter.ERROR_TYPE.NO_TASK_PROCESS,null);
             return;
         }
         String nlp = intent.getStringExtra(KEY_NLP);
         if (TextUtils.isEmpty(nlp)) {
             Logger.d("NLP is empty!!!");
-            ErrorPromoter.getInstance().speakErrorPromote(ErrorPromoter.ERROR_TYPE.DATA_INVALID, null);
+            ErrorPromoter.getInstance().speakErrorPromote(ErrorPromoter.ERROR_TYPE.NO_TASK_PROCESS, null);
             return;
         }
 
@@ -40,7 +40,7 @@ public class IntentParser {
 
         if (null == nlpBean) {
             Logger.d("NLPData is empty!!!");
-            ErrorPromoter.getInstance().speakErrorPromote(ErrorPromoter.ERROR_TYPE.DATA_INVALID, null);
+            ErrorPromoter.getInstance().speakErrorPromote(ErrorPromoter.ERROR_TYPE.NO_TASK_PROCESS, null);
             return;
         }
 
@@ -48,14 +48,14 @@ public class IntentParser {
 
         if (slots == null || slots.isEmpty()) {
             Logger.i("NLP slots is invalid");
-            ErrorPromoter.getInstance().speakErrorPromote(ErrorPromoter.ERROR_TYPE.DATA_INVALID, null);
+            ErrorPromoter.getInstance().speakErrorPromote(ErrorPromoter.ERROR_TYPE.NO_TASK_PROCESS, null);
             return;
         }
 
 
         if (!slots.containsKey(KEY_COMMON_RESPONSE)) {
             Logger.i("NLP slots has no COMMON_RESPONSE info");
-            ErrorPromoter.getInstance().speakErrorPromote(ErrorPromoter.ERROR_TYPE.DATA_INVALID, null);
+            ErrorPromoter.getInstance().speakErrorPromote(ErrorPromoter.ERROR_TYPE.NO_TASK_PROCESS, null);
             return;
         }
 
@@ -63,7 +63,7 @@ public class IntentParser {
 
         if (TextUtils.isEmpty(extraString)) {
             Logger.i("COMMON_RESPONSE info is invalid");
-            ErrorPromoter.getInstance().speakErrorPromote(ErrorPromoter.ERROR_TYPE.DATA_INVALID, null);
+            ErrorPromoter.getInstance().speakErrorPromote(ErrorPromoter.ERROR_TYPE.NO_TASK_PROCESS, null);
             return;
         }
 
@@ -76,7 +76,7 @@ public class IntentParser {
         }
         if (null == commonResponse) {
             Logger.d("parse common response failed");
-            ErrorPromoter.getInstance().speakErrorPromote(ErrorPromoter.ERROR_TYPE.DATA_INVALID, null);
+            ErrorPromoter.getInstance().speakErrorPromote(ErrorPromoter.ERROR_TYPE.NO_TASK_PROCESS, null);
             return;
         }
 

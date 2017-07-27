@@ -34,6 +34,8 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
     //表明当此次返回的action执行完后 CloudAppClient 是否要退出，同时，当 shouldEndSession 为 true 时，CloudAppClient 将会忽略 EventRequests，即在action执行过程中不会产生 EventRequest。
     public boolean shouldEndSession;
 
+    public PROMOTE_STATE promoteState;
+
     public MEDIA_STATE currentMediaState;
     public VOICE_STATE currentVoiceState;
 
@@ -64,7 +66,7 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
         if (actionNode != null) {
             if (TextUtils.isEmpty(actionNode.getAppId())) {
                 Logger.d("new cloudAppId is null !");
-                checkAppState();
+                promoteErrorInfo(ErrorPromoter.ERROR_TYPE.NO_TASK_PROCESS);
                 return;
             }
 
@@ -81,7 +83,7 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
             processActionNode(actionNode);
 
         } else {
-            promoteErrorInfo(ErrorPromoter.ERROR_TYPE.DATA_INVALID);
+            promoteErrorInfo(ErrorPromoter.ERROR_TYPE.NO_TASK_PROCESS);
         }
     }
 
@@ -92,20 +94,20 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
 
             if (TextUtils.isEmpty(actionNode.getAppId())) {
                 Logger.d("new cloudAppId is null !");
-                checkAppState();
+                promoteErrorInfo(ErrorPromoter.ERROR_TYPE.NO_TASK_PROCESS);
                 return;
             }
 
             if (!actionNode.getAppId().equals(mAppId)) {
                 Logger.d("onNewEventActionNode the appId is the not the same with lastAppId");
-                checkAppState();
+                promoteErrorInfo(ErrorPromoter.ERROR_TYPE.NO_TASK_PROCESS);
                 return;
             }
 
             this.shouldEndSession = actionNode.isShouldEndSession();
             processActionNode(actionNode);
         } else {
-            checkAppState();
+            promoteErrorInfo(ErrorPromoter.ERROR_TYPE.NO_TASK_PROCESS);
         }
     }
 
@@ -126,27 +128,19 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
     }
 
     @Override
-    public void onAppDestory() {
+    public synchronized void onAppDestory() {
         Logger.d("form: " + getFormType() + " onAppDestory " + " currentMediaState: " + currentMediaState + " currentVoiceState: " + currentVoiceState);
     }
 
     @Override
     public synchronized void onMediaStart() {
-        currentMediaState = MEDIA_STATE.MEDIA_PLAY;
+        currentMediaState = MEDIA_STATE.MEDIA_START;
         Logger.d("form: " + getFormType() + " onMediaStart ! " + " currentMediaState: " + currentMediaState + " currentVoiceState " + currentVoiceState);
         if (TextUtils.isEmpty(mAppId)) {
             Logger.d(" appId is null !");
             return;
         }
-
         reporterManager.executeReporter(new MediaReporter(mAppId, MediaReporter.START, getExtraBean()));
-    }
-
-    private String getExtraBean() {
-        ExtraBean extraBean = new ExtraBean();
-        extraBean.setMedia(new ExtraBean.MediaExtraBean(MediaAction.getInstance().getCurrentToken(), String.valueOf(MediaAction.getInstance().getMediaPosition()), String.valueOf(MediaAction.getInstance().getMediaDuration())));
-        Logger.d(" extraBean : " + extraBean.toString());
-        return extraBean.toString();
     }
 
     @Override
@@ -213,42 +207,11 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
         } else {
             if (TextUtils.isEmpty(mAppId)) {
                 Logger.d(" appId is null !");
-                checkAppState();
+                promoteErrorInfo(ErrorPromoter.ERROR_TYPE.NO_TASK_PROCESS);
                 return;
             }
             reporterManager.executeReporter(new VoiceReporter(mAppId, VoiceReporter.FINISHED));
         }
-    }
-
-    public void promoteErrorInfo(ErrorPromoter.ERROR_TYPE errorType){
-        Logger.d(" promoteErrorInfo isStateInvalid : " + isStateInvalid());
-        if (isStateInvalid()){
-            try {
-                ErrorPromoter.getInstance().speakErrorPromote(errorType, new ErrorPromoter.ErrorPromoteCallback() {
-                    @Override
-                    public void onPromoteFinished() {
-                        if (mTaskProcessCallback != null && mTaskProcessCallback.get() != null){
-                            mTaskProcessCallback.get().onAllTaskFinished();
-                        }
-                    }
-                });
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public void checkAppState() {
-        if (isStateInvalid() && mTaskProcessCallback != null && mTaskProcessCallback.get() != null){
-            Logger.d("form: " + getFormType() + " voice stop , allTaskFinished ! finish app !");
-            mTaskProcessCallback.get().onAllTaskFinished();
-        }
-    }
-
-    private boolean isStateInvalid() {
-        Logger.d("form: " + getFormType() + " isStateInvalid shouldEndSession : " + shouldEndSession + " mediaType : " + currentMediaState + " videoType : " + currentVoiceState);
-        return (currentMediaState == null || currentMediaState == MEDIA_STATE.MEDIA_STOP || currentMediaState == MEDIA_STATE.MEDIA_ERROR) && (currentVoiceState == null || currentVoiceState == VOICE_STATE.VOICE_STOP || currentVoiceState == VOICE_STATE.VOICE_CANCLED || currentVoiceState == VOICE_STATE.VOICE_ERROR)
-                && mTaskProcessCallback != null;
     }
 
     @Override
@@ -274,7 +237,7 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
     @Override
     public synchronized void onEventErrorCallback(String event, int errorCode) {
         Logger.e("form: " + getFormType() + "  onEventErrorCallback " + " event : " + event + " errorCode " + errorCode + " currentMediaState: " + currentMediaState + " currentVoiceState " + currentVoiceState);
-        checkAppState();
+        promoteErrorInfo(ErrorPromoter.ERROR_TYPE.NO_TASK_PROCESS);
     }
 
 
@@ -311,6 +274,50 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
         }
     }
 
+    private void promoteErrorInfo(ErrorPromoter.ERROR_TYPE errorType){
+        Logger.d(" promoteErrorInfo isStateInvalid : " + isStateInvalid());
+        if (isStateInvalid()){
+            try {
+                ErrorPromoter.getInstance().speakErrorPromote(errorType, new ErrorPromoter.ErrorPromoteCallback() {
+                    @Override
+                    public void onPrmoteStarted() {
+                        promoteState = PROMOTE_STATE.STARTED;
+                    }
+
+                    @Override
+                    public void onPromoteFinished() {
+                        if (mTaskProcessCallback != null && mTaskProcessCallback.get() != null){
+                            promoteState = PROMOTE_STATE.FINISHED;
+                            mTaskProcessCallback.get().onAllTaskFinished();
+                        }
+                    }
+                });
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private String getExtraBean() {
+        ExtraBean extraBean = new ExtraBean();
+        extraBean.setMedia(new ExtraBean.MediaExtraBean(MediaAction.getInstance().getCurrentToken(), String.valueOf(MediaAction.getInstance().getMediaPosition()), String.valueOf(MediaAction.getInstance().getMediaDuration())));
+        Logger.d(" extraBean : " + extraBean.toString());
+        return extraBean.toString();
+    }
+
+    private void checkAppState() {
+        if (isStateInvalid() && mTaskProcessCallback != null && mTaskProcessCallback.get() != null){
+            Logger.d("form: " + getFormType() + " voice stop , allTaskFinished ! finish app !");
+            mTaskProcessCallback.get().onAllTaskFinished();
+        }
+    }
+
+    private boolean isStateInvalid() {
+        Logger.d("form: " + getFormType() + " isStateInvalid shouldEndSession : " + shouldEndSession + " mediaType : " + currentMediaState + " videoType : " + currentVoiceState +
+        " promoteState : " + promoteState );
+        return (currentMediaState == null || currentMediaState == MEDIA_STATE.MEDIA_STOP || currentMediaState == MEDIA_STATE.MEDIA_ERROR) && (currentVoiceState == null || currentVoiceState == VOICE_STATE.VOICE_STOP || currentVoiceState == VOICE_STATE.VOICE_CANCLED || currentVoiceState == VOICE_STATE.VOICE_ERROR) &&  (promoteState == null || promoteState == PROMOTE_STATE.FINISHED);
+    }
+
     public void finishActivity() {
         if (mTaskProcessCallback != null && mTaskProcessCallback.get() != null) {
             Logger.d("form: " + getFormType() + " onExitCallback finishActivity");
@@ -335,6 +342,11 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
 
     public abstract String getFormType();
 
+    public enum PROMOTE_STATE{
+        STARTED,
+        FINISHED
+    }
+
     public enum VOICE_STATE {
         VOICE_START,
         VOICE_PAUSED,
@@ -344,7 +356,7 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
     }
 
     public enum MEDIA_STATE {
-        MEDIA_PLAY,
+        MEDIA_START,
         MEDIA_PAUSED,
         MEDIA_RESUME,
         MEDIA_STOP,
@@ -369,7 +381,7 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
     }
 
     public enum USER_MEDIA_CONTROL_TYPE {
-        MEDIA_PLAY,
+        MEDIA_START,
         MEDIA_PAUSE,
         MEDIA_RESUME,
         MEDIA_STOP

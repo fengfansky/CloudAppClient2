@@ -13,7 +13,8 @@
 
         <activity
             android:name="com.rokid.cloudappclient.activity.CloudSceneActivity"
-            android:launchMode="singleTask">
+            android:launchMode="singleTask"
+            android:taskAffinity="com.rokid.cloudsceneclient">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.DEFAULT"/>
@@ -23,7 +24,8 @@
 
         <activity android:name="com.rokid.cloudappclient.activity.CloudCutActivity"
             android:process=":remote"
-            android:launchMode="singleTask">
+            android:launchMode="singleTask"
+            android:taskAffinity="com.rokid.cloudcutclient">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.DEFAULT"/>
