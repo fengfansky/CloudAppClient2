@@ -6,7 +6,7 @@ import com.rokid.cloudappclient.bean.CommonResponseBean;
 import com.rokid.cloudappclient.bean.response.CloudActionResponseBean;
 import com.rokid.cloudappclient.proto.SendEvent;
 import com.rokid.cloudappclient.reporter.BaseReporter;
-import com.rokid.cloudappclient.util.AppTypeRecorder;
+import com.rokid.cloudappclient.state.AppTypeRecorder;
 import com.rokid.cloudappclient.util.CommonResponseHelper;
 import com.rokid.cloudappclient.util.Logger;
 //import com.android.okhttp.Response;
@@ -52,12 +52,12 @@ public class ResponseParser {
             eventResponse = SendEvent.SendEventResponse.parseFrom(response.body().source().readByteArray());
         } catch (IOException e) {
             e.printStackTrace();
-            AppTypeRecorder.getInstance().getAppStateManager().onEventErrorCallback(event, BaseReporter.ReporterResponseCallBack.ERROR_RESPONSE_NULL);
+            AppTypeRecorder.getInstance().getAppStateManager().onEventErrorCallback(event, BaseReporter.ReporterResponseCallBack.ERROR_CODE.ERROR_PARSE_EXCEPTION);
         }
 
         if (eventResponse == null) {
             Logger.d(" eventResponse is null");
-            AppTypeRecorder.getInstance().getAppStateManager().onEventErrorCallback(event, BaseReporter.ReporterResponseCallBack.ERROR_RESPONSE_NULL);
+            AppTypeRecorder.getInstance().getAppStateManager().onEventErrorCallback(event, BaseReporter.ReporterResponseCallBack.ERROR_CODE.ERROR_RESPONSE_NULL);
             return;
         }
 
@@ -65,7 +65,7 @@ public class ResponseParser {
 
         if (eventResponse.getResponse() == null) {
             Logger.d("eventResponse is null !");
-            AppTypeRecorder.getInstance().getAppStateManager().onEventErrorCallback(event, BaseReporter.ReporterResponseCallBack.ERROR_RESPONSE_NULL);
+            AppTypeRecorder.getInstance().getAppStateManager().onEventErrorCallback(event, BaseReporter.ReporterResponseCallBack.ERROR_CODE.ERROR_RESPONSE_NULL);
             return;
         }
 
@@ -73,7 +73,7 @@ public class ResponseParser {
 
         if (cloudResponse == null) {
             Logger.d("cloudResponse parsed null !");
-            AppTypeRecorder.getInstance().getAppStateManager().onEventErrorCallback(event, BaseReporter.ReporterResponseCallBack.ERROR_RESPONSE_NULL);
+            AppTypeRecorder.getInstance().getAppStateManager().onEventErrorCallback(event, BaseReporter.ReporterResponseCallBack.ERROR_CODE.ERROR_RESPONSE_NULL);
             return;
         }
 

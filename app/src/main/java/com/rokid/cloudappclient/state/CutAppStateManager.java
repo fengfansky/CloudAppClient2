@@ -3,6 +3,7 @@ package com.rokid.cloudappclient.state;
 import com.rokid.cloudappclient.action.MediaAction;
 import com.rokid.cloudappclient.bean.response.responseinfo.action.ActionBean;
 import com.rokid.cloudappclient.action.VoiceAction;
+import com.rokid.cloudappclient.http.HttpClientWrapper;
 import com.rokid.cloudappclient.util.Logger;
 
 /**
@@ -25,6 +26,7 @@ public class CutAppStateManager extends BaseAppStateManager {
         Logger.d(" cut : pause tts and finishActivity");
         VoiceAction.getInstance().stopPlay();
         MediaAction.getInstance().stopPlay();
+        HttpClientWrapper.getInstance().close();
         finishActivity();
     }
 

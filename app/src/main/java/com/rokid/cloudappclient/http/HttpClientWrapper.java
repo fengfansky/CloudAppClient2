@@ -33,7 +33,7 @@ public class HttpClientWrapper {
         return SingleHolder.instance;
     }
 
-    public Response sendRequest(String url, BaseParameter params, SendEvent.SendEventRequest eventRequest) throws IOException {
+    public Response sendRequest(String url, SendEvent.SendEventRequest eventRequest) throws IOException {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         eventRequest.writeTo(byteArrayOutputStream);
         Request request = new Request.Builder()
@@ -41,7 +41,7 @@ public class HttpClientWrapper {
                 .header("Accept", "text/plain")
                 .addHeader("Accept-Charset", "utf-8")
                 .addHeader("Cache-Control", "no-cache")
-                .addHeader("Authorization", params.getAuthorization())
+                .addHeader("Authorization", BaseUrlConfig.getAuthorization())
                 .post(RequestBody.create(MediaType.parse(CONTENT_TYPE)
                         , byteArrayOutputStream.toByteArray()))
                 .build();

@@ -31,7 +31,7 @@ public class ErrorPromoter {
             @Override
             public void onPrepared(IMediaPlayer mp) {
                 if (errorPromoteCallback != null){
-                    errorPromoteCallback.onPrmoteStarted();
+                    errorPromoteCallback.onPromoteStarted();
                 }
             }
         });
@@ -77,7 +77,7 @@ public class ErrorPromoter {
     }
 
     public interface ErrorPromoteCallback {
-        void onPrmoteStarted();
+        void onPromoteStarted();
         void onPromoteFinished();
     }
 

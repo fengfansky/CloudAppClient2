@@ -3,7 +3,7 @@ package com.rokid.cloudappclient.tts;
 import android.text.TextUtils;
 
 import com.rokid.cloudappclient.state.BaseAppStateManager;
-import com.rokid.cloudappclient.util.AppTypeRecorder;
+import com.rokid.cloudappclient.state.AppTypeRecorder;
 import com.rokid.cloudappclient.util.Logger;
 
 import rokid.os.RKTTS;

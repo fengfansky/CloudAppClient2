@@ -5,9 +5,10 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.rokid.cloudappclient.http.BaseUrlConfig;
 import com.rokid.cloudappclient.parser.IntentParser;
 import com.rokid.cloudappclient.state.BaseAppStateManager;
-import com.rokid.cloudappclient.util.AppTypeRecorder;
+import com.rokid.cloudappclient.state.AppTypeRecorder;
 import com.rokid.cloudappclient.util.Logger;
 
 import java.io.IOException;

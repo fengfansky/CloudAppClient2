@@ -2,6 +2,8 @@ package com.rokid.cloudappclient;
 
 import android.app.Application;
 
+import com.rokid.cloudappclient.http.BaseUrlConfig;
+
 /**
  * Modified by fanfeng on 2017/7/20.
  */
@@ -13,6 +15,7 @@ public class RKCloudAppApplication extends Application {
     public void onCreate() {
         super.onCreate();
         instance = this;
+        BaseUrlConfig.initDeviceInfo();
     }
 
     public static RKCloudAppApplication getInstance() {

@@ -14,7 +14,6 @@ import com.rokid.cloudappclient.reporter.ExtraBean;
 import com.rokid.cloudappclient.reporter.MediaReporter;
 import com.rokid.cloudappclient.reporter.ReporterManager;
 import com.rokid.cloudappclient.reporter.VoiceReporter;
-import com.rokid.cloudappclient.util.AppTypeRecorder;
 import com.rokid.cloudappclient.util.Logger;
 import com.squareup.okhttp.Response;
 
@@ -66,7 +65,7 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
         if (actionNode != null) {
             if (TextUtils.isEmpty(actionNode.getAppId())) {
                 Logger.d("new cloudAppId is null !");
-                promoteErrorInfo(ErrorPromoter.ERROR_TYPE.NO_TASK_PROCESS);
+                checkAppState();
                 return;
             }
 
@@ -83,7 +82,7 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
             processActionNode(actionNode);
 
         } else {
-            promoteErrorInfo(ErrorPromoter.ERROR_TYPE.NO_TASK_PROCESS);
+            checkAppState();
         }
     }
 
@@ -94,20 +93,20 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
 
             if (TextUtils.isEmpty(actionNode.getAppId())) {
                 Logger.d("new cloudAppId is null !");
-                promoteErrorInfo(ErrorPromoter.ERROR_TYPE.NO_TASK_PROCESS);
+                checkAppState();
                 return;
             }
 
             if (!actionNode.getAppId().equals(mAppId)) {
                 Logger.d("onNewEventActionNode the appId is the not the same with lastAppId");
-                promoteErrorInfo(ErrorPromoter.ERROR_TYPE.NO_TASK_PROCESS);
+                checkAppState();
                 return;
             }
 
             this.shouldEndSession = actionNode.isShouldEndSession();
             processActionNode(actionNode);
         } else {
-            promoteErrorInfo(ErrorPromoter.ERROR_TYPE.NO_TASK_PROCESS);
+            checkAppState();
         }
     }
 
@@ -207,7 +206,7 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
         } else {
             if (TextUtils.isEmpty(mAppId)) {
                 Logger.d(" appId is null !");
-                promoteErrorInfo(ErrorPromoter.ERROR_TYPE.NO_TASK_PROCESS);
+                checkAppState();
                 return;
             }
             reporterManager.executeReporter(new VoiceReporter(mAppId, VoiceReporter.FINISHED));
@@ -235,9 +234,11 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
     }
 
     @Override
-    public synchronized void onEventErrorCallback(String event, int errorCode) {
+    public synchronized void onEventErrorCallback(String event, ERROR_CODE errorCode) {
+        Logger.e(" event error call back !!!");
         Logger.e("form: " + getFormType() + "  onEventErrorCallback " + " event : " + event + " errorCode " + errorCode + " currentMediaState: " + currentMediaState + " currentVoiceState " + currentVoiceState);
-        promoteErrorInfo(ErrorPromoter.ERROR_TYPE.NO_TASK_PROCESS);
+        checkAppState();
+//        promoteErrorInfo(ErrorPromoter.ERROR_TYPE.NO_TASK_PROCESS);
     }
 
 
@@ -280,13 +281,15 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
             try {
                 ErrorPromoter.getInstance().speakErrorPromote(errorType, new ErrorPromoter.ErrorPromoteCallback() {
                     @Override
-                    public void onPrmoteStarted() {
+                    public void onPromoteStarted() {
+                        Logger.d(" onPromoteStarted!");
                         promoteState = PROMOTE_STATE.STARTED;
                     }
 
                     @Override
                     public void onPromoteFinished() {
                         if (mTaskProcessCallback != null && mTaskProcessCallback.get() != null){
+                            Logger.d(" onPromoteFinished !");
                             promoteState = PROMOTE_STATE.FINISHED;
                             mTaskProcessCallback.get().onAllTaskFinished();
                         }

@@ -1,6 +1,4 @@
-package com.rokid.cloudappclient.util;
-
-import com.rokid.cloudappclient.state.BaseAppStateManager;
+package com.rokid.cloudappclient.state;
 
 /**
  * Created by fanfeng on 2017/6/16.

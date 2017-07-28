@@ -8,7 +8,7 @@ import com.rokid.cloudappclient.bean.response.responseinfo.action.media.MediaBea
 import com.rokid.cloudappclient.bean.response.responseinfo.action.media.MediaItemBean;
 import com.rokid.cloudappclient.player.RKAudioPlayer;
 import com.rokid.cloudappclient.state.BaseAppStateManager;
-import com.rokid.cloudappclient.util.AppTypeRecorder;
+import com.rokid.cloudappclient.state.AppTypeRecorder;
 import com.rokid.cloudappclient.util.Logger;
 
 import tv.danmaku.ijk.media.player.IMediaPlayer;

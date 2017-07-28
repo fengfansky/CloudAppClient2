@@ -3,7 +3,7 @@ package com.rokid.cloudappclient.action;
 import com.rokid.cloudappclient.bean.response.responseinfo.action.voice.VoiceBean;
 import com.rokid.cloudappclient.bean.response.responseinfo.action.voice.VoiceItemBean;
 import com.rokid.cloudappclient.state.BaseAppStateManager;
-import com.rokid.cloudappclient.util.AppTypeRecorder;
+import com.rokid.cloudappclient.state.AppTypeRecorder;
 import com.rokid.cloudappclient.tts.TTSHelper;
 import com.rokid.cloudappclient.util.Logger;
 

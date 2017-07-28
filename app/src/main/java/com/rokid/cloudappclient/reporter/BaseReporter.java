@@ -1,11 +1,10 @@
 package com.rokid.cloudappclient.reporter;
 
-import com.rokid.cloudappclient.http.BaseParameter;
 import com.rokid.cloudappclient.http.BaseUrlConfig;
 import com.rokid.cloudappclient.http.HttpClientWrapper;
 import com.rokid.cloudappclient.proto.SendEvent;
 import com.rokid.cloudappclient.proto.SendEventCreator;
-import com.rokid.cloudappclient.util.AppTypeRecorder;
+import com.rokid.cloudappclient.state.AppTypeRecorder;
 import com.rokid.cloudappclient.util.Logger;
 //import com.android.okhttp.Response;
 import com.squareup.okhttp.Response;
@@ -55,24 +54,24 @@ public abstract class BaseReporter implements Runnable {
         SendEvent.SendEventRequest eventRequest =
                 SendEventCreator.generateSendEventRequest(appId, event, extra);
         Logger.d(" eventRequest : " + eventRequest.toString());
-        BaseParameter baseParameter = new BaseParameter();
+        Logger.d(" eventRequest url: " + BaseUrlConfig.getUrl());
         Response response = null;
         try {
-            response = HttpClientWrapper.getInstance().sendRequest(BaseUrlConfig.getUrl(), baseParameter, eventRequest);
+            response = HttpClientWrapper.getInstance().sendRequest(BaseUrlConfig.getUrl(), eventRequest);
         } catch (IOException e) {
-            AppTypeRecorder.getInstance().getAppStateManager().onEventErrorCallback(event, ReporterResponseCallBack.ERROR_IOEXCEPTION);
-            Logger.e(" response callback exception !");
+            e.printStackTrace();
+            AppTypeRecorder.getInstance().getAppStateManager().onEventErrorCallback(event, ReporterResponseCallBack.ERROR_CODE.ERROR_IOEXCEPTION);
         }finally {
             try {
                 if (response != null && response.body() != null){
                     AppTypeRecorder.getInstance().getAppStateManager().onEventResponseCallback(event, response);
                     response.body().close();
                 }else {
-                    AppTypeRecorder.getInstance().getAppStateManager().onEventErrorCallback(event, ReporterResponseCallBack.ERROR_RESPONSE_NULL);
+                    AppTypeRecorder.getInstance().getAppStateManager().onEventErrorCallback(event, ReporterResponseCallBack.ERROR_CODE.ERROR_RESPONSE_NULL);
                 }
             } catch (IOException e) {
-                AppTypeRecorder.getInstance().getAppStateManager().onEventErrorCallback(event, ReporterResponseCallBack.ERROR_IOEXCEPTION);
-                Logger.e(" response close exception !");
+                e.printStackTrace();
+                AppTypeRecorder.getInstance().getAppStateManager().onEventErrorCallback(event, ReporterResponseCallBack.ERROR_CODE.ERROR_IOEXCEPTION);
             }
         }
 
@@ -81,11 +80,15 @@ public abstract class BaseReporter implements Runnable {
 
     public interface ReporterResponseCallBack {
 
-        int ERROR_CONNNECTION_TIMEOUT = 0;
-        int ERROR_RESPONSE_NULL = 1;
-        int ERROR_IOEXCEPTION = 2;
+        enum ERROR_CODE{
+            ERROR_CONNNECTION_TIMEOUT,
+            ERROR_RESPONSE_NULL,
+            ERROR_IOEXCEPTION ,
+            ERROR_PARSE_EXCEPTION
 
-        void onEventErrorCallback(String event, int errorCode);
+        }
+
+        void onEventErrorCallback(String event, ERROR_CODE errorCode);
 
         void onEventResponseCallback(String event, Response response);
     }
