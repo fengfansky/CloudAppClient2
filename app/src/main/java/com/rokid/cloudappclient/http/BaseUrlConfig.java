@@ -25,7 +25,7 @@ public class BaseUrlConfig {
 
     private static Map<String,String> deviceMap;
 
-    private static final String KEY_HOST = "host";
+    private static final String KEY_HOST = "event_req_host";
 
     private static final String PARAM_KEY_KEY = "key";
     private static final String PARAM_KEY_DEVICE_TYPE_ID = "device_type_id";
@@ -86,7 +86,7 @@ public class BaseUrlConfig {
             mHost = DEFAULT_HOST;
         }
 
-        return BASE_HTTP + mHost + SEND_EVENT_PATH;
+        return BASE_HTTP + DEFAULT_HOST + SEND_EVENT_PATH;
     }
 
     public static String getAuthorization() {
