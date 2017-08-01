@@ -17,7 +17,7 @@ public class BaseUrlConfig {
 
     private static final String BASE_HTTP = "https://";
 
-    private static final String DEFAULT_HOST = "apigwws-dev.open.rokid.com";
+    private static final String DEFAULT_HOST = "apigwrest.open.rokid.com";
 
     private static final String SEND_EVENT_PATH = "/v1/skill/dispatch/sendEvent";
 
