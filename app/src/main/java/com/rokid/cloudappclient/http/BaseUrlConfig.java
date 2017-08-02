@@ -86,7 +86,7 @@ public class BaseUrlConfig {
             mHost = DEFAULT_HOST;
         }
 
-        return BASE_HTTP + DEFAULT_HOST + SEND_EVENT_PATH;
+        return BASE_HTTP + mHost + SEND_EVENT_PATH;
     }
 
     public static String getAuthorization() {

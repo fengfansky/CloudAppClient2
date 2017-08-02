@@ -1,6 +1,6 @@
 package com.rokid.cloudappclient.bean.response.responseinfo.action.confirm;
 
-import com.rokid.cloudappclient.bean.response.responseinfo.action.voice.ConfirmAttributesBean;
+import java.util.List;
 
 /**
  * Defines the Confirm content for confirm request
@@ -12,7 +12,7 @@ public class ConfirmBean {
 
     private String confirmIntent;
     private String confirmSlot;
-    private ConfirmAttributesBean optionWords;
+    private List<String> optionWords;
 
     public String getConfirmIntent() {
         return confirmIntent;
@@ -30,7 +30,13 @@ public class ConfirmBean {
         this.confirmSlot = confirmSlot;
     }
 
+    public List<String> getOptionWords() {
+        return optionWords;
+    }
 
+    public void setOptionWords(List<String> optionWords) {
+        this.optionWords = optionWords;
+    }
 }
 
 
