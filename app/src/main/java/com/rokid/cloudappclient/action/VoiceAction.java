@@ -96,4 +96,7 @@ public class VoiceAction extends BaseAction<VoiceBean> {
         return ACTION_TYPE.VOICE;
     }
 
+    public VoiceBean getVoiceBean() {
+        return voiceBean;
+    }
 }

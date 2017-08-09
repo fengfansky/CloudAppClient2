@@ -5,8 +5,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.rokid.cloudappclient.http.BaseUrlConfig;
-import com.rokid.cloudappclient.parser.IntentParser;
+import com.rokid.cloudappclient.parser.ResponseParser;
 import com.rokid.cloudappclient.state.BaseAppStateManager;
 import com.rokid.cloudappclient.state.AppTypeRecorder;
 import com.rokid.cloudappclient.util.Logger;
@@ -22,8 +21,6 @@ import java.io.IOException;
  */
 public abstract class BaseActivity extends Activity implements BaseAppStateManager.TaskProcessCallback {
 
-    IntentParser intentParser = new IntentParser();
-
     //只有在cut应用入栈的时候才会调onResume
     boolean isNeedResume;
 
@@ -35,7 +32,7 @@ public abstract class BaseActivity extends Activity implements BaseAppStateManag
         getAppStateManager().setTaskProcessCallback(this);
         isNeedResume = false;
         try {
-            intentParser.parseIntent(getIntent());
+            ResponseParser.getInstance().parseIntent(getIntent());
         } catch (IOException e) {
             Logger.e("exception : promote error data invalid ");
         }
@@ -51,7 +48,7 @@ public abstract class BaseActivity extends Activity implements BaseAppStateManag
         }
         isNeedResume = false;
         try {
-            intentParser.parseIntent(intent);
+            ResponseParser.getInstance().parseIntent(intent);
         } catch (IOException e) {
             Logger.e("exception : promote error data invalid ");
         }
@@ -102,21 +99,17 @@ public abstract class BaseActivity extends Activity implements BaseAppStateManag
     }
 
     @Override
-    public void openSiren() {
-        Logger.d(" process confirm ");
+    public void openSiren(boolean pickupEnable, int durationInMilliseconds) {
+        Logger.d(" process openSiren ");
         Intent intent = new Intent();
         ComponentName compontent = new ComponentName("com.rokid.activation", "com.rokid.activation.service.CoreService");
         intent.setComponent(compontent);
         intent.putExtra("InputAction", "confirmEvent");
         Bundle bundle = new Bundle();
-        bundle.putInt("isConfirm", 1);   //isConfirm  参数 目前支持 1: 打开拾音 , 0: 关闭拾音
+        bundle.putBoolean("isConfirm", pickupEnable);//拾音打开或关闭
+        bundle.putInt("durationInMilliseconds", durationInMilliseconds);//当enable=true时，在用户不说话的情况下，拾音打开持续时间
         intent.putExtra("intent", bundle);
         startService(intent);
-    }
-
-    @Override
-    public void onAllTaskFinished() {
-        finish();
     }
 
     @Override

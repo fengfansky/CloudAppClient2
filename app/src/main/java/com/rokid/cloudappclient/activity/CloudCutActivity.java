@@ -10,4 +10,13 @@ public class CloudCutActivity extends BaseActivity {
         return CutAppStateManager.getInstance();
     }
 
+    @Override
+    public void onInvalidateState() {
+        finish();
+    }
+
+    @Override
+    public void onAllTaskFinished() {
+        finish();
+    }
 }

@@ -29,28 +29,69 @@ public class ExtraBean extends BaseBean{
 
     public static class MediaExtraBean extends BaseExtraBean{
 
+        public MediaExtraBean(String progress, String duration) {
+            super(progress, duration);
+        }
+
         public MediaExtraBean(String token, String progress, String duration) {
             super(token, progress, duration);
+        }
+
+        public MediaExtraBean(String itemId, String token, String progress, String duration) {
+            super(itemId, token, progress, duration);
         }
     }
 
 
     public static class VoiceExtraBean extends BaseExtraBean{
 
+        public VoiceExtraBean(String itemId) {
+            super(itemId);
+        }
+
         public VoiceExtraBean(String token, String progress, String duration) {
             super(token, progress, duration);
+        }
+
+        public VoiceExtraBean(String itemId, String token, String progress, String duration) {
+            super(itemId, token, progress, duration);
         }
     }
 
     public static abstract class BaseExtraBean{
+        private String itemId;
         private String token;
         private String progress;
         private String duration;
+
+        public BaseExtraBean(String itemId) {
+            this.itemId = itemId;
+        }
+
+        public BaseExtraBean(String progress, String duration) {
+            this.progress = progress;
+            this.duration = duration;
+        }
 
         public BaseExtraBean(String token, String progress, String duration) {
             this.token = token;
             this.progress = progress;
             this.duration = duration;
+        }
+
+        public BaseExtraBean(String itemId, String token, String progress, String duration) {
+            this.itemId = itemId;
+            this.token = token;
+            this.progress = progress;
+            this.duration = duration;
+        }
+
+        public String getItemId() {
+            return itemId;
+        }
+
+        public void setItemId(String itemId) {
+            this.itemId = itemId;
         }
 
         public String getToken() {

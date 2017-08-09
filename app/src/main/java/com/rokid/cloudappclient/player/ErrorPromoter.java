@@ -1,12 +1,9 @@
 package com.rokid.cloudappclient.player;
 
 import android.content.res.AssetManager;
-
 import com.rokid.cloudappclient.RKCloudAppApplication;
 import com.rokid.cloudappclient.util.Logger;
-
 import java.io.IOException;
-
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 
 /**
@@ -67,7 +64,7 @@ public class ErrorPromoter {
                 //找不到要播放的文件，换一个试试吧。
                 rkAudioPlayer.setAssetVideo(assetManager.openFd("media_error.mp3"));
                 break;
-            case NO_TASK_PROCESS:
+            case DATA_INVALID:
             case TTS_ERROR:
                 //遇到了一点小问题，稍后再试一下吧
                 rkAudioPlayer.setAssetVideo(assetManager.openFd("common_error.mp3"));
@@ -82,7 +79,7 @@ public class ErrorPromoter {
     }
 
     public enum ERROR_TYPE {
-        NO_TASK_PROCESS,
+        DATA_INVALID,
         MEDIA_TIME_OUT,
         MEDIA_ERROR,
         TTS_ERROR

@@ -20,6 +20,19 @@ public abstract class BaseActionBean extends BaseBean {
 
     public String action;
 
+    /**
+     * if need close EventRequest
+     */
+    private boolean disableEvent;
+
+    public boolean isDisableEvent() {
+        return disableEvent;
+    }
+
+    public void setDisableEvent(boolean disableEvent) {
+        this.disableEvent = disableEvent;
+    }
+
     public String getAction() {
         return action;
     }

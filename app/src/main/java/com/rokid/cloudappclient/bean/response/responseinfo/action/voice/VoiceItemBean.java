@@ -10,7 +10,16 @@ import com.rokid.cloudappclient.bean.base.BaseBean;
  */
 public class VoiceItemBean extends BaseBean {
 
+    private String itemId;
     private String tts;
+
+    public String getItemId() {
+        return itemId;
+    }
+
+    public void setItemId(String itemId) {
+        this.itemId = itemId;
+    }
 
     public String getTts() {
         return tts;

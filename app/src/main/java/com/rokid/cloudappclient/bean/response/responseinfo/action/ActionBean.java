@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import com.rokid.cloudappclient.bean.response.responseinfo.action.confirm.ConfirmBean;
 import com.rokid.cloudappclient.bean.response.responseinfo.action.display.DisplayBean;
 import com.rokid.cloudappclient.bean.response.responseinfo.action.media.MediaBean;
+import com.rokid.cloudappclient.bean.response.responseinfo.action.pickup.PickupBean;
 import com.rokid.cloudappclient.bean.response.responseinfo.action.voice.VoiceBean;
 
 /**
@@ -48,6 +49,7 @@ public class ActionBean {
     private DisplayBean display;
     private MediaBean media;
     private ConfirmBean confirm;
+    private PickupBean pickup;
 
     /**
      * 当前action的展现形式：scene、cut、service。scene的action会在被打断后压栈，cut的action会在被打    * 断后直接结束，service会在后台执行，但没有任何界面。该字段在技能创建时被确定，无法由cloud app更改。
@@ -120,6 +122,14 @@ public class ActionBean {
 
     public void setConfirm(ConfirmBean confirm) {
         this.confirm = confirm;
+    }
+
+    public PickupBean getPickup() {
+        return pickup;
+    }
+
+    public void setPickup(PickupBean pickup) {
+        this.pickup = pickup;
     }
 
     public boolean isTypeValid() {

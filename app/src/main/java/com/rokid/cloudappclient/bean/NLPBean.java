@@ -17,6 +17,11 @@ public class NLPBean extends BaseBean{
     private String asr;
 
     /**
+     * action content
+     */
+    private String action;
+
+    /**
      * intent cloudAppId
      */
     private String appId;
@@ -76,6 +81,14 @@ public class NLPBean extends BaseBean{
 
     public void setAsr(String asr) {
         this.asr = asr;
+    }
+
+    public String getAction() {
+        return action;
+    }
+
+    public void setAction(String action) {
+        this.action = action;
     }
 
     public String getAppId() {

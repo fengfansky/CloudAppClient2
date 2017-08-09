@@ -6,6 +6,7 @@ import com.rokid.cloudappclient.action.MediaAction;
 import com.rokid.cloudappclient.action.VoiceAction;
 import com.rokid.cloudappclient.bean.ActionNode;
 import com.rokid.cloudappclient.bean.response.responseinfo.action.ActionBean;
+import com.rokid.cloudappclient.bean.response.responseinfo.action.pickup.PickupBean;
 import com.rokid.cloudappclient.player.ErrorPromoter;
 import com.rokid.cloudappclient.parser.ResponseParser;
 import com.rokid.cloudappclient.player.RKAudioPlayer;
@@ -65,7 +66,7 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
         if (actionNode != null) {
             if (TextUtils.isEmpty(actionNode.getAppId())) {
                 Logger.d("new cloudAppId is null !");
-                checkAppState();
+                checkStateValid();
                 return;
             }
 
@@ -82,7 +83,7 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
             processActionNode(actionNode);
 
         } else {
-            checkAppState();
+            checkStateValid();
         }
     }
 
@@ -93,20 +94,20 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
 
             if (TextUtils.isEmpty(actionNode.getAppId())) {
                 Logger.d("new cloudAppId is null !");
-                checkAppState();
+                checkStateValid();
                 return;
             }
 
             if (!actionNode.getAppId().equals(mAppId)) {
                 Logger.d("onNewEventActionNode the appId is the not the same with lastAppId");
-                checkAppState();
+                checkStateValid();
                 return;
             }
 
             this.shouldEndSession = actionNode.isShouldEndSession();
             processActionNode(actionNode);
         } else {
-            checkAppState();
+            checkStateValid();
         }
     }
 
@@ -135,22 +136,15 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
     public synchronized void onMediaStart() {
         currentMediaState = MEDIA_STATE.MEDIA_START;
         Logger.d("form: " + getFormType() + " onMediaStart ! " + " currentMediaState: " + currentMediaState + " currentVoiceState " + currentVoiceState);
-        if (TextUtils.isEmpty(mAppId)) {
-            Logger.d(" appId is null !");
-            return;
-        }
-        reporterManager.executeReporter(new MediaReporter(mAppId, MediaReporter.START, getExtraBean()));
+
+        sendMediaReporter(MediaReporter.START);
     }
 
     @Override
     public synchronized void onMediaPause(int position) {
         currentMediaState = MEDIA_STATE.MEDIA_PAUSED;
         Logger.d("form: " + getFormType() + " onMediaPause ! position : " + position + " currentMediaState: " + currentMediaState + " currentVoiceState " + currentVoiceState);
-        if (TextUtils.isEmpty(mAppId)) {
-            Logger.d(" appId is null !");
-            return;
-        }
-        reporterManager.executeReporter(new MediaReporter(mAppId, MediaReporter.PAUSED, getExtraBean()));
+        sendMediaReporter(MediaReporter.PAUSED);
     }
 
     @Override
@@ -164,14 +158,14 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
         currentMediaState = MEDIA_STATE.MEDIA_STOP;
         Logger.d("form: " + getFormType() + " onMediaStop !" + " currentMediaState: " + currentMediaState + " currentVoiceState " + currentVoiceState);
         if (shouldEndSession) {
-            checkAppState();
+            checkStateValid();
         } else {
             if (TextUtils.isEmpty(mAppId)) {
                 Logger.d(" appId is null !");
                 return;
             }
 
-            reporterManager.executeReporter(new MediaReporter(mAppId, MediaReporter.FINISHED, getExtraBean()));
+            sendMediaReporter(MediaReporter.FINISHED);
         }
     }
 
@@ -179,9 +173,9 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
     public synchronized void onMediaError(int errorCode) {
         currentMediaState = MEDIA_STATE.MEDIA_ERROR;
         Logger.d("form: " + getFormType() + " onMediaError ! errorCode : " + errorCode + " currentMediaState: " + currentMediaState + " currentVoiceState " + currentVoiceState);
-        if (errorCode == RKAudioPlayer.MEDIA_ERROR_TIME_OUT){
+        if (errorCode == RKAudioPlayer.MEDIA_ERROR_TIME_OUT) {
             promoteErrorInfo(ErrorPromoter.ERROR_TYPE.MEDIA_TIME_OUT);
-        }else {
+        } else {
             promoteErrorInfo(ErrorPromoter.ERROR_TYPE.MEDIA_ERROR);
         }
     }
@@ -190,11 +184,7 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
     public synchronized void onVoiceStart() {
         currentVoiceState = VOICE_STATE.VOICE_START;
         Logger.d("form: " + getFormType() + " onVoiceStart !" + " currentMediaState: " + currentMediaState + " currentVoiceState " + currentVoiceState);
-        if (TextUtils.isEmpty(mAppId)) {
-            Logger.d(" appId is null !");
-            return;
-        }
-        reporterManager.executeReporter(new VoiceReporter(mAppId, VoiceReporter.START));
+        sendVoiceReporter(VoiceReporter.START);
     }
 
     @Override
@@ -202,14 +192,9 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
         currentVoiceState = VOICE_STATE.VOICE_STOP;
         Logger.d("form: " + getFormType() + " onVoiceStop !" + " currentMediaState: " + currentMediaState + " currentVoiceState " + currentVoiceState);
         if (shouldEndSession) {
-            checkAppState();
+            checkStateValid();
         } else {
-            if (TextUtils.isEmpty(mAppId)) {
-                Logger.d(" appId is null !");
-                checkAppState();
-                return;
-            }
-            reporterManager.executeReporter(new VoiceReporter(mAppId, VoiceReporter.FINISHED));
+            sendVoiceReporter(VoiceReporter.FINISHED);
         }
     }
 
@@ -223,7 +208,7 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
     public synchronized void onVoiceCancled() {
         currentVoiceState = VOICE_STATE.VOICE_CANCLED;
         Logger.d("form: " + getFormType() + " onVoiceCancled !" + " currentMediaState: " + currentMediaState + " currentVoiceState " + currentVoiceState);
-        checkAppState();
+        checkStateValid();
     }
 
     @Override
@@ -237,7 +222,7 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
     public synchronized void onEventErrorCallback(String event, ERROR_CODE errorCode) {
         Logger.e(" event error call back !!!");
         Logger.e("form: " + getFormType() + "  onEventErrorCallback " + " event : " + event + " errorCode " + errorCode + " currentMediaState: " + currentMediaState + " currentVoiceState " + currentVoiceState);
-        checkAppState();
+        checkStateValid();
 //        promoteErrorInfo(ErrorPromoter.ERROR_TYPE.NO_TASK_PROCESS);
     }
 
@@ -265,8 +250,9 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
 
             if (actionNode.getVoice() != null) {
                 VoiceAction.getInstance().processAction(actionNode.getVoice());
-                if (actionNode.getConfirmBean() != null && mTaskProcessCallback != null && mTaskProcessCallback.get() != null){
-                   mTaskProcessCallback.get().openSiren();
+                if (actionNode.getConfirmBean() != null && mTaskProcessCallback != null && mTaskProcessCallback.get() != null) {
+                    //confirm 打开拾音，默认6秒
+                    mTaskProcessCallback.get().openSiren(true, 6000);
                 }
             }
             if (actionNode.getMedia() != null) {
@@ -275,9 +261,65 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
         }
     }
 
-    private void promoteErrorInfo(ErrorPromoter.ERROR_TYPE errorType){
+    private void sendVoiceReporter(String action) {
+        if (TextUtils.isEmpty(mAppId)) {
+            Logger.d(" appId is null !");
+            checkStateValid();
+            return;
+        }
+        if (mActionNode == null || mActionNode.getVoice() == null) {
+            Logger.d(" mActionNode or voice is null ! ");
+            checkStateValid();
+            return;
+        }
+        if (mActionNode.getVoice().isDisableEvent()) {
+            Logger.d("SendEventRequest disableEvent closed!");
+            checkStateValid();
+            return;
+        }
+
+        ExtraBean extraBean = new ExtraBean();
+        if (mActionNode.getVoice().getItem() == null) {
+            reporterManager.executeReporter(new VoiceReporter(mAppId, action));
+        } else {
+            Logger.d(" extraBean : " + extraBean.toString());
+            extraBean.setVoice(new ExtraBean.VoiceExtraBean(mActionNode.getVoice().getItem().getItemId()));
+            reporterManager.executeReporter(new VoiceReporter(mAppId, action, extraBean.toString()));
+        }
+    }
+
+    private void sendMediaReporter(String action) {
+        if (TextUtils.isEmpty(mAppId)) {
+            Logger.d(" appId is null !");
+            checkStateValid();
+            return;
+        }
+        if (mActionNode == null || mActionNode.getMedia() == null) {
+            Logger.d("mActionNode or media is null!");
+            checkStateValid();
+            return;
+        }
+
+        if (mActionNode.getMedia().isDisableEvent()) {
+            Logger.d("SendEventRequest disableEvent closed!");
+            checkStateValid();
+            return;
+        }
+        ExtraBean extraBean = new ExtraBean();
+
+        if (mActionNode.getMedia().getItem() == null) {
+            extraBean.setMedia(new ExtraBean.MediaExtraBean(String.valueOf(MediaAction.getInstance().getMediaPosition()), String.valueOf(MediaAction.getInstance().getMediaDuration())));
+        } else {
+            extraBean.setMedia(new ExtraBean.MediaExtraBean(mActionNode.getMedia().getItem().getItemId(), mActionNode.getMedia().getItem().getToken(), String.valueOf(MediaAction.getInstance().getMediaPosition()), String.valueOf(MediaAction.getInstance().getMediaDuration())));
+        }
+        Logger.d(" extraBean : " + extraBean.toString());
+
+        reporterManager.executeReporter(new MediaReporter(mAppId, action, extraBean.toString()));
+    }
+
+    private void promoteErrorInfo(ErrorPromoter.ERROR_TYPE errorType) {
         Logger.d(" promoteErrorInfo isStateInvalid : " + isStateInvalid());
-        if (isStateInvalid()){
+        if (isStateInvalid()) {
             try {
                 ErrorPromoter.getInstance().speakErrorPromote(errorType, new ErrorPromoter.ErrorPromoteCallback() {
                     @Override
@@ -288,7 +330,7 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
 
                     @Override
                     public void onPromoteFinished() {
-                        if (mTaskProcessCallback != null && mTaskProcessCallback.get() != null){
+                        if (mTaskProcessCallback != null && mTaskProcessCallback.get() != null) {
                             Logger.d(" onPromoteFinished !");
                             promoteState = PROMOTE_STATE.FINISHED;
                             mTaskProcessCallback.get().onAllTaskFinished();
@@ -301,24 +343,22 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
         }
     }
 
-    private String getExtraBean() {
-        ExtraBean extraBean = new ExtraBean();
-        extraBean.setMedia(new ExtraBean.MediaExtraBean(MediaAction.getInstance().getCurrentToken(), String.valueOf(MediaAction.getInstance().getMediaPosition()), String.valueOf(MediaAction.getInstance().getMediaDuration())));
-        Logger.d(" extraBean : " + extraBean.toString());
-        return extraBean.toString();
-    }
 
-    private void checkAppState() {
-        if (isStateInvalid() && mTaskProcessCallback != null && mTaskProcessCallback.get() != null){
-            Logger.d("form: " + getFormType() + " voice stop , allTaskFinished ! finish app !");
-            mTaskProcessCallback.get().onAllTaskFinished();
+    private void checkStateValid() {
+        if (isStateInvalid() && mTaskProcessCallback != null && mTaskProcessCallback.get() != null) {
+            Logger.d("checkStateValid form: " + getFormType() + " voice stop , checkAllTaskIsFinished ! finish app !");
+            mTaskProcessCallback.get().onInvalidateState();
+            if (mActionNode.getPickup() != null) {
+                Logger.d("pickUp : " + mActionNode.getPickup().toString());
+                mTaskProcessCallback.get().openSiren(mActionNode.getPickup().isEnable(), mActionNode.getPickup().getDurationInMilliseconds());
+            }
         }
     }
 
     private boolean isStateInvalid() {
         Logger.d("form: " + getFormType() + " isStateInvalid shouldEndSession : " + shouldEndSession + " mediaType : " + currentMediaState + " videoType : " + currentVoiceState +
-        " promoteState : " + promoteState );
-        return (currentMediaState == null || currentMediaState == MEDIA_STATE.MEDIA_STOP || currentMediaState == MEDIA_STATE.MEDIA_ERROR) && (currentVoiceState == null || currentVoiceState == VOICE_STATE.VOICE_STOP || currentVoiceState == VOICE_STATE.VOICE_CANCLED || currentVoiceState == VOICE_STATE.VOICE_ERROR) &&  (promoteState == null || promoteState == PROMOTE_STATE.FINISHED);
+                " promoteState : " + promoteState);
+        return (currentMediaState == null || currentMediaState == MEDIA_STATE.MEDIA_STOP || currentMediaState == MEDIA_STATE.MEDIA_ERROR) && (currentVoiceState == null || currentVoiceState == VOICE_STATE.VOICE_STOP || currentVoiceState == VOICE_STATE.VOICE_CANCLED || currentVoiceState == VOICE_STATE.VOICE_ERROR) && (promoteState == null || promoteState == PROMOTE_STATE.FINISHED);
     }
 
     public void finishActivity() {
@@ -336,7 +376,9 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
 
     public interface TaskProcessCallback {
 
-        void openSiren();
+        void openSiren(boolean pickupEnable, int durationInMilliseconds);
+
+        void onInvalidateState();
 
         void onAllTaskFinished();
 
@@ -345,7 +387,7 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
 
     public abstract String getFormType();
 
-    public enum PROMOTE_STATE{
+    public enum PROMOTE_STATE {
         STARTED,
         FINISHED
     }

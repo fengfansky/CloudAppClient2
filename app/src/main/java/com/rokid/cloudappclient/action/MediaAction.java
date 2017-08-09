@@ -19,8 +19,6 @@ public class MediaAction extends BaseAction<MediaBean> {
 
     private RKAudioPlayer rkAudioPlayer;
 
-    private String currentToken;
-
     private MediaAction() {
         initRKAudioPlayer();
     }
@@ -91,9 +89,8 @@ public class MediaAction extends BaseAction<MediaBean> {
         }
 
         Logger.d("play mediaBean : " + mediaBean);
-        currentToken = mediaBeanItem.getToken();
 
-        String url = mediaBeanItem.getUrl();
+        String url = mediaBeanItem.getUrl() + "&" + mediaBeanItem.getToken();
 
         if (TextUtils.isEmpty(url)) {
             Logger.d("media url invalidate!");
@@ -186,10 +183,6 @@ public class MediaAction extends BaseAction<MediaBean> {
             return 0;
         }
         return rkAudioPlayer.getCurrentPosition();
-    }
-
-    public String getCurrentToken() {
-        return currentToken;
     }
 
     public void releasePlayer() {

@@ -1,9 +1,14 @@
 package com.rokid.cloudappclient.parser;
 
+import android.content.Intent;
+import android.text.TextUtils;
+
 import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
 import com.rokid.cloudappclient.bean.ActionNode;
-import com.rokid.cloudappclient.bean.CommonResponseBean;
+import com.rokid.cloudappclient.bean.NLPBean;
 import com.rokid.cloudappclient.bean.response.CloudActionResponseBean;
+import com.rokid.cloudappclient.player.ErrorPromoter;
 import com.rokid.cloudappclient.proto.SendEvent;
 import com.rokid.cloudappclient.reporter.BaseReporter;
 import com.rokid.cloudappclient.state.AppTypeRecorder;
@@ -19,8 +24,6 @@ import java.io.IOException;
 
 public class ResponseParser {
 
-    //private BaseAppStateManager appStateManager = AppTypeRecorder.getInstance().getAppStateManager();
-
     private static ResponseParser parser;
 
     public static ResponseParser getInstance() {
@@ -33,11 +36,56 @@ public class ResponseParser {
         return parser;
     }
 
-    public void parseIntentResponse(CommonResponseBean commonResponse) {
+    private static final String KEY_NLP = "nlp";
+    private static final String KEY_ACTION = "action";
+    private static final String KEY_COMMON_RESPONSE = "extra";
 
-        Logger.d(" parse IntentResponse commonResponse : " + commonResponse);
+    public void parseIntent(Intent intent) throws IOException {
 
-        ActionNode actionNode = CommonResponseHelper.generateActionNode(commonResponse);
+        if (intent == null) {
+            Logger.d("intent null !");
+            ErrorPromoter.getInstance().speakErrorPromote(ErrorPromoter.ERROR_TYPE.DATA_INVALID,null);
+            return;
+        }
+
+        String nlp = intent.getStringExtra(KEY_NLP);
+        if (TextUtils.isEmpty(nlp)) {
+            Logger.d("NLP is empty!!!");
+            ErrorPromoter.getInstance().speakErrorPromote(ErrorPromoter.ERROR_TYPE.DATA_INVALID, null);
+            return;
+        }
+
+        Logger.d("parseIntent Nlp ---> ", nlp);
+        NLPBean nlpBean = null;
+        try{
+            nlpBean = new Gson().fromJson(nlp, NLPBean.class);
+        }catch (JsonParseException jsonException){
+            Logger.e(" json exception ! " + jsonException.getMessage());
+            ErrorPromoter.getInstance().speakErrorPromote(ErrorPromoter.ERROR_TYPE.DATA_INVALID, null);
+            jsonException.printStackTrace();
+        }
+
+        if (null == nlpBean) {
+            Logger.d("NLPData is empty!!!");
+            ErrorPromoter.getInstance().speakErrorPromote(ErrorPromoter.ERROR_TYPE.DATA_INVALID, null);
+            return;
+        }
+
+        String actionStr = nlpBean.getAction();
+
+        CloudActionResponseBean actionBean = null;
+
+        try{
+            actionBean = new Gson().fromJson(actionStr, CloudActionResponseBean.class);
+        }catch (JsonParseException jsonException){
+            Logger.e(" json exception ! " + jsonException.getMessage());
+            ErrorPromoter.getInstance().speakErrorPromote(ErrorPromoter.ERROR_TYPE.DATA_INVALID, null);
+            jsonException.printStackTrace();
+        }
+
+        Logger.d(" parse IntentResponse commonResponse : " + actionBean);
+
+        ActionNode actionNode = CommonResponseHelper.generateActionNode(actionBean);
 
         //update appState
         AppTypeRecorder.getInstance().getAppStateManager().onNewIntentActionNode(actionNode);
@@ -69,7 +117,13 @@ public class ResponseParser {
             return;
         }
 
-        CloudActionResponseBean cloudResponse = new Gson().fromJson(eventResponse.getResponse(), CloudActionResponseBean.class);
+        CloudActionResponseBean cloudResponse = null;
+        try{
+            cloudResponse = new Gson().fromJson(eventResponse.getResponse(), CloudActionResponseBean.class);
+        }catch (JsonParseException jsonException){
+            Logger.e(" json exception ! " + jsonException.getMessage());
+            jsonException.printStackTrace();
+        }
 
         if (cloudResponse == null) {
             Logger.d("cloudResponse parsed null !");
@@ -77,9 +131,7 @@ public class ResponseParser {
             return;
         }
 
-        CommonResponseBean commonResponse = new CommonResponseBean();
-        commonResponse.setAction(cloudResponse);
-        ActionNode actionNode = CommonResponseHelper.generateActionNode(commonResponse);
+        ActionNode actionNode = CommonResponseHelper.generateActionNode(cloudResponse);
 
         //update appState
         AppTypeRecorder.getInstance().getAppStateManager().onNewEventActionNode(actionNode);

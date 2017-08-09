@@ -9,10 +9,19 @@ package com.rokid.cloudappclient.bean.response.responseinfo.action.media;
  */
 public class MediaItemBean {
 
+    private String itemId;
     private String token;
     private String type;
     private String url;
     private int offsetInMilliseconds;
+
+    public String getItemId() {
+        return itemId;
+    }
+
+    public void setItemId(String itemId) {
+        this.itemId = itemId;
+    }
 
     public String getToken() {
         return token;

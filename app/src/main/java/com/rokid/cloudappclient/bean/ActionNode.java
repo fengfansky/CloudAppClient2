@@ -3,10 +3,11 @@ package com.rokid.cloudappclient.bean;
 import com.rokid.cloudappclient.bean.base.BaseBean;
 import com.rokid.cloudappclient.bean.response.responseinfo.action.confirm.ConfirmBean;
 import com.rokid.cloudappclient.bean.response.responseinfo.action.media.MediaBean;
+import com.rokid.cloudappclient.bean.response.responseinfo.action.pickup.PickupBean;
 import com.rokid.cloudappclient.bean.response.responseinfo.action.voice.VoiceBean;
 
 /**
- * Created by showingcp on 3/16/17.
+ * Created by fengfan on 3/16/17.
  */
 
 public class ActionNode extends BaseBean{
@@ -21,6 +22,7 @@ public class ActionNode extends BaseBean{
     private VoiceBean voice;
     private MediaBean media;
     private ConfirmBean confirmBean;
+    private PickupBean pickup;
 
     public String getAsr() {
         return asr;
@@ -110,5 +112,11 @@ public class ActionNode extends BaseBean{
         this.confirmBean = confirmBean;
     }
 
+    public PickupBean getPickup() {
+        return pickup;
+    }
 
+    public void setPickup(PickupBean pickup) {
+        this.pickup = pickup;
+    }
 }
