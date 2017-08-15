@@ -6,7 +6,6 @@ import com.rokid.cloudappclient.action.MediaAction;
 import com.rokid.cloudappclient.action.VoiceAction;
 import com.rokid.cloudappclient.bean.ActionNode;
 import com.rokid.cloudappclient.bean.response.responseinfo.action.ActionBean;
-import com.rokid.cloudappclient.bean.response.responseinfo.action.pickup.PickupBean;
 import com.rokid.cloudappclient.player.ErrorPromoter;
 import com.rokid.cloudappclient.parser.ResponseParser;
 import com.rokid.cloudappclient.player.RKAudioPlayer;
@@ -28,6 +27,9 @@ import java.lang.ref.WeakReference;
 
 public abstract class BaseAppStateManager implements AppStateCallback, MediaStateCallback, VoiceStateCallback, BaseReporter.ReporterResponseCallBack {
 
+    private static final String SIREN_TYPE_CONFIRM = "CONFIRM";
+    private static final String SIREN_TYPE_PICKUP = "PICKUP";
+
     public ActionNode mActionNode;
     public String mAppId;
 
@@ -44,21 +46,6 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
 
     public ReporterManager reporterManager = ReporterManager.getInstance();
 
-    public MEDIA_STATE getCurrentMediaState() {
-        return currentMediaState;
-    }
-
-    public void setCurrentMediaState(MEDIA_STATE currentMediaState) {
-        this.currentMediaState = currentMediaState;
-    }
-
-    public VOICE_STATE getCurrentVoiceState() {
-        return currentVoiceState;
-    }
-
-    public void setCurrentVoiceState(VOICE_STATE currentVoiceState) {
-        this.currentVoiceState = currentVoiceState;
-    }
 
     @Override
     public synchronized void onNewIntentActionNode(ActionNode actionNode) {
@@ -110,11 +97,6 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
             checkStateValid();
         }
     }
-
-    public synchronized boolean isShouldEndSession() {
-        return shouldEndSession;
-    }
-
 
     @Override
     public synchronized void onAppPaused() {
@@ -252,7 +234,7 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
                 VoiceAction.getInstance().processAction(actionNode.getVoice());
                 if (actionNode.getConfirmBean() != null && mTaskProcessCallback != null && mTaskProcessCallback.get() != null) {
                     //confirm 打开拾音，默认6秒
-                    mTaskProcessCallback.get().openSiren(true, 6000);
+                    mTaskProcessCallback.get().openSiren(SIREN_TYPE_CONFIRM, true, 6000);
                 }
             }
             if (actionNode.getMedia() != null) {
@@ -350,7 +332,7 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
             mTaskProcessCallback.get().onInvalidateState();
             if (mActionNode.getPickup() != null) {
                 Logger.d("pickUp : " + mActionNode.getPickup().toString());
-                mTaskProcessCallback.get().openSiren(mActionNode.getPickup().isEnable(), mActionNode.getPickup().getDurationInMilliseconds());
+                mTaskProcessCallback.get().openSiren(SIREN_TYPE_PICKUP, true, mActionNode.getPickup().getDurationInMilliseconds());
             }
         }
     }
@@ -376,7 +358,7 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
 
     public interface TaskProcessCallback {
 
-        void openSiren(boolean pickupEnable, int durationInMilliseconds);
+        void openSiren(String type, boolean pickupEnable, int durationInMilliseconds);
 
         void onInvalidateState();
 
@@ -408,18 +390,18 @@ public abstract class BaseAppStateManager implements AppStateCallback, MediaStat
         MEDIA_ERROR
     }
 
+    public void setCurrentMediaState(MEDIA_STATE currentMediaState) {
+        this.currentMediaState = currentMediaState;
+    }
 
-    public USER_MEDIA_CONTROL_TYPE getUserMediaControlType() {
-        return userMediaControlType;
+    public void setCurrentVoiceState(VOICE_STATE currentVoiceState) {
+        this.currentVoiceState = currentVoiceState;
     }
 
     public void setUserMediaControlType(USER_MEDIA_CONTROL_TYPE userMediaControlType) {
         this.userMediaControlType = userMediaControlType;
     }
 
-    public USER_VOICE_CONTROL_TYPE getUserVoiceControlType() {
-        return userVoiceControlType;
-    }
 
     public void setUserVoiceControlType(USER_VOICE_CONTROL_TYPE userVoiceControlType) {
         this.userVoiceControlType = userVoiceControlType;

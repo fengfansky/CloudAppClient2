@@ -99,11 +99,12 @@ public abstract class BaseActivity extends Activity implements BaseAppStateManag
     }
 
     @Override
-    public void openSiren(boolean pickupEnable, int durationInMilliseconds) {
+    public void openSiren(String type ,boolean pickupEnable, int durationInMilliseconds) {
         Logger.d(" process openSiren ");
         Intent intent = new Intent();
         ComponentName compontent = new ComponentName("com.rokid.activation", "com.rokid.activation.service.CoreService");
         intent.setComponent(compontent);
+        intent.putExtra("FromType", type);
         intent.putExtra("InputAction", "confirmEvent");
         Bundle bundle = new Bundle();
         bundle.putBoolean("isConfirm", pickupEnable);//拾音打开或关闭

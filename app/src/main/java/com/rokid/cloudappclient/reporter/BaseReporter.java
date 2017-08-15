@@ -46,10 +46,6 @@ public abstract class BaseReporter implements Runnable {
             return;
         }
 
-        if (AppTypeRecorder.getInstance().getAppStateManager().isShouldEndSession()) {
-            Logger.d("cloudscene isShouldEndSession true , dont't sendEventReport !");
-            return;
-        }
 
         SendEvent.SendEventRequest eventRequest =
                 SendEventCreator.generateSendEventRequest(appId, event, extra);

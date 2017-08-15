@@ -90,7 +90,10 @@ public class MediaAction extends BaseAction<MediaBean> {
 
         Logger.d("play mediaBean : " + mediaBean);
 
-        String url = mediaBeanItem.getUrl() + "&" + mediaBeanItem.getToken();
+        String url = mediaBeanItem.getUrl();
+        if (!TextUtils.isEmpty(mediaBeanItem.getToken())) {
+            url.concat("&").concat(mediaBeanItem.getToken());
+        }
 
         if (TextUtils.isEmpty(url)) {
             Logger.d("media url invalidate!");
