@@ -8,7 +8,13 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/FalconCloudClient" />
+            <option value="$PROJECT_DIR$/RobotCloudClient" />
+            <option value="$PROJECT_DIR$/cloudprotocol" />
+            <option value="$PROJECT_DIR$/common" />
+            <option value="$PROJECT_DIR$/httpclient" />
+            <option value="$PROJECT_DIR$/logger" />
+            <option value="$PROJECT_DIR$/rkaudio" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

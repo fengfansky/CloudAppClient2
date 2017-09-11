@@ -1,1 +1,3 @@
-include ':app'
+include ':RobotCloudClient'
+include ':FalconCloudClient'
+include ':common', ':rkaudio', ':httpclient', ':cloudprotocol', ':logger'

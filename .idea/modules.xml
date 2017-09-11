@@ -3,7 +3,13 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/CloudAppClient.iml" filepath="$PROJECT_DIR$/CloudAppClient.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/FalconCloudClient/FalconCloudClient.iml" filepath="$PROJECT_DIR$/FalconCloudClient/FalconCloudClient.iml" />
+      <module fileurl="file://$PROJECT_DIR$/RobotCloudClient/RobotCloudClient.iml" filepath="$PROJECT_DIR$/RobotCloudClient/RobotCloudClient.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cloudprotocol/cloudprotocol.iml" filepath="$PROJECT_DIR$/cloudprotocol/cloudprotocol.iml" />
+      <module fileurl="file://$PROJECT_DIR$/common/common.iml" filepath="$PROJECT_DIR$/common/common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/httpclient/httpclient.iml" filepath="$PROJECT_DIR$/httpclient/httpclient.iml" />
+      <module fileurl="file://$PROJECT_DIR$/logger/logger.iml" filepath="$PROJECT_DIR$/logger/logger.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rkaudio/rkaudio.iml" filepath="$PROJECT_DIR$/rkaudio/rkaudio.iml" />
     </modules>
   </component>
 </project>
