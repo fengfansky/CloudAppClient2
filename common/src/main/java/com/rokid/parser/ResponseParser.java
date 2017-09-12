@@ -46,10 +46,9 @@ public class ResponseParser {
             jsonException.printStackTrace();
         }
 
-        Logger.d(" parse IntentResponse commonResponse : " + actionBean);
-
         ActionNode actionNode = ActionNodeHelper.generateActionNode(actionBean);
 
+        Logger.d("actionNode : " + actionNode);
         return actionNode;
     }
 

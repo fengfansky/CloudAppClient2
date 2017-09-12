@@ -2,6 +2,7 @@ package com.rokid.bean.response;
 
 import android.text.TextUtils;
 
+import com.rokid.bean.base.BaseBean;
 import com.rokid.bean.request.session.SessionBean;
 import com.rokid.bean.response.responseinfo.ResponseBean;
 import com.rokid.bean.response.responseinfo.action.ActionBean;
@@ -17,7 +18,7 @@ import com.rokid.logger.Logger;
  * Modified: fan.feng
  * Version: 2017/08/24
  */
-public class CloudActionResponseBean {
+public class CloudActionResponseBean extends BaseBean{
 
     private static final String PROTOCOL_VERSION = "2.0.0";
 

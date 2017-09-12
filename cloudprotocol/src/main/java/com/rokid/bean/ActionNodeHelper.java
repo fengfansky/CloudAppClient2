@@ -13,7 +13,6 @@ public class ActionNodeHelper {
             return null;
         }
 
-
         actionNode.setAppId(cloudActionResponse.getAppId());
         actionNode.setActionType(cloudActionResponse.getResponse().getAction().getType());
         actionNode.setRespId(cloudActionResponse.getResponse().getRespId());

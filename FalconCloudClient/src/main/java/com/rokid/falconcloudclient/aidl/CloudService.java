@@ -1,11 +1,12 @@
-package com.rokid.cloudappclient.aidl;
-
+package com.rokid.falconcloudclient.aidl;
 
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.RemoteException;
+
+import com.rokid.falconcloudclient.FalconCloudTask;
 
 /**
  * Created by fanfeng on 2017/8/29.
@@ -22,10 +23,8 @@ public class CloudService extends Service {
 
         @Override
         public String getCloudStatus() throws RemoteException {
-            String cloudStatus = null;
 
-            //TODO get cloudStatus
-            return cloudStatus;
+            return FalconCloudTask.getInstance().getCloudStateMonitor().getCloudStatus();
 
         }
     };

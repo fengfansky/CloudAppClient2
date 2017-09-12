@@ -100,7 +100,11 @@ public class MediaAction extends BaseAction<MediaBean> {
         String url = mediaBeanItem.getUrl();
         if (!TextUtils.isEmpty(mediaBeanItem.getToken())) {
             Logger.d("token not null ! token: " + mediaBeanItem.getToken());
-            url = url + "?token=" + mediaBeanItem.getToken();
+            if (url.contains("?")){
+                url = url + "&token=" + mediaBeanItem.getToken();
+            }else {
+                url = url + "?token=" + mediaBeanItem.getToken();
+            }
         }else {
             Logger.d("token is null! ");
         }

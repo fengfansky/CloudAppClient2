@@ -3,6 +3,7 @@ package com.rokid.bean.response.responseinfo.action;
 import android.text.TextUtils;
 
 import com.rokid.bean.base.BaseBean;
+import com.rokid.logger.Logger;
 
 /**
  * Created by fanfeng on 2017/6/24.
@@ -32,6 +33,7 @@ public abstract class BaseActionBean extends BaseBean {
 
     public void setErrorLog(String errorLog) {
         this.errorLog = errorLog;
+        Logger.d("errorLog: " + errorLog);
     }
 
     public String getErrorLog() {

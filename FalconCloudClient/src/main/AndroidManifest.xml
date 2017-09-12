@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.rokid.cloudappclient"
+    package="com.rokid.falconcloudclient"
     android:versionCode="1">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -9,12 +9,12 @@
 
     <application>
 
-        <service android:name="com.rokid.cloudappclient.FalconCloudTask"
+        <service android:name="com.rokid.falconcloudclient.FalconCloudTask"
             android:exported="true">
         </service>
 
         <service
-            android:name="com.rokid.cloudappclient.aidl.CloudService"
+            android:name="com.rokid.falconcloudclient.aidl.CloudService"
             android:exported="true">
         </service>
 

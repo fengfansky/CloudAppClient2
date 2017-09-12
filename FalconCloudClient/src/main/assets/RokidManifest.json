@@ -1,11 +1,11 @@
 {
   "Task": {
-    "PackageName": "com.rokid.cloudappclient",
+    "PackageName": "com.rokid.falconcloudclient",
     "MinAndroidSDK": "L",
     "TargetAndroidSDK": "20",
     "FalconSDK": "1",
     "PackageAffinity": "",
-    "TaskName": "com.rokid.cloudappclient.FalconCloudTask",
+    "TaskName": "com.rokid.falconcloudclient.FalconCloudTask",
     "Version": "0",
     "AppId": "com.rokid.cloud",
     "IgnoreDomain": false,
@@ -15,11 +15,11 @@
   },
   "Components": [
     {
-      "Name":"com.rokid.cloudappclient.state.CloudCutState",
+      "Name":"com.rokid.falconcloudclient.state.CloudCutState",
       "Type":"cut"
     },
     {
-      "Name":"com.rokid.cloudappclient.state.CloudSceneState",
+      "Name":"com.rokid.falconcloudclient.state.CloudSceneState",
       "Type":"scene"
     }
   ]
