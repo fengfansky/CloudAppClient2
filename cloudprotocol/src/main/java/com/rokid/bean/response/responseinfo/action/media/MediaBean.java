@@ -2,7 +2,7 @@ package com.rokid.bean.response.responseinfo.action.media;
 
 import android.text.TextUtils;
 
-import com.rokid.bean.response.responseinfo.action.BaseActionBean;
+import com.rokid.bean.response.responseinfo.action.CommonActionBean;
 
 /**
  * Media is used to play streaming media.
@@ -11,11 +11,7 @@ import com.rokid.bean.response.responseinfo.action.BaseActionBean;
  * Author: xupan.shi
  * Version: V0.1 2017/3/7
  */
-public class MediaBean extends BaseActionBean {
-
-    /**
-     * Defines the action of the media player.
-     */
+public class MediaBean extends CommonActionBean {
 
     private MediaItemBean item;
 
@@ -51,4 +47,5 @@ public class MediaBean extends BaseActionBean {
     public String getType() {
         return "media";
     }
+
 }

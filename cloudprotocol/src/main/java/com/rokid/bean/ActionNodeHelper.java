@@ -19,15 +19,14 @@ public class ActionNodeHelper {
         actionNode.setResType(cloudActionResponse.getResponse().getResType());
         actionNode.setForm(cloudActionResponse.getResponse().getAction().getForm());
         actionNode.setShouldEndSession(cloudActionResponse.getResponse().getAction().isShouldEndSession());
-        actionNode.setVoice(cloudActionResponse.getResponse().getAction().getVoice());
-        actionNode.setMedia(cloudActionResponse.getResponse().getAction().getMedia());
-        actionNode.setConfirmBean(cloudActionResponse.getResponse().getAction().getConfirm());
-        actionNode.setPickup(cloudActionResponse.getResponse().getAction().getPickup());
+        actionNode.setMedia(cloudActionResponse.getMediaBean());
+        actionNode.setVoice(cloudActionResponse.getVoiceBean());
+        actionNode.setDisplayBean(cloudActionResponse.getDisplayBean());
+        actionNode.setPickup(cloudActionResponse.getPickupBean());
+        actionNode.setConfirmBean(cloudActionResponse.getConfirmBean());
 
         return actionNode;
     }
-
-
 
 
 }

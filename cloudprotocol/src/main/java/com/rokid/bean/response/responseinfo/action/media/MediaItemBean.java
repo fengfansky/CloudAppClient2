@@ -10,10 +10,10 @@ package com.rokid.bean.response.responseinfo.action.media;
 public class MediaItemBean {
 
     private String itemId;
+    private int offsetInMilliseconds;
     private String token;
     private String type;
     private String url;
-    private int offsetInMilliseconds;
 
     public String getItemId() {
         return itemId;

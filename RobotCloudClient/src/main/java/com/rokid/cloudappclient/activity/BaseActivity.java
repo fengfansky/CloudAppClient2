@@ -37,10 +37,12 @@ public abstract class BaseActivity extends Activity implements BaseCloudStateMon
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Logger.d("activity type: " + getCloudStateMonitor().getFormType() + " OnCreated");
-        TTSUtils.setTtsHelper(new TTSHelper());
+        getCloudStateMonitor().registerContext(new WeakReference<Context>(this));
+        TTSUtils.setTtsHelper(new TTSHelper().registerVoiceStateCallback((getCloudStateMonitor())));
         AppTypeRecorder.getInstance().storeAppStateManager(getCloudStateMonitor());
         getCloudStateMonitor().setTaskProcessCallback(new WeakReference<BaseCloudStateMonitor.TaskProcessCallback>(this));
-        ErrorPromoter.getInstance().initRKAudioPlayer(new WeakReference<Context>(this));
+        ErrorPromoter.getInstance().registerContext(new WeakReference<Context>(this));
+        getCloudStateMonitor().onCreate();
         isNeedResume = false;
         executeIntent(getIntent());
     }

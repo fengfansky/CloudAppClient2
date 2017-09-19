@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import com.rokid.bean.response.responseinfo.action.ActionBean;
 import com.rokid.bean.response.responseinfo.card.CardBean;
 
+
 /**
  * There are two sections in response .
  * card is the response for mobile card display. And action is for CloudAppClient.
@@ -26,7 +27,6 @@ public class ResponseBean {
 
     private CardBean card;
     private ActionBean action;
-
 
     public String getRespId() {
         return respId;
@@ -64,6 +64,5 @@ public class ResponseBean {
     public boolean isResTypeValid() {
         return !TextUtils.isEmpty(resType) && (TYPE_INTENT.equals(resType) || TYPE_EVENT.equals(resType));
     }
-
 
 }

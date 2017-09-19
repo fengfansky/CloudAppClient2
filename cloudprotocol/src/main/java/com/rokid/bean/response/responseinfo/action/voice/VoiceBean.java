@@ -2,7 +2,7 @@ package com.rokid.bean.response.responseinfo.action.voice;
 
 import android.text.TextUtils;
 
-import com.rokid.bean.response.responseinfo.action.BaseActionBean;
+import com.rokid.bean.response.responseinfo.action.CommonActionBean;
 
 /**
  * Defines the voice interaction of CloudApps, including TTS and Confirmation.
@@ -10,7 +10,7 @@ import com.rokid.bean.response.responseinfo.action.BaseActionBean;
  * Author: fanfeng
  * Version: V0.1 2017/08/24
  */
-public class VoiceBean extends BaseActionBean {
+public class VoiceBean extends CommonActionBean {
 
     private VoiceItemBean item;
 

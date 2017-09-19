@@ -21,7 +21,9 @@ public class CloudCutStateMonitor extends BaseCloudStateMonitor {
     @Override
     public synchronized void onPause() {
         super.onPause();
-        Logger.d(" cut : stop tts and finishActivity");
+        Logger.d(" cut : stop tts and media , finishActivity");
+        voiceAction.stopPlay();
+        mediaAction.stopPlay();
         finishActivity();
     }
 
@@ -29,8 +31,6 @@ public class CloudCutStateMonitor extends BaseCloudStateMonitor {
     @Override
     public synchronized void onDestroy() {
         super.onDestroy();
-        voiceAction.stopPlay();
-        mediaAction.stopPlay();
         HttpClientWrapper.getInstance().close();
     }
 

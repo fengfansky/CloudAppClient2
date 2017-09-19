@@ -20,7 +20,7 @@ public class SessionBean {
     /**
      * session attributes set by CloudApp in Response
      */
-    private Map<String, String> attributes;
+    private Map<String, Object> attributes;
 
     public String getSessionId() {
         return sessionId;
@@ -46,11 +46,11 @@ public class SessionBean {
         this.applicationId = applicationId;
     }
 
-    public Map<String, String> getAttributes() {
+    public Map<String, Object> getAttributes() {
         return attributes;
     }
 
-    public void setAttributes(Map<String, String> attributes) {
+    public void setAttributes(Map<String, Object> attributes) {
         this.attributes = attributes;
     }
 }

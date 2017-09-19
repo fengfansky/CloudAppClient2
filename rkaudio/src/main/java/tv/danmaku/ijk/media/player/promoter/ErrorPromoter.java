@@ -23,8 +23,16 @@ public class ErrorPromoter {
     private WeakReference<Context> mContextRef;
     private ErrorPromoteCallback errorPromoteCallback;
 
-    public void initRKAudioPlayer(WeakReference<Context> reference) {
+    public ErrorPromoter() {
+        initAudioPlayer();
+    }
+
+    public void registerContext(WeakReference<Context> reference) {
         this.mContextRef = reference;
+        initAudioPlayer();
+    }
+
+    private void initAudioPlayer() {
         if (mContextRef == null || mContextRef.get() == null){
             Logger.d("mContext is null!  you should set context !");
             return;
@@ -45,6 +53,7 @@ public class ErrorPromoter {
                 if (errorPromoteCallback != null){
                     errorPromoteCallback.onPromoteFinished();
                 }
+                rkAudioPlayer.release(true);
             }
         });
     }

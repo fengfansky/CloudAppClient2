@@ -247,6 +247,7 @@ public class RKAudioPlayer implements MediaController.MediaPlayerControl {
     @Override
     public void pause() {
         if (isInPlaybackState()) {
+            Logger.d(" mediaPlayer isPlaying " + mMediaPlayer.isPlaying());
             if (mMediaPlayer.isPlaying()) {
                 mMediaPlayer.pause();
                 mCurrentState = STATE_PAUSED;

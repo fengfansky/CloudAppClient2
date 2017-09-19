@@ -2,6 +2,7 @@ package com.rokid.bean;
 
 import com.rokid.bean.base.BaseBean;
 import com.rokid.bean.response.responseinfo.action.confirm.ConfirmBean;
+import com.rokid.bean.response.responseinfo.action.display.DisplayBean;
 import com.rokid.bean.response.responseinfo.action.media.MediaBean;
 import com.rokid.bean.response.responseinfo.action.pickup.PickupBean;
 import com.rokid.bean.response.responseinfo.action.voice.VoiceBean;
@@ -12,7 +13,6 @@ import com.rokid.bean.response.responseinfo.action.voice.VoiceBean;
 
 public class ActionNode extends BaseBean {
     private String asr;
-    private NLPBean nlp;
     private String respId;
     private String resType;
     private String appId;
@@ -21,6 +21,7 @@ public class ActionNode extends BaseBean {
     private boolean shouldEndSession;
     private VoiceBean voice;
     private MediaBean media;
+    private DisplayBean displayBean;
     private ConfirmBean confirmBean;
     private PickupBean pickup;
 
@@ -30,14 +31,6 @@ public class ActionNode extends BaseBean {
 
     public void setAsr(String asr) {
         this.asr = asr;
-    }
-
-    public NLPBean getNlp() {
-        return nlp;
-    }
-
-    public void setNlp(NLPBean nlp) {
-        this.nlp = nlp;
     }
 
     public String getRespId() {
@@ -102,6 +95,14 @@ public class ActionNode extends BaseBean {
 
     public void setMedia(MediaBean media) {
         this.media = media;
+    }
+
+    public DisplayBean getDisplayBean() {
+        return displayBean;
+    }
+
+    public void setDisplayBean(DisplayBean displayBean) {
+        this.displayBean = displayBean;
     }
 
     public ConfirmBean getConfirmBean() {

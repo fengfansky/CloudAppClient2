@@ -1,10 +1,12 @@
 package com.rokid.bean.response.responseinfo.action.pickup;
 
+import com.rokid.bean.response.responseinfo.action.BaseActionBean;
+
 /**
  * Created by fanfeng on 2017/8/7.
  */
 
-public class PickupBean {
+public class PickupBean extends BaseActionBean{
 
     private boolean enable;
     private int durationInMilliseconds;
@@ -23,5 +25,10 @@ public class PickupBean {
 
     public void setDurationInMilliseconds(int durationInMilliseconds) {
         this.durationInMilliseconds = durationInMilliseconds;
+    }
+
+    @Override
+    public boolean isValid() {
+        return true;
     }
 }

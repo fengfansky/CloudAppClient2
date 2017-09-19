@@ -11,7 +11,6 @@ import java.io.IOException;
 
 //import com.android.okhttp.Response;
 
-
 /**
  * Created by fanfeng on 2017/5/9.
  */
@@ -53,10 +52,11 @@ public abstract class BaseReporter implements Runnable {
             response = HttpClientWrapper.getInstance().sendRequest(BaseUrlConfig.getUrl(), eventRequest);
         } catch (IOException e) {
             e.printStackTrace();
-            mResponseCallback.onEventErrorCallback(event, ReporterResponseCallback.ERROR_CODE.ERROR_IOEXCEPTION);
+            mResponseCallback.onEventErrorCallback(event, ReporterResponseCallback.ERROR_CODE.ERROR_IO_EXCEPTION);
         }finally {
             try {
                 if (response != null && response.body() != null){
+                    Logger.d(" response : "  + response.body().toString());
                     mResponseCallback.onEventResponseCallback(event, response);
                     response.body().close();
                 }else {
@@ -64,7 +64,7 @@ public abstract class BaseReporter implements Runnable {
                 }
             } catch (IOException e) {
                 e.printStackTrace();
-                mResponseCallback.onEventErrorCallback(event, ReporterResponseCallback.ERROR_CODE.ERROR_IOEXCEPTION);
+                mResponseCallback.onEventErrorCallback(event, ReporterResponseCallback.ERROR_CODE.ERROR_IO_EXCEPTION);
             }
         }
 
@@ -73,9 +73,9 @@ public abstract class BaseReporter implements Runnable {
     public interface ReporterResponseCallback {
 
         enum ERROR_CODE{
-            ERROR_CONNNECTION_TIMEOUT,
+            ERROR_CONNECTION_TIMEOUT,
             ERROR_RESPONSE_NULL,
-            ERROR_IOEXCEPTION ,
+            ERROR_IO_EXCEPTION,
             ERROR_PARSE_EXCEPTION
 
         }

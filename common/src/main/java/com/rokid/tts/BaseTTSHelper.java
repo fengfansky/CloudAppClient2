@@ -12,8 +12,9 @@ public abstract class BaseTTSHelper {
 
     public VoiceStateCallback mVoiceStateCallback;
 
-    public void registerVoiceStateCallback(VoiceStateCallback voiceStateCallback){
+    public BaseTTSHelper registerVoiceStateCallback(VoiceStateCallback voiceStateCallback){
         mVoiceStateCallback = voiceStateCallback;
+        return this;
     }
 
     public abstract void speakTTS(String ttsContent);

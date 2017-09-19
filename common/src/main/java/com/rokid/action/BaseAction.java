@@ -3,7 +3,7 @@ package com.rokid.action;
 import android.content.Context;
 import android.text.TextUtils;
 
-import com.rokid.bean.response.responseinfo.action.BaseActionBean;
+import com.rokid.bean.response.responseinfo.action.CommonActionBean;
 import com.rokid.logger.Logger;
 import com.rokid.monitor.BaseCloudStateMonitor;
 
@@ -13,7 +13,7 @@ import java.lang.ref.WeakReference;
  * Created by fanfeng on 2017/4/20.
  */
 
-public abstract class BaseAction<T extends BaseActionBean> {
+public abstract class BaseAction<T extends CommonActionBean> {
 
     protected WeakReference<Context> mWeakContext;
 
@@ -42,22 +42,22 @@ public abstract class BaseAction<T extends BaseActionBean> {
         }
 
         switch (action) {
-            case BaseActionBean.ACTION_PLAY:
+            case CommonActionBean.ACTION_PLAY:
                 userStartPlay(actionBean);
                 break;
-            case BaseActionBean.ACTION_PAUSE:
+            case CommonActionBean.ACTION_PAUSE:
                 userPausedPlay();
                 break;
-            case BaseActionBean.ACTION_RESUME:
+            case CommonActionBean.ACTION_RESUME:
                 userResumePlay();
                 break;
-            case BaseActionBean.ACTION_STOP:
+            case CommonActionBean.ACTION_STOP:
                 userStopPlay();
                 break;
-            case BaseActionBean.ACTION_FORWARD:
+            case CommonActionBean.ACTION_FORWARD:
                 forward();
                 break;
-            case BaseActionBean.ACTION_BACKWARD:
+            case CommonActionBean.ACTION_BACKWARD:
                 backward();
                 break;
             default:

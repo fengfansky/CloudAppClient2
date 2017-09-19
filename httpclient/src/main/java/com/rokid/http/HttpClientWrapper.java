@@ -2,9 +2,12 @@ package com.rokid.http;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import com.rokid.logger.Logger;
 import com.rokid.proto.SendEvent;
+import com.rokid.reporter.EventParamUtils;
 import com.squareup.okhttp.*;
 
 //import com.android.okhttp.*;
@@ -36,6 +39,13 @@ public class HttpClientWrapper {
     }
 
     public Response sendRequest(String url, SendEvent.SendEventRequest eventRequest) throws IOException {
+        if (EventParamUtils.getEventParamCreator() == null){
+            Logger.d(" EventParamCreator is null !");
+            return null;
+        }
+
+        Map<String,String> paramMap = EventParamUtils.getEventParamCreator().getEnvParam();
+
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         eventRequest.writeTo(byteArrayOutputStream);
         Request request = new Request.Builder()
@@ -43,7 +53,7 @@ public class HttpClientWrapper {
                 .header("Accept", "text/plain")
                 .addHeader("Accept-Charset", "utf-8")
                 .addHeader("Cache-Control", "no-cache")
-                .addHeader("Authorization", BaseUrlConfig.getAuthorization())
+                .addHeader("Authorization", BaseUrlConfig.getAuthorization(paramMap))
                 .post(RequestBody.create(MediaType.parse(CONTENT_TYPE)
                         , byteArrayOutputStream.toByteArray()))
                 .build();

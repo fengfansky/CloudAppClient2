@@ -47,7 +47,7 @@ public class MediaAction extends BaseAction<MediaBean> {
         rkAudioPlayer.setmOnPreparedTimeoutListener(new RKAudioPlayer.OnPreparedTimeoutListener() {
             @Override
             public void onPreparedTimeout() {
-                cloudStateMonitor.onPreparedTimeout();
+//                cloudStateMonitor.onPreparedTimeout();
             }
         });
         rkAudioPlayer.setmOnErrorListener(new IMediaPlayer.OnErrorListener() {
@@ -118,13 +118,16 @@ public class MediaAction extends BaseAction<MediaBean> {
         cloudStateMonitor.setUserMediaControlType(BaseCloudStateMonitor.USER_MEDIA_CONTROL_TYPE.STARTED);
         cloudStateMonitor.setCurrentMediaState(BaseCloudStateMonitor.MEDIA_STATE.STARTED);
         rkAudioPlayer.setVideoURI(Uri.parse(url));
+        Logger.d("audio seekTo " + mediaBeanItem.getOffsetInMilliseconds());
+        rkAudioPlayer.seekTo(mediaBeanItem.getOffsetInMilliseconds() + 1);
         rkAudioPlayer.start();
-        rkAudioPlayer.seekTo(mediaBeanItem.getOffsetInMilliseconds());
     }
 
     @Override
     public synchronized void pausePlay() {
+        Logger.d(" pausePlay rkAudioPlayer " + (rkAudioPlayer != null));
         if (rkAudioPlayer != null && rkAudioPlayer.canPause()) {
+            Logger.d(" pause rkAudio");
             rkAudioPlayer.pause();
         }
     }

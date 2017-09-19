@@ -52,8 +52,26 @@ public class BaseUrlConfig {
         params.put(key, value);
     }
 
-    public static void initDeviceInfo() {
+    private static void initEventReqParams(Map<String,String> deviceMap){
 
+        Logger.d(" deviceMap is " + deviceMap.toString());
+
+        params = new LinkedHashMap<>();
+
+        mHost = deviceMap.get(KEY_HOST);
+
+        putUnEmptyParam(PARAM_KEY_KEY, deviceMap.get(PARAM_KEY_KEY));
+        putUnEmptyParam(PARAM_KEY_DEVICE_TYPE_ID, deviceMap.get(PARAM_KEY_DEVICE_TYPE_ID));
+        putUnEmptyParam(PARAM_KEY_DEVICE_ID, deviceMap.get(PARAM_KEY_DEVICE_ID));
+
+        putUnEmptyParam(PARAM_KEY_SERVICE, PARAM_VALUE_SERVICE);
+        putUnEmptyParam(PARAM_KEY_VERSION, deviceMap.get("api_version"));
+        putUnEmptyParam(PARAM_KEY_TIME, String.valueOf(System.currentTimeMillis()));
+        putUnEmptyParam(PARAM_KEY_SIGN, MD5Utils.generateMD5(params, deviceMap.get(PARAM_KEY_SECRET)));
+        Logger.d(" params : " + params.toString());
+    }
+
+    private static void initEnvHost(){
         String configFilePath = Environment.getRootDirectory().getAbsolutePath() + "/etc/" + "openvoice_profile.json";
 
         String deviceConfigStr = null;
@@ -78,9 +96,10 @@ public class BaseUrlConfig {
         }
 
         deviceConfig = new Gson().fromJson(deviceConfigStr,DeviceConfig.class);
-        mHost = deviceConfig.getEvent_req_host();
 
         Logger.d(" deviceConfig : " +  deviceConfig);
+
+        mHost = deviceConfig.getEvent_req_host();
     }
 
     public static String getUrl() {
@@ -92,23 +111,11 @@ public class BaseUrlConfig {
         return BASE_HTTP + mHost + SEND_EVENT_PATH;
     }
 
-    public static String getAuthorization() {
+    public static String getAuthorization(Map<String,String> deviceMap) {
 
-        params = new LinkedHashMap<>();
+        initEnvHost();
+        initEventReqParams(deviceMap);
 
-        if (deviceConfig == null){
-            Logger.d(" deviceConfig is null ");
-            return null;
-        }
-
-        putUnEmptyParam(PARAM_KEY_KEY, deviceConfig.getKey());
-        putUnEmptyParam(PARAM_KEY_DEVICE_TYPE_ID, deviceConfig.getDevice_type_id());
-        putUnEmptyParam(PARAM_KEY_DEVICE_ID, deviceConfig.getDevice_id());
-
-        putUnEmptyParam(PARAM_KEY_SERVICE, PARAM_VALUE_SERVICE);
-        putUnEmptyParam(PARAM_KEY_VERSION, deviceConfig.getApi_version());
-        putUnEmptyParam(PARAM_KEY_TIME, String.valueOf(System.currentTimeMillis()));
-        putUnEmptyParam(PARAM_KEY_SIGN, MD5Utils.generateMD5(params, deviceConfig.getSecret()));
         if (params.isEmpty()) {
             Logger.d("param is null !");
             return null;

@@ -1,6 +1,6 @@
 package com.rokid.bean.response.responseinfo.action.confirm;
 
-import com.rokid.bean.base.BaseBean;
+import com.rokid.bean.response.responseinfo.action.BaseActionBean;
 
 import java.util.List;
 
@@ -10,7 +10,7 @@ import java.util.List;
  * Author: xupan.shi
  * Version: V0.1 2017/3/9
  */
-public class ConfirmBean extends BaseBean{
+public class ConfirmBean extends BaseActionBean{
 
     private String confirmIntent;
     private String confirmSlot;
@@ -38,6 +38,11 @@ public class ConfirmBean extends BaseBean{
 
     public void setOptionWords(List<String> optionWords) {
         this.optionWords = optionWords;
+    }
+
+    @Override
+    public boolean isValid() {
+        return true;
     }
 }
 

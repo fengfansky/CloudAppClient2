@@ -1,17 +1,19 @@
 package com.rokid.cloudappclient.activity;
 
-import android.content.Context;
-
 import com.rokid.monitor.BaseCloudStateMonitor;
 import com.rokid.monitor.CloudCutStateMonitor;
-
-import java.lang.ref.WeakReference;
 
 public class CloudCutActivity extends BaseActivity {
 
     @Override
     public BaseCloudStateMonitor getCloudStateMonitor() {
-        return CloudCutStateMonitor.getInstance().registerContext(new WeakReference<Context>(this));
+        return CloudCutStateMonitor.getInstance();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        finish();
     }
 
     @Override
@@ -20,12 +22,8 @@ public class CloudCutActivity extends BaseActivity {
     }
 
     @Override
-    public void onInvalidateState() {
+    public void onTaskFinished(boolean shouldEndSession) {
         finish();
     }
 
-    @Override
-    public void onAllTaskFinished() {
-        finish();
-    }
 }

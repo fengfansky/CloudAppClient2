@@ -12,6 +12,8 @@ public interface CloudStateCallback {
 
     void onNewEventActionNode(ActionNode actionNode);
 
+    void onCreate();
+
     void onResume();
 
     void onPause();

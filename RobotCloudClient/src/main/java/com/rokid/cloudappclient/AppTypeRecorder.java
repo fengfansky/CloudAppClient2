@@ -27,7 +27,7 @@ public class AppTypeRecorder {
     }
 
     public String getCloudAppStatus(){
-        if (appStateManager != null) {
+        if (appStateManager != null ) {
             return appStateManager.getCloudStatus();
         }else {
             return null;

@@ -40,6 +40,7 @@ public class ResponseParser {
 
         try {
             actionBean = new Gson().fromJson(actionStr, CloudActionResponseBean.class);
+            Logger.d(" json parse action: " + actionBean);
         } catch (JsonParseException jsonException) {
             Logger.e(" json exception ! " + jsonException.getMessage());
             ErrorPromoter.getInstance().speakErrorPromote(ErrorPromoter.ERROR_TYPE.DATA_INVALID, null);
