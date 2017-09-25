@@ -6,6 +6,8 @@ import android.content.res.AssetFileDescriptor;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.MediaController;
@@ -15,8 +17,6 @@ import com.rokid.logger.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import tv.danmaku.ijk.media.player.misc.IMediaDataSource;
 
@@ -42,15 +42,17 @@ public class RKAudioPlayer implements MediaController.MediaPlayerControl {
     private static final int STATE_PLAYING = 3;
     private static final int STATE_PAUSED = 4;
     private static final int STATE_PLAYBACK_COMPLETED = 5;
-    private static final int STATE_STOPED = 6;
+    private static final int STATE_STOPPED = 6;
 
     //all media error state
     public static final int MEDIA_ERROR_TIME_OUT = -110;
     public static final int MEDIA_ERROR_IO = -1004;
     public static final int MEDIA_ERROR_MALFORMED = -1007;
+
     public static final int MEDIA_ERROR_UNSUPPORTED = -1010;
 
-    public static final int MEDIA_PREPARED_TIME_OUT = 2000;
+
+    public static final int MEDIA_STATE_CHECK_PERIOD = 1000;
 
     // mCurrentState is a VideoView object's current state.
     // mTargetState is the state that a method caller intends to reach.
@@ -62,7 +64,8 @@ public class RKAudioPlayer implements MediaController.MediaPlayerControl {
 
     private IMediaPlayer mMediaPlayer = null;
 
-    private OnPreparedTimeoutListener mOnPreparedTimeoutListener;
+    private OnLoadingListener mOnLoadingListener;
+    private OnTruckListener mOnTruckListener;
     private OnStoppedListener mOnStoppedListener;
     private IMediaPlayer.OnCompletionListener mOnCompletionListener;
     private IMediaPlayer.OnPausedListener mOnPausedListener;
@@ -77,13 +80,13 @@ public class RKAudioPlayer implements MediaController.MediaPlayerControl {
 
     private Context mAppContext;
 
-    private Timer timer;
-
     private long mPrepareStartTime = 0;
     private long mPrepareEndTime = 0;
 
     private long mSeekStartTime = 0;
     private long mSeekEndTime = 0;
+
+    private int truckTime = 0;
 
     public RKAudioPlayer(Context mAppContext) {
         initPlayer(mAppContext);
@@ -103,7 +106,6 @@ public class RKAudioPlayer implements MediaController.MediaPlayerControl {
         am.requestAudioFocus(null, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
 
         mMediaPlayer = createPlayer();
-        timer = new Timer();
 
         // REMOVED: mAudioSession
         mMediaPlayer.setOnPreparedListener(mPreparedListener);
@@ -199,16 +201,10 @@ public class RKAudioPlayer implements MediaController.MediaPlayerControl {
         mMediaPlayer.prepareAsync();
 
         mCurrentState = STATE_PREPARING;
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                Logger.d(" check audio status " + mCurrentState);
-                //2s后没有播放音乐,则判定加载过慢，上报服务端
-                if (mCurrentState != STATE_PLAYING){
-                    mOnPreparedTimeoutListener.onPreparedTimeout();
-                }
-            }
-        },MEDIA_PREPARED_TIME_OUT);
+        if (mOnLoadingListener != null) {
+            Logger.d(" onLoadingStart ");
+            mOnLoadingListener.onPreparing();
+        }
 
     }
 
@@ -240,6 +236,10 @@ public class RKAudioPlayer implements MediaController.MediaPlayerControl {
         if (isInPlaybackState()) {
             mMediaPlayer.start();
             mCurrentState = STATE_PLAYING;
+            if (mOnLoadingListener != null) {
+                mOnLoadingListener.onStartPlay();
+            }
+            startMonitorState();
         }
         mTargetState = STATE_PLAYING;
     }
@@ -262,11 +262,14 @@ public class RKAudioPlayer implements MediaController.MediaPlayerControl {
     public void stop() {
         if (isInPlaybackState()) {
             mMediaPlayer.stop();
-            mCurrentState = STATE_STOPED;
+            mCurrentState = STATE_STOPPED;
             if (mOnStoppedListener != null) {
                 Logger.d("player stopPlay");
                 mOnStoppedListener.onStopped();
             }
+            Logger.d(" onStop timer cancel");
+            truckMonitorHandler.removeMessages(TRUCK_TAG);
+
         }
     }
 
@@ -348,12 +351,16 @@ public class RKAudioPlayer implements MediaController.MediaPlayerControl {
         this.mOnStoppedListener = mOnStoppedListener;
     }
 
+    public void setmOnLoadingListener(OnLoadingListener mOnLoadingListener) {
+        this.mOnLoadingListener = mOnLoadingListener;
+    }
+
     public void setmOnPreparedListener(IMediaPlayer.OnPreparedListener mOnPreparedListener) {
         this.mOnPreparedListener = mOnPreparedListener;
     }
 
-    public void setmOnPreparedTimeoutListener(OnPreparedTimeoutListener mOnPreparedTimeoutListener) {
-        this.mOnPreparedTimeoutListener = mOnPreparedTimeoutListener;
+    public void setmOnTruckListener(OnTruckListener mOnTruckListener) {
+        this.mOnTruckListener = mOnTruckListener;
     }
 
     public void setmOnErrorListener(IMediaPlayer.OnErrorListener mOnErrorListener) {
@@ -368,7 +375,7 @@ public class RKAudioPlayer implements MediaController.MediaPlayerControl {
         public void onPrepared(IMediaPlayer mp) {
             mPrepareEndTime = System.currentTimeMillis();
             mCurrentState = STATE_PREPARED;
-
+            truckTime = 0;
             // Get the capabilities of the player for this stream
             // REMOVED: Metadata
 
@@ -376,8 +383,13 @@ public class RKAudioPlayer implements MediaController.MediaPlayerControl {
                 mOnPreparedListener.onPrepared(mMediaPlayer);
             }
 
+            if (mOnLoadingListener != null) {
+                Logger.d(" loadingEnd");
+                mOnLoadingListener.onPrepared();
+            }
+
             int seekToPosition = mSeekWhenPrepared;  // mSeekWhenPrepared may be changed after seekTo() call
-            if (seekToPosition != 0) {
+            if (seekToPosition >= 0) {
                 seekTo(seekToPosition);
             }
 
@@ -387,11 +399,65 @@ public class RKAudioPlayer implements MediaController.MediaPlayerControl {
         }
     };
 
+    private int startLoadPosition;
+
+    private static final int TRUCK_TAG = 0;
+
+    private boolean isStartTruck = false;
+
+    private Handler truckMonitorHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            Logger.d(" check audio status " + mCurrentState);
+            Logger.d(" currentPosition : " + getCurrentPosition());
+
+            if (mCurrentState == STATE_PLAYING) {
+                Logger.d(" truckTime : " + truckTime);
+                if (getCurrentPosition() == startLoadPosition) {
+                    isStartTruck = true;
+                    if (mOnTruckListener != null) {
+                        mOnTruckListener.onStartTruck();
+                    }
+                } else if (isStartTruck) {
+                    truckTime = 0;
+                    isStartTruck = false;
+                    if (mOnTruckListener != null) {
+                        mOnTruckListener.onStartPlay();
+                    }
+                }
+
+                if (isStartTruck) {
+                    truckTime++;
+                }
+
+                if (truckTime >= 5) {
+                    if (mOnTruckListener != null) {
+                        mOnTruckListener.onTruckTimeout();
+                    }
+                    truckMonitorHandler.removeMessages(TRUCK_TAG);
+                }
+            }
+
+            truckMonitorHandler.sendEmptyMessageDelayed(TRUCK_TAG, MEDIA_STATE_CHECK_PERIOD);
+        }
+    };
+
+    private void startMonitorState() {
+
+        startLoadPosition = getCurrentPosition();
+
+        truckMonitorHandler.sendEmptyMessageDelayed(TRUCK_TAG, MEDIA_STATE_CHECK_PERIOD);
+
+    }
+
     private IMediaPlayer.OnCompletionListener mCompletionListener =
             new IMediaPlayer.OnCompletionListener() {
                 public void onCompletion(IMediaPlayer mp) {
                     mCurrentState = STATE_PLAYBACK_COMPLETED;
                     mTargetState = STATE_PLAYBACK_COMPLETED;
+                    Logger.d("onComplete timer cancel");
+                    truckMonitorHandler.removeMessages(TRUCK_TAG);
                     if (mOnCompletionListener != null) {
                         mOnCompletionListener.onCompletion(mMediaPlayer);
                     }
@@ -405,8 +471,10 @@ public class RKAudioPlayer implements MediaController.MediaPlayerControl {
                     Log.d(TAG, "Error: " + framework_err + "," + impl_err);
                     mCurrentState = STATE_ERROR;
                     mTargetState = STATE_ERROR;
+                    Logger.d(" onError timer cancel");
+                    truckMonitorHandler.removeMessages(TRUCK_TAG);
 
-                    /* If an error handler has been supplied, use it and finish. */
+//                     If an error handler has been supplied, use it and finish.
                     if (mOnErrorListener != null) {
                         if (mOnErrorListener.onError(mMediaPlayer, framework_err, impl_err)) {
                             return true;
@@ -432,9 +500,11 @@ public class RKAudioPlayer implements MediaController.MediaPlayerControl {
                             break;
                         case IMediaPlayer.MEDIA_INFO_BUFFERING_START:
                             Log.d(TAG, "MEDIA_INFO_BUFFERING_START:");
+                            Logger.d("MEDIA_INFO_BUFFERING_START");
                             break;
                         case IMediaPlayer.MEDIA_INFO_BUFFERING_END:
                             Log.d(TAG, "MEDIA_INFO_BUFFERING_END:");
+                            Logger.d("MEDIA_INFO_BUFFERING_END");
                             break;
                         case IMediaPlayer.MEDIA_INFO_NETWORK_BANDWIDTH:
                             Log.d(TAG, "MEDIA_INFO_NETWORK_BANDWIDTH: " + arg2);
@@ -465,6 +535,7 @@ public class RKAudioPlayer implements MediaController.MediaPlayerControl {
     private IMediaPlayer.OnBufferingUpdateListener mBufferingUpdateListener =
             new IMediaPlayer.OnBufferingUpdateListener() {
                 public void onBufferingUpdate(IMediaPlayer mp, int percent) {
+                    Logger.d(" onBufferingUpdate percent : " + percent);
                     mCurrentBufferPercentage = percent;
                 }
             };
@@ -479,11 +550,28 @@ public class RKAudioPlayer implements MediaController.MediaPlayerControl {
 
 
     public interface OnStoppedListener {
+
         void onStopped();
+
     }
 
-    public interface OnPreparedTimeoutListener {
-        void onPreparedTimeout();
+    public interface OnLoadingListener {
+
+        void onPreparing();
+
+        void onPrepared();
+
+        void onStartPlay();
+    }
+
+
+    public interface OnTruckListener {
+
+        void onStartTruck();
+
+        void onTruckTimeout();
+
+        void onStartPlay();
     }
 
 }

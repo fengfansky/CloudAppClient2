@@ -10,6 +10,4 @@ public abstract class BaseRuntimeCreator {
 
     public abstract Map<String,String> getEnvParam();
 
-    public abstract
-
 }

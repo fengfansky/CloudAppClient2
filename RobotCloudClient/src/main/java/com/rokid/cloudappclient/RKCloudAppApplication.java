@@ -15,7 +15,7 @@ public class RKCloudAppApplication extends Application {
     public void onCreate() {
         super.onCreate();
         instance = this;
-        EventParamUtils.setEventParamCreator(new RuntimeCreator());
+        EventParamUtils.setEventParamCreator(new SystemServiceHelper());
     }
 
     public static RKCloudAppApplication getInstance() {

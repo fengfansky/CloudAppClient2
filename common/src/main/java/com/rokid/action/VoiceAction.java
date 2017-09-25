@@ -23,15 +23,14 @@ public class VoiceAction extends BaseAction<VoiceBean> {
             VoiceItemBean voiceItemBean = actionBean.getItem();
             String ttsContent;
             ttsContent = voiceItemBean.getTts();
-            TTSUtils.getTtsHelper().speakTTS(ttsContent);
-            cloudStateMonitor.setCurrentVoiceState(BaseCloudStateMonitor.VOICE_STATE.STARTED);
+            TTSUtils.getInstance().getTtsHelper().speakTTS(ttsContent);
         }
     }
 
     @Override
     public synchronized void pausePlay() {
         Logger.d("pause play voice");
-        TTSUtils.getTtsHelper().pauseTTS();
+        TTSUtils.getInstance().getTtsHelper().pauseTTS();
     }
 
     @Override
@@ -46,7 +45,7 @@ public class VoiceAction extends BaseAction<VoiceBean> {
     public synchronized void stopPlay() {
         Logger.d("stop play voice");
         voiceBean = null;
-        TTSUtils.getTtsHelper().stopTTS();
+        TTSUtils.getInstance().getTtsHelper().stopTTS();
     }
 
     @Override

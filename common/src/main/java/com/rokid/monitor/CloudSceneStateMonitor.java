@@ -44,10 +44,9 @@ public class CloudSceneStateMonitor extends BaseCloudStateMonitor {
 
     @Override
     public void onDestroy() {
+        super.onDestroy();
         mediaAction.stopPlay();
         voiceAction.stopPlay();
-        HttpClientWrapper.getInstance().close();
-        super.onDestroy();
     }
 
     @Override

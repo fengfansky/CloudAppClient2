@@ -6,13 +6,22 @@ package com.rokid.tts;
 
 public class TTSUtils {
 
-    private static BaseTTSHelper ttsHelper;
+    private static TTSUtils ttsUtils;
 
-    public static BaseTTSHelper getTtsHelper() {
-        return ttsHelper;
+    private BaseTTSHelper ttsHelper;
+
+    public static TTSUtils getInstance(){
+        if (ttsUtils == null){
+            ttsUtils = new TTSUtils();
+        }
+        return ttsUtils;
     }
 
-    public static void setTtsHelper(BaseTTSHelper ttsHelper) {
-        TTSUtils.ttsHelper = ttsHelper;
+    public BaseTTSHelper getTtsHelper() {
+        return this.ttsHelper;
+    }
+
+    public void setTtsHelper(BaseTTSHelper ttsHelper) {
+        this.ttsHelper = ttsHelper;
     }
 }

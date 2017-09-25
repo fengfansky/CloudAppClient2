@@ -17,12 +17,12 @@ import java.io.IOException;
 
 public abstract class BaseReporter implements Runnable {
 
-    String appId;
-    String event;
-    String extra;
-    ReporterResponseCallback mResponseCallback;
+    private String appId;
+    private String event;
+    private String extra;
+    private ReporterResponseCallback mResponseCallback;
 
-    public BaseReporter(String appId, String event,ReporterResponseCallback reporterResponseCallback){
+    public BaseReporter(String appId, String event, ReporterResponseCallback reporterResponseCallback) {
         this.appId = appId;
         this.event = event;
         this.extra = "{}";
@@ -41,7 +41,7 @@ public abstract class BaseReporter implements Runnable {
         report();
     }
 
-    public void report() {
+    public synchronized void report() {
 
         SendEvent.SendEventRequest eventRequest =
                 SendEventCreator.generateSendEventRequest(appId, event, extra);
@@ -53,13 +53,13 @@ public abstract class BaseReporter implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
             mResponseCallback.onEventErrorCallback(event, ReporterResponseCallback.ERROR_CODE.ERROR_IO_EXCEPTION);
-        }finally {
+        } finally {
             try {
-                if (response != null && response.body() != null){
-                    Logger.d(" response : "  + response.body().toString());
+                if (response != null && response.body() != null) {
+                    Logger.d(" response : " + response.body().toString());
                     mResponseCallback.onEventResponseCallback(event, response);
                     response.body().close();
-                }else {
+                } else {
                     mResponseCallback.onEventErrorCallback(event, ReporterResponseCallback.ERROR_CODE.ERROR_RESPONSE_NULL);
                 }
             } catch (IOException e) {
@@ -72,7 +72,7 @@ public abstract class BaseReporter implements Runnable {
 
     public interface ReporterResponseCallback {
 
-        enum ERROR_CODE{
+        enum ERROR_CODE {
             ERROR_CONNECTION_TIMEOUT,
             ERROR_RESPONSE_NULL,
             ERROR_IO_EXCEPTION,

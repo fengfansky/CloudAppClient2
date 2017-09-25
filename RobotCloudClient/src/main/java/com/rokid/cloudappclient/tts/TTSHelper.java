@@ -2,7 +2,9 @@ package com.rokid.cloudappclient.tts;
 
 import android.text.TextUtils;
 
+import com.rokid.cloudappclient.AppTypeRecorder;
 import com.rokid.logger.Logger;
+import com.rokid.monitor.BaseCloudStateMonitor;
 import com.rokid.tts.BaseTTSHelper;
 
 import rokid.os.RKTTS;
@@ -18,7 +20,6 @@ public class TTSHelper extends BaseTTSHelper{
 
     private RKTTS mRktts = new RKTTS();
 
-
     @Override
     public void speakTTS(String ttsContent) {
         if (TextUtils.isEmpty(ttsContent)) {
@@ -31,7 +32,6 @@ public class TTSHelper extends BaseTTSHelper{
         }
 
         ttsId = mRktts.speak(ttsContent, rkttsCallback);
-//        AppTypeRecorder.getInstance().getAppStateManager().setCurrentVoiceState(BaseAppStateManager.VOICE_STATE.VOICE_START);
         Logger.d(" speak TTS ttiId " + ttsId);
     }
 

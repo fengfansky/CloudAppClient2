@@ -72,16 +72,10 @@ public class ErrorPromoter {
         Logger.d(" speakErrorPromote errorType is " + errorType);
         this.errorPromoteCallback = errorPromoteCallback;
         switch (errorType) {
-            case MEDIA_TIME_OUT:
-                //突然卡了一下，稍后再试吧。
-                rkAudioPlayer.setAssetVideo(assetManager.openFd("media_timeout.mp3"));
-                break;
-            case MEDIA_ERROR:
-                //找不到要播放的文件，换一个试试吧。
-                rkAudioPlayer.setAssetVideo(assetManager.openFd("media_error.mp3"));
-                break;
+            case NET_BAD:
+                //网络情况较差，请稍后再试
+                rkAudioPlayer.setAssetVideo(assetManager.openFd("network_bad.wav"));
             case DATA_INVALID:
-            case TTS_ERROR:
                 //遇到了一点小问题，稍后再试一下吧
                 rkAudioPlayer.setAssetVideo(assetManager.openFd("common_error.mp3"));
                 break;
@@ -96,6 +90,7 @@ public class ErrorPromoter {
 
     public enum ERROR_TYPE {
         DATA_INVALID,
+        NET_BAD,
         MEDIA_TIME_OUT,
         MEDIA_ERROR,
         TTS_ERROR

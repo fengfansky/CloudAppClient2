@@ -7,6 +7,7 @@ import com.rokid.bean.ActionNode;
 import com.rokid.bean.response.responseinfo.action.ActionBean;
 import com.rokid.action.MediaAction;
 import com.rokid.action.VoiceAction;
+import com.rokid.http.HttpClientWrapper;
 import com.rokid.logger.Logger;
 import com.rokid.parser.ResponseParser;
 import com.rokid.reporter.BaseReporter;
@@ -20,7 +21,6 @@ import com.squareup.okhttp.Response;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 
-import tv.danmaku.ijk.media.player.RKAudioPlayer;
 import tv.danmaku.ijk.media.player.promoter.ErrorPromoter;
 //import com.android.okhttp.Response;
 
@@ -56,10 +56,12 @@ public abstract class BaseCloudStateMonitor implements CloudStateCallback, Media
     private String mCloudStatus;
     private boolean isDestroy;
 
+    private ReporterManager reporterManager;
+
     public BaseCloudStateMonitor() {
         mediaAction = new MediaAction(this);
         voiceAction = new VoiceAction(this);
-
+        reporterManager = new ReporterManager();
     }
 
     public BaseCloudStateMonitor registerContext(WeakReference<Context> contextWeakReference) {
@@ -87,6 +89,10 @@ public abstract class BaseCloudStateMonitor implements CloudStateCallback, Media
         this.userVoiceControlType = userVoiceControlType;
     }
 
+    public String getmAppId() {
+        return mAppId;
+    }
+
     public ExtraBean.MediaExtraBean getMediaExtraBean() {
         return mediaExtraBean;
     }
@@ -105,7 +111,7 @@ public abstract class BaseCloudStateMonitor implements CloudStateCallback, Media
             }
 
             if (!actionNode.getAppId().equals(mAppId)) {
-                Logger.d("onNewEventActionNode the appId is the not the same with lastAppId");
+                Logger.d("onNewIntent the appId is the not the same with lastAppId");
                 mediaAction.stopPlay();
                 voiceAction.stopPlay();
                 this.currentMediaState = null;
@@ -166,6 +172,8 @@ public abstract class BaseCloudStateMonitor implements CloudStateCallback, Media
     public synchronized void onDestroy() {
         Logger.d("form: " + getFormType() + " onAppDestroy " + " currentMediaState: " + currentMediaState + " currentVoiceState: " + currentVoiceState);
         isDestroy = true;
+        mediaAction.releasePlayer();
+        HttpClientWrapper.getInstance().close();
     }
 
     @Override
@@ -177,9 +185,8 @@ public abstract class BaseCloudStateMonitor implements CloudStateCallback, Media
     }
 
     @Override
-    public void onPreparedTimeout() {
+    public void onTruckTimeout() {
         Logger.d("form: " + getFormType() + " onMediaStart ! " + " currentMediaState: " + currentMediaState + " currentVoiceState " + currentVoiceState);
-
         sendMediaReporter(MediaReporter.TIMEOUT);
     }
 
@@ -194,6 +201,7 @@ public abstract class BaseCloudStateMonitor implements CloudStateCallback, Media
     public synchronized void onMediaResumed() {
         currentMediaState = MEDIA_STATE.RESUMED;
         Logger.d("form: " + getFormType() + " onMediaResume ! " + " currentMediaState: " + currentMediaState + " currentVoiceState " + currentVoiceState);
+        sendMediaReporter(MediaReporter.STARTED);
     }
 
     @Override
@@ -206,8 +214,8 @@ public abstract class BaseCloudStateMonitor implements CloudStateCallback, Media
     public synchronized void onMediaFinished() {
         currentMediaState = MEDIA_STATE.FINISHED;
         Logger.d("form: " + getFormType() + " onMediaFinished !" + " currentMediaState: " + currentMediaState + " currentVoiceState " + currentVoiceState);
-        checkStateValid();
         sendMediaReporter(MediaReporter.FINISHED);
+        checkStateValid();
     }
 
     @Override
@@ -215,11 +223,6 @@ public abstract class BaseCloudStateMonitor implements CloudStateCallback, Media
         currentMediaState = MEDIA_STATE.ERROR;
         Logger.d("form: " + getFormType() + " onMediaFailed ! errorCode : " + errorCode + " currentMediaState: " + currentMediaState + " currentVoiceState " + currentVoiceState);
         sendMediaReporter(MediaReporter.FAILED);
-        if (errorCode == RKAudioPlayer.MEDIA_ERROR_TIME_OUT) {
-            promoteErrorInfo(ErrorPromoter.ERROR_TYPE.MEDIA_TIME_OUT);
-        } else {
-            promoteErrorInfo(ErrorPromoter.ERROR_TYPE.MEDIA_ERROR);
-        }
     }
 
     @Override
@@ -230,7 +233,7 @@ public abstract class BaseCloudStateMonitor implements CloudStateCallback, Media
     }
 
     @Override
-    public void onVoicePaused() {
+    public synchronized void onVoicePaused() {
         currentVoiceState = VOICE_STATE.PAUSED;
         Logger.d("form: " + getFormType() + " onVoiceCanceled !" + " currentMediaState: " + currentMediaState + " currentVoiceState " + currentVoiceState);
     }
@@ -250,7 +253,7 @@ public abstract class BaseCloudStateMonitor implements CloudStateCallback, Media
     }
 
     @Override
-    public void onVoiceFinished() {
+    public synchronized void onVoiceFinished() {
         currentVoiceState = VOICE_STATE.FINISHED;
         Logger.d("form: " + getFormType() + " onVoiceFinished !" + " currentMediaState: " + currentMediaState + " currentVoiceState " + currentVoiceState);
         checkStateValid();
@@ -261,8 +264,18 @@ public abstract class BaseCloudStateMonitor implements CloudStateCallback, Media
     public synchronized void onEventErrorCallback(String event, ERROR_CODE errorCode) {
         Logger.e(" event error call back !!!");
         Logger.e("form: " + getFormType() + "  onEventErrorCallback " + " event : " + event + " errorCode " + errorCode + " currentMediaState: " + currentMediaState + " currentVoiceState " + currentVoiceState);
-        checkStateValid();
 
+        //加载音频文件出错或者卡顿超过5s的事件超时时的处理
+        if (errorCode == ERROR_CODE.ERROR_CONNECTION_TIMEOUT ){
+            if (MediaReporter.TIMEOUT == event || MediaReporter.FAILED == event){
+                if (isStateInvalid()){
+                    promoteErrorInfo(ErrorPromoter.ERROR_TYPE.NET_BAD);
+                    return;
+                }
+            }
+        }
+
+        checkStateValid();
     }
 
 
@@ -281,7 +294,7 @@ public abstract class BaseCloudStateMonitor implements CloudStateCallback, Media
 
         if (ActionBean.TYPE_EXIT.equals(actionNode.getActionType())) {
             Logger.d("current response is a INTENT EXIT - Finish Activity");
-            finishActivity();
+            exitApp();
             return;
         }
 
@@ -298,7 +311,7 @@ public abstract class BaseCloudStateMonitor implements CloudStateCallback, Media
 
     public String getCloudStatus() {
 
-        if (isDestroy){
+        if (isDestroy) {
             Logger.d(getFormType() + " app not exit !");
             return null;
         }
@@ -387,7 +400,6 @@ public abstract class BaseCloudStateMonitor implements CloudStateCallback, Media
         }
 
         String voiceState;
-
         if (currentVoiceState == VOICE_STATE.STARTED) {
             voiceState = "PLAYING";
         } else if (currentVoiceState == VOICE_STATE.PAUSED) {
@@ -405,7 +417,7 @@ public abstract class BaseCloudStateMonitor implements CloudStateCallback, Media
         }
         Logger.d("sendVoiceReporter extraBean : " + extraBean.toString());
 
-        ReporterManager.getInstance().executeReporter(new VoiceReporter(mAppId, action, extraBean.toString(), this));
+        reporterManager.executeReporter(new VoiceReporter(mAppId, action, extraBean.toString(), this));
 
     }
 
@@ -442,14 +454,14 @@ public abstract class BaseCloudStateMonitor implements CloudStateCallback, Media
 
         ExtraBean extraBean = new ExtraBean();
 
-        if (mActionNode.getMedia().getItem() == null) {
+        if (mediaAction.getMediaBeanItem() == null) {
             extraBean.setMedia(mediaExtraBean = new ExtraBean.MediaExtraBean(mediaState, String.valueOf(mediaAction.getMediaPosition()), String.valueOf(mediaAction.getMediaDuration())));
         } else {
-            extraBean.setMedia(mediaExtraBean = new ExtraBean.MediaExtraBean(mediaState, mActionNode.getMedia().getItem().getItemId(), mActionNode.getMedia().getItem().getToken(), String.valueOf(mediaAction.getMediaPosition()), String.valueOf(mediaAction.getMediaDuration())));
+            extraBean.setMedia(mediaExtraBean = new ExtraBean.MediaExtraBean(mediaAction.getMediaBeanItem().getItemId(), mediaAction.getMediaBeanItem().getToken(), String.valueOf(mediaAction.getMediaPosition()), String.valueOf(mediaAction.getMediaDuration())));
         }
         Logger.d("sendMediaReporter extraBean : " + extraBean.toString());
 
-        ReporterManager.getInstance().executeReporter(new MediaReporter(mAppId, action, extraBean.toString(), this));
+        reporterManager.executeReporter(new MediaReporter(mAppId, action, extraBean.toString(), this));
 
     }
 
@@ -484,7 +496,7 @@ public abstract class BaseCloudStateMonitor implements CloudStateCallback, Media
         if (isStateInvalid()) {
             actionFinished();
         } else {
-            Logger.d(" state is valid , don't suspend cloudstate");
+            Logger.d(" app is executing , don't close app !");
         }
     }
 
@@ -514,7 +526,7 @@ public abstract class BaseCloudStateMonitor implements CloudStateCallback, Media
         return (currentMediaState == null || currentMediaState == MEDIA_STATE.FINISHED || currentMediaState == MEDIA_STATE.STOPPED || currentMediaState == MEDIA_STATE.ERROR) && (currentVoiceState == null || currentVoiceState == VOICE_STATE.STOPPED || currentVoiceState == VOICE_STATE.FINISHED || currentVoiceState == VOICE_STATE.ERROR) && (promoteState == null || promoteState == PROMOTE_STATE.FINISHED);
     }
 
-    public void finishActivity() {
+    public void exitApp() {
         if (mTaskProcessCallback != null && mTaskProcessCallback.get() != null) {
             Logger.d("form: " + getFormType() + " onExitCallback finishActivity");
             mTaskProcessCallback.get().onExitCallback();

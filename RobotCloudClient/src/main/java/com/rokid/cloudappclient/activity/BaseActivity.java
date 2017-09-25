@@ -8,7 +8,9 @@ import android.os.Bundle;
 
 import com.rokid.bean.ActionNode;
 import com.rokid.cloudappclient.AppTypeRecorder;
+import com.rokid.cloudappclient.light.LightHelper;
 import com.rokid.cloudappclient.tts.TTSHelper;
+import com.rokid.light.LightUtils;
 import com.rokid.parser.ResponseParser;
 import com.rokid.monitor.BaseCloudStateMonitor;
 import com.rokid.logger.Logger;
@@ -17,6 +19,8 @@ import com.rokid.tts.TTSUtils;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 
+import rokid.os.RKEventBus;
+import rokid.services.util.RemoteServiceHelper;
 import tv.danmaku.ijk.media.player.promoter.ErrorPromoter;
 
 /**
@@ -38,13 +42,19 @@ public abstract class BaseActivity extends Activity implements BaseCloudStateMon
         super.onCreate(savedInstanceState);
         Logger.d("activity type: " + getCloudStateMonitor().getFormType() + " OnCreated");
         getCloudStateMonitor().registerContext(new WeakReference<Context>(this));
-        TTSUtils.setTtsHelper(new TTSHelper().registerVoiceStateCallback((getCloudStateMonitor())));
-        AppTypeRecorder.getInstance().storeAppStateManager(getCloudStateMonitor());
         getCloudStateMonitor().setTaskProcessCallback(new WeakReference<BaseCloudStateMonitor.TaskProcessCallback>(this));
+        AppTypeRecorder.getInstance().storeAppStateManager(getCloudStateMonitor());
+
+        TTSUtils.getInstance().setTtsHelper(new TTSHelper().registerVoiceStateCallback((getCloudStateMonitor())));
+
+        LightUtils.getInstance().setLightHelper(new LightHelper().initLight());
+
         ErrorPromoter.getInstance().registerContext(new WeakReference<Context>(this));
+
         getCloudStateMonitor().onCreate();
         isNeedResume = false;
         executeIntent(getIntent());
+
     }
 
     @Override
@@ -139,6 +149,20 @@ public abstract class BaseActivity extends Activity implements BaseCloudStateMon
     @Override
     public void onExitCallback() {
         finish();
+        exitSessionToAppEngine();
+    }
+
+
+    public static final String EXIT_SESSION = "EXIT_SESSION";
+
+    public void exitSessionToAppEngine(){
+
+        String appId = getCloudStateMonitor().getmAppId();
+
+        RKEventBus eventBus = RemoteServiceHelper.getService(RemoteServiceHelper.RK_EVENTBUS);
+        Bundle bundle = new Bundle();
+        bundle.putString("appId", appId);
+        eventBus.sendEvent(EXIT_SESSION,bundle,0);
     }
 
     public abstract BaseCloudStateMonitor getCloudStateMonitor();

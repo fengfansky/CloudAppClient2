@@ -8,11 +8,14 @@ import com.rokid.reporter.BaseRuntimeCreator;
 import java.lang.reflect.Method;
 import java.util.Map;
 
+import rokid.os.IRKLight;
+import rokid.services.util.RemoteServiceHelper;
+
 /**
  * Created by fanfeng on 2017/9/17.
  */
 
-public class RuntimeCreator extends BaseRuntimeCreator {
+public class SystemServiceHelper extends BaseRuntimeCreator {
 
     @Override
     public Map<String,String> getEnvParam(){
@@ -38,9 +41,6 @@ public class RuntimeCreator extends BaseRuntimeCreator {
 
         return deviceMap;
     }
-
-
-
 
     private IBinder getRuntimeBinder() {
         IBinder runtimeBinder = null;

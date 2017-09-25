@@ -6,6 +6,7 @@ import android.text.TextUtils;
 
 import com.rokid.bean.response.responseinfo.action.media.MediaBean;
 import com.rokid.bean.response.responseinfo.action.media.MediaItemBean;
+import com.rokid.light.LightUtils;
 import com.rokid.monitor.BaseCloudStateMonitor;
 import com.rokid.logger.Logger;
 
@@ -18,6 +19,7 @@ import tv.danmaku.ijk.media.player.RKAudioPlayer;
 public class MediaAction extends BaseAction<MediaBean> {
 
     private RKAudioPlayer rkAudioPlayer;
+    private MediaItemBean mediaBeanItem;
 
     public MediaAction(BaseCloudStateMonitor cloudStateMonitor) {
         super(cloudStateMonitor);
@@ -30,24 +32,51 @@ public class MediaAction extends BaseAction<MediaBean> {
     }
 
     private void initRKAudioPlayer() {
-        if (mWeakContext.get() == null){
+        if (mWeakContext.get() == null) {
             Logger.d(" context is null return !");
             return;
         }
 
         rkAudioPlayer = new RKAudioPlayer(mWeakContext.get());
 
-        rkAudioPlayer.setmOnPreparedListener(new IMediaPlayer.OnPreparedListener() {
+        rkAudioPlayer.setmOnLoadingListener(new RKAudioPlayer.OnLoadingListener() {
             @Override
-            public void onPrepared(IMediaPlayer mp) {
+            public void onPreparing() {
+                Logger.d("onLoadStart");
+                LightUtils.getInstance().getLightHelper().openLoadingLight();
+            }
+
+            @Override
+            public void onPrepared() {
+
+            }
+
+            @Override
+            public void onStartPlay() {
+                Logger.d("onStartPlay");
                 cloudStateMonitor.onMediaStarted();
+                LightUtils.getInstance().getLightHelper().closeLight();
             }
         });
 
-        rkAudioPlayer.setmOnPreparedTimeoutListener(new RKAudioPlayer.OnPreparedTimeoutListener() {
+        rkAudioPlayer.setmOnTruckListener(new RKAudioPlayer.OnTruckListener() {
+
             @Override
-            public void onPreparedTimeout() {
-//                cloudStateMonitor.onPreparedTimeout();
+            public void onStartTruck() {
+                Logger.d("onStartTruck");
+                LightUtils.getInstance().getLightHelper().openLoadingLight();
+            }
+
+            @Override
+            public void onStartPlay() {
+                Logger.d("onPlaying");
+                LightUtils.getInstance().getLightHelper().closeLight();
+            }
+
+            @Override
+            public void onTruckTimeout() {
+                Logger.d("onTruckTimeout");
+                cloudStateMonitor.onTruckTimeout();
             }
         });
         rkAudioPlayer.setmOnErrorListener(new IMediaPlayer.OnErrorListener() {
@@ -55,6 +84,13 @@ public class MediaAction extends BaseAction<MediaBean> {
             public boolean onError(IMediaPlayer mp, int what, int extra) {
                 Logger.d(" onMediaFailed what : " + what + " extra :" + extra);
                 cloudStateMonitor.onMediaFailed(extra);
+                return false;
+            }
+        });
+        rkAudioPlayer.setmOnInfoListener(new IMediaPlayer.OnInfoListener() {
+            @Override
+            public boolean onInfo(IMediaPlayer mp, int what, int extra) {
+                Logger.d("onMediaInfo what : " + what + " extra: " + extra);
                 return false;
             }
         });
@@ -89,23 +125,25 @@ public class MediaAction extends BaseAction<MediaBean> {
         if (rkAudioPlayer == null) {
             initRKAudioPlayer();
         }
-        MediaItemBean mediaBeanItem = mediaBean.getItem();
-        if (mediaBeanItem == null) {
+
+        if (mediaBean.getItem() == null) {
             Logger.d("start play media mediaBeanItem null!");
             return;
         }
+
+        mediaBeanItem = mediaBean.getItem();
 
         Logger.d("play mediaBean : " + mediaBean);
 
         String url = mediaBeanItem.getUrl();
         if (!TextUtils.isEmpty(mediaBeanItem.getToken())) {
             Logger.d("token not null ! token: " + mediaBeanItem.getToken());
-            if (url.contains("?")){
+            if (url.contains("?")) {
                 url = url + "&token=" + mediaBeanItem.getToken();
-            }else {
+            } else {
                 url = url + "?token=" + mediaBeanItem.getToken();
             }
-        }else {
+        } else {
             Logger.d("token is null! ");
         }
 
@@ -119,7 +157,7 @@ public class MediaAction extends BaseAction<MediaBean> {
         cloudStateMonitor.setCurrentMediaState(BaseCloudStateMonitor.MEDIA_STATE.STARTED);
         rkAudioPlayer.setVideoURI(Uri.parse(url));
         Logger.d("audio seekTo " + mediaBeanItem.getOffsetInMilliseconds());
-        rkAudioPlayer.seekTo(mediaBeanItem.getOffsetInMilliseconds() + 1);
+        rkAudioPlayer.seekTo(mediaBeanItem.getOffsetInMilliseconds());
         rkAudioPlayer.start();
     }
 
@@ -203,6 +241,10 @@ public class MediaAction extends BaseAction<MediaBean> {
             return 0;
         }
         return rkAudioPlayer.getCurrentPosition();
+    }
+
+    public MediaItemBean getMediaBeanItem() {
+        return mediaBeanItem;
     }
 
     public void releasePlayer() {

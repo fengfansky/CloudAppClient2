@@ -8,7 +8,7 @@ public interface MediaStateCallback {
 
     void onMediaStarted();
 
-    void onPreparedTimeout();
+    void onTruckTimeout();
 
     void onMediaPaused(int position);
 

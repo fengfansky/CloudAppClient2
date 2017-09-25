@@ -11,14 +11,10 @@ public class CloudSceneActivity extends BaseActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
     public void onTaskFinished(boolean shouldEndSession) {
         if (shouldEndSession){
             finish();
+            exitSessionToAppEngine();
         }
     }
 

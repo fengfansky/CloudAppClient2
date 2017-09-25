@@ -17,13 +17,11 @@ public class CloudCutActivity extends BaseActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
     public void onTaskFinished(boolean shouldEndSession) {
         finish();
+        if (shouldEndSession){
+            exitSessionToAppEngine();
+        }
     }
 
 }
