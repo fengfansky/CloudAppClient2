@@ -16,12 +16,5 @@ public class CloudCutActivity extends BaseActivity {
         finish();
     }
 
-    @Override
-    public void onTaskFinished(boolean shouldEndSession) {
-        finish();
-        if (shouldEndSession){
-            exitSessionToAppEngine();
-        }
-    }
 
 }

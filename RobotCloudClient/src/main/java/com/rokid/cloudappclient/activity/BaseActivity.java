@@ -8,12 +8,15 @@ import android.os.Bundle;
 
 import com.rokid.bean.ActionNode;
 import com.rokid.cloudappclient.AppTypeRecorder;
+import com.rokid.cloudappclient.SirenService;
+import com.rokid.cloudappclient.SystemServiceHelper;
 import com.rokid.cloudappclient.light.LightHelper;
 import com.rokid.cloudappclient.tts.TTSHelper;
 import com.rokid.light.LightUtils;
 import com.rokid.parser.ResponseParser;
 import com.rokid.monitor.BaseCloudStateMonitor;
 import com.rokid.logger.Logger;
+import com.rokid.reporter.EventParamUtils;
 import com.rokid.tts.TTSUtils;
 
 import java.io.IOException;
@@ -47,6 +50,8 @@ public abstract class BaseActivity extends Activity implements BaseCloudStateMon
 
         TTSUtils.getInstance().setTtsHelper(new TTSHelper().registerVoiceStateCallback((getCloudStateMonitor())));
 
+        EventParamUtils.setEventParamCreator(new SystemServiceHelper());
+
         LightUtils.getInstance().setLightHelper(new LightHelper().initLight());
 
         ErrorPromoter.getInstance().registerContext(new WeakReference<Context>(this));
@@ -55,6 +60,8 @@ public abstract class BaseActivity extends Activity implements BaseCloudStateMon
         isNeedResume = false;
         executeIntent(getIntent());
 
+        Intent sirenService = new Intent(this, SirenService.class);
+        startService(sirenService);
     }
 
     @Override
@@ -147,14 +154,19 @@ public abstract class BaseActivity extends Activity implements BaseCloudStateMon
     }
 
     @Override
+    public void onTaskFinished() {
+        finish();
+    }
+
+    @Override
     public void onExitCallback() {
         finish();
-        exitSessionToAppEngine();
     }
 
 
     public static final String EXIT_SESSION = "EXIT_SESSION";
 
+    @Override
     public void exitSessionToAppEngine(){
 
         String appId = getCloudStateMonitor().getmAppId();

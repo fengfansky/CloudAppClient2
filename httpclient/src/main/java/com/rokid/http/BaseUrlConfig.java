@@ -52,7 +52,7 @@ public class BaseUrlConfig {
         params.put(key, value);
     }
 
-    private static void initEventReqParams(Map<String,String> deviceMap){
+    public static void initEventReqParams(Map<String,String> deviceMap){
 
         Logger.d(" deviceMap is " + deviceMap.toString());
 
@@ -71,7 +71,7 @@ public class BaseUrlConfig {
         Logger.d(" params : " + params.toString());
     }
 
-    private static void initEnvHost(){
+    /*private static void initEnvHost(){
         String configFilePath = Environment.getRootDirectory().getAbsolutePath() + "/etc/" + "openvoice_profile.json";
 
         String deviceConfigStr = null;
@@ -100,7 +100,7 @@ public class BaseUrlConfig {
         Logger.d(" deviceConfig : " +  deviceConfig);
 
         mHost = deviceConfig.getEvent_req_host();
-    }
+    }*/
 
     public static String getUrl() {
 
@@ -111,10 +111,7 @@ public class BaseUrlConfig {
         return BASE_HTTP + mHost + SEND_EVENT_PATH;
     }
 
-    public static String getAuthorization(Map<String,String> deviceMap) {
-
-        initEnvHost();
-        initEventReqParams(deviceMap);
+    public static String getAuthorization() {
 
         if (params.isEmpty()) {
             Logger.d("param is null !");

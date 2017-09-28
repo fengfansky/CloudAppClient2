@@ -21,15 +21,24 @@ public class ReporterManager {
     ExecutorService threadPoolExecutor = new ThreadPoolExecutor(POOL_CORE_SIZE, POOL_MAX_SIZE, POOL_KEEP_TIME,
             TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(BLOCKING_QUEUE_CAPACITY));
 
-    public ReporterManager() {
+    private ReporterManager() {
 
     }
 
-    public synchronized void executeReporter(BaseReporter baseReporter) {
+    public void executeReporter(BaseReporter baseReporter) {
         if (baseReporter != null) {
             Logger.d("executeReporter ");
             threadPoolExecutor.execute(baseReporter);
         }
     }
 
+    public static ReporterManager getInstance() {
+        return SingleHolder.instance;
+    }
+
+    private static class SingleHolder {
+        private static final ReporterManager instance = new ReporterManager();
+    }
+
 }
+

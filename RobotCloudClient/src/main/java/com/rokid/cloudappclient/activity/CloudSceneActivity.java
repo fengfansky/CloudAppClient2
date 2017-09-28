@@ -10,12 +10,4 @@ public class CloudSceneActivity extends BaseActivity {
         return CloudSceneStateMonitor.getInstance();
     }
 
-    @Override
-    public void onTaskFinished(boolean shouldEndSession) {
-        if (shouldEndSession){
-            finish();
-            exitSessionToAppEngine();
-        }
-    }
-
 }

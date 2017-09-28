@@ -1,49 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    android:versionCode="2"
-    package="com.rokid.cloudappclient">
+    package="com.rokid.cloudappclient"
+    android:versionCode="2">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <!-- Needed only if your app targets Android 5.0 (API level 21) or higher. -->
-    <application
-        android:name="com.rokid.cloudappclient.RKCloudAppApplication">
-
+    <application android:name=".RKCloudAppApplication">
         <activity
-            android:name="com.rokid.cloudappclient.activity.CloudSceneActivity"
+            android:name=".activity.CloudSceneActivity"
             android:launchMode="singleTask"
             android:taskAffinity="com.rokid.cloudsceneclient">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.DEFAULT"/>
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".activity.CloudCutActivity"
+            android:launchMode="singleTask"
+            android:process=":remote"
+            android:taskAffinity="com.rokid.cloudcutclient">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <activity android:name="com.rokid.cloudappclient.activity.CloudCutActivity"
-            android:process=":remote"
-            android:launchMode="singleTask"
-            android:taskAffinity="com.rokid.cloudcutclient">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
-        </activity>
+        <service
+            android:name=".aidl.CloudSceneService"
+            android:exported="true"></service>
+        <service
+            android:name=".aidl.CloudCutService"
+            android:exported="true"
+            android:process=":remote"></service>
 
         <service
-            android:name="com.rokid.cloudappclient.aidl.CloudSceneService"
-            android:exported="true">
-        </service>
-
-        <service
-            android:name="com.rokid.cloudappclient.aidl.CloudCutService"
-            android:process=":remote"
-            android:exported="true">
-        </service>
-
+            android:name=".SirenService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

@@ -79,14 +79,17 @@ public class MediaAction extends BaseAction<MediaBean> {
                 cloudStateMonitor.onTruckTimeout();
             }
         });
+
         rkAudioPlayer.setmOnErrorListener(new IMediaPlayer.OnErrorListener() {
             @Override
             public boolean onError(IMediaPlayer mp, int what, int extra) {
                 Logger.d(" onMediaFailed what : " + what + " extra :" + extra);
                 cloudStateMonitor.onMediaFailed(extra);
+                LightUtils.getInstance().getLightHelper().closeLight();
                 return false;
             }
         });
+
         rkAudioPlayer.setmOnInfoListener(new IMediaPlayer.OnInfoListener() {
             @Override
             public boolean onInfo(IMediaPlayer mp, int what, int extra) {
@@ -94,12 +97,14 @@ public class MediaAction extends BaseAction<MediaBean> {
                 return false;
             }
         });
+
         rkAudioPlayer.setmOnPausedListener(new IMediaPlayer.OnPausedListener() {
             @Override
             public void onPaused(IMediaPlayer mp) {
                 cloudStateMonitor.onMediaPaused((int) mp.getCurrentPosition());
             }
         });
+
         rkAudioPlayer.setmOnStoppedListener(new RKAudioPlayer.OnStoppedListener() {
             @Override
             public void onStopped() {
@@ -107,6 +112,7 @@ public class MediaAction extends BaseAction<MediaBean> {
 
             }
         });
+
         rkAudioPlayer.setmOnCompletionListener(new IMediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(IMediaPlayer mp) {

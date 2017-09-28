@@ -437,9 +437,9 @@ public class RKAudioPlayer implements MediaController.MediaPlayerControl {
                     }
                     truckMonitorHandler.removeMessages(TRUCK_TAG);
                 }
+                truckMonitorHandler.sendEmptyMessageDelayed(TRUCK_TAG, MEDIA_STATE_CHECK_PERIOD);
             }
 
-            truckMonitorHandler.sendEmptyMessageDelayed(TRUCK_TAG, MEDIA_STATE_CHECK_PERIOD);
         }
     };
 

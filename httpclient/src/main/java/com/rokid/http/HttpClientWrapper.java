@@ -44,8 +44,6 @@ public class HttpClientWrapper {
             return null;
         }
 
-        Map<String,String> paramMap = EventParamUtils.getEventParamCreator().getEnvParam();
-
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         eventRequest.writeTo(byteArrayOutputStream);
         Request request = new Request.Builder()
@@ -53,7 +51,7 @@ public class HttpClientWrapper {
                 .header("Accept", "text/plain")
                 .addHeader("Accept-Charset", "utf-8")
                 .addHeader("Cache-Control", "no-cache")
-                .addHeader("Authorization", BaseUrlConfig.getAuthorization(paramMap))
+                .addHeader("Authorization", BaseUrlConfig.getAuthorization())
                 .post(RequestBody.create(MediaType.parse(CONTENT_TYPE)
                         , byteArrayOutputStream.toByteArray()))
                 .build();

@@ -8,6 +8,8 @@ import com.rokid.proto.SendEventCreator;
 import com.squareup.okhttp.Response;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
+import java.util.Map;
 
 //import com.android.okhttp.Response;
 
@@ -46,13 +48,19 @@ public abstract class BaseReporter implements Runnable {
         SendEvent.SendEventRequest eventRequest =
                 SendEventCreator.generateSendEventRequest(appId, event, extra);
         Logger.d(" eventRequest : " + eventRequest.toString());
-        Logger.d(" eventRequest url: " + BaseUrlConfig.getUrl());
+
+        Map<String,String> paramMap = EventParamUtils.getEventParamCreator().getEnvParam();
+
+        BaseUrlConfig.initEventReqParams(paramMap);
+
         Response response = null;
         try {
             response = HttpClientWrapper.getInstance().sendRequest(BaseUrlConfig.getUrl(), eventRequest);
+        } catch (SocketTimeoutException e) {
+            e.printStackTrace();
+            mResponseCallback.onEventErrorCallback(event, ReporterResponseCallback.ERROR_CODE.ERROR_CONNECTION_TIMEOUT);
         } catch (IOException e) {
             e.printStackTrace();
-            mResponseCallback.onEventErrorCallback(event, ReporterResponseCallback.ERROR_CODE.ERROR_IO_EXCEPTION);
         } finally {
             try {
                 if (response != null && response.body() != null) {

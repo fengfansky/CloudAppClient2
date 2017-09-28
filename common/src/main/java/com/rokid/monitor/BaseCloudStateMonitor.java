@@ -30,8 +30,8 @@ import tv.danmaku.ijk.media.player.promoter.ErrorPromoter;
 
 public abstract class BaseCloudStateMonitor implements CloudStateCallback, MediaStateCallback, BaseTTSHelper.VoiceStateCallback, BaseReporter.ReporterResponseCallback {
 
-    private static final String SIREN_TYPE_CONFIRM = "CONFIRM";
-    private static final String SIREN_TYPE_PICKUP = "PICKUP";
+    public static final String SIREN_TYPE_CONFIRM = "CONFIRM";
+    public static final String SIREN_TYPE_PICKUP = "PICKUP";
 
     protected ActionNode mActionNode;
     protected String mAppId;
@@ -56,12 +56,11 @@ public abstract class BaseCloudStateMonitor implements CloudStateCallback, Media
     private String mCloudStatus;
     private boolean isDestroy;
 
-    private ReporterManager reporterManager;
+    private ReporterManager reporterManager = ReporterManager.getInstance();
 
     public BaseCloudStateMonitor() {
         mediaAction = new MediaAction(this);
         voiceAction = new VoiceAction(this);
-        reporterManager = new ReporterManager();
     }
 
     public BaseCloudStateMonitor registerContext(WeakReference<Context> contextWeakReference) {
@@ -147,7 +146,7 @@ public abstract class BaseCloudStateMonitor implements CloudStateCallback, Media
             this.shouldEndSession = actionNode.isShouldEndSession();
             processActionNode(actionNode);
         } else {
-            checkStateValid();
+            checkRunningState();
         }
     }
 
@@ -214,8 +213,12 @@ public abstract class BaseCloudStateMonitor implements CloudStateCallback, Media
     public synchronized void onMediaFinished() {
         currentMediaState = MEDIA_STATE.FINISHED;
         Logger.d("form: " + getFormType() + " onMediaFinished !" + " currentMediaState: " + currentMediaState + " currentVoiceState " + currentVoiceState);
-        sendMediaReporter(MediaReporter.FINISHED);
-        checkStateValid();
+        if (shouldEndSession) {
+            checkRunningState();
+        }else {
+            sendMediaReporter(MediaReporter.FINISHED);
+        }
+
     }
 
     @Override
@@ -248,7 +251,7 @@ public abstract class BaseCloudStateMonitor implements CloudStateCallback, Media
     public synchronized void onVoiceFailed() {
         currentVoiceState = VOICE_STATE.ERROR;
         Logger.d("form: " + getFormType() + " onVoiceError !" + " currentMediaState: " + currentMediaState + " currentVoiceState " + currentVoiceState);
-        promoteErrorInfo(ErrorPromoter.ERROR_TYPE.TTS_ERROR);
+//        promoteErrorInfo(ErrorPromoter.ERROR_TYPE.TTS_ERROR);
         sendVoiceReporter(VoiceReporter.FAILED);
     }
 
@@ -256,8 +259,12 @@ public abstract class BaseCloudStateMonitor implements CloudStateCallback, Media
     public synchronized void onVoiceFinished() {
         currentVoiceState = VOICE_STATE.FINISHED;
         Logger.d("form: " + getFormType() + " onVoiceFinished !" + " currentMediaState: " + currentMediaState + " currentVoiceState " + currentVoiceState);
-        checkStateValid();
-        sendVoiceReporter(VoiceReporter.FINISHED);
+
+        if (shouldEndSession) {
+            checkRunningState();
+        }else {
+            sendVoiceReporter(VoiceReporter.FINISHED);
+        }
     }
 
     @Override
@@ -266,22 +273,24 @@ public abstract class BaseCloudStateMonitor implements CloudStateCallback, Media
         Logger.e("form: " + getFormType() + "  onEventErrorCallback " + " event : " + event + " errorCode " + errorCode + " currentMediaState: " + currentMediaState + " currentVoiceState " + currentVoiceState);
 
         //加载音频文件出错或者卡顿超过5s的事件超时时的处理
-        if (errorCode == ERROR_CODE.ERROR_CONNECTION_TIMEOUT ){
-            if (MediaReporter.TIMEOUT == event || MediaReporter.FAILED == event){
-                if (isStateInvalid()){
+        if (errorCode == ERROR_CODE.ERROR_CONNECTION_TIMEOUT ) {
+            if (MediaReporter.TIMEOUT == event || MediaReporter.FAILED == event) {
+                if (isStateInvalid()) {
                     promoteErrorInfo(ErrorPromoter.ERROR_TYPE.NET_BAD);
                     return;
                 }
             }
         }
 
-        checkStateValid();
+        checkRunningState();
     }
 
 
     @Override
     public synchronized void onEventResponseCallback(String event, Response response) {
         Logger.d("form: " + getFormType() + " onEventResponseCallback event : " + event + " response : " + response + " currentMediaState: " + currentMediaState + " currentVoiceState " + currentVoiceState);
+        reporterCount--;
+        Logger.d(" onEventResponseCallback reporterCount: " + reporterCount);
         ResponseParser.getInstance().parseSendEventResponse(event, response, this);
     }
 
@@ -380,22 +389,25 @@ public abstract class BaseCloudStateMonitor implements CloudStateCallback, Media
 
     private void sendVoiceReporter(String action) {
 
-        if (shouldEndSession) {
+        /*if (shouldEndSession) {
             Logger.d("shouldEndSession true don't sendVoiceReporter");
             return;
-        }
+        }*/
 
         if (mActionNode == null || mActionNode.getVoice() == null) {
             Logger.d(" mActionNode or voice is null ! ");
+            checkRunningState();
             return;
         }
         if (mActionNode.getVoice().isDisableEvent()) {
-            Logger.d("SendEventRequest disableEvent closed!");
+            Logger.d("SendEventRequest disableEvent true!");
+            checkRunningState();
             return;
         }
 
         if (TextUtils.isEmpty(mAppId)) {
             Logger.d(" appId is null !");
+            checkRunningState();
             return;
         }
 
@@ -419,27 +431,35 @@ public abstract class BaseCloudStateMonitor implements CloudStateCallback, Media
 
         reporterManager.executeReporter(new VoiceReporter(mAppId, action, extraBean.toString(), this));
 
+        reporterCount++;
+        Logger.d("sendVoiceReporter action : " + action + " reporterCount : " + reporterCount);
+
     }
+
+    private volatile int reporterCount;
 
     private void sendMediaReporter(String action) {
 
-        if (shouldEndSession) {
+        /*if (shouldEndSession) {
             Logger.d("shouldEndSession true don't sendMediaReporter");
             return;
-        }
+        }*/
 
         if (mActionNode == null || mActionNode.getMedia() == null) {
             Logger.d("mActionNode or media is null!");
+            checkRunningState();
             return;
         }
 
         if (mActionNode.getMedia().isDisableEvent()) {
             Logger.d("SendEventRequest disableEvent closed!");
+            checkRunningState();
             return;
         }
 
         if (TextUtils.isEmpty(mAppId)) {
             Logger.d(" appId is null !");
+            checkRunningState();
             return;
         }
 
@@ -457,57 +477,76 @@ public abstract class BaseCloudStateMonitor implements CloudStateCallback, Media
         if (mediaAction.getMediaBeanItem() == null) {
             extraBean.setMedia(mediaExtraBean = new ExtraBean.MediaExtraBean(mediaState, String.valueOf(mediaAction.getMediaPosition()), String.valueOf(mediaAction.getMediaDuration())));
         } else {
-            extraBean.setMedia(mediaExtraBean = new ExtraBean.MediaExtraBean(mediaAction.getMediaBeanItem().getItemId(), mediaAction.getMediaBeanItem().getToken(), String.valueOf(mediaAction.getMediaPosition()), String.valueOf(mediaAction.getMediaDuration())));
+            extraBean.setMedia(mediaExtraBean = new ExtraBean.MediaExtraBean(mediaState,mediaAction.getMediaBeanItem().getItemId(), mediaAction.getMediaBeanItem().getToken(), String.valueOf(mediaAction.getMediaPosition()), String.valueOf(mediaAction.getMediaDuration())));
         }
         Logger.d("sendMediaReporter extraBean : " + extraBean.toString());
 
         reporterManager.executeReporter(new MediaReporter(mAppId, action, extraBean.toString(), this));
 
+        reporterCount++;
+        Logger.d(" sendMediaReporter action " + action +  " reporterCount : " + reporterCount);
     }
 
     private void promoteErrorInfo(ErrorPromoter.ERROR_TYPE errorType) {
         Logger.d(" promoteErrorInfo isStateInvalid : " + isStateInvalid() + " errorType : " + errorType);
-        if (isStateInvalid()) {
-            try {
-                ErrorPromoter.getInstance().speakErrorPromote(errorType, new ErrorPromoter.ErrorPromoteCallback() {
-                    @Override
-                    public void onPromoteStarted() {
-                        Logger.d(" onPromoteStarted!");
-                        promoteState = PROMOTE_STATE.STARTED;
-                    }
 
-                    @Override
-                    public void onPromoteFinished() {
-                        if (mTaskProcessCallback != null && mTaskProcessCallback.get() != null) {
-                            Logger.d(" onPromoteFinished !");
-                            promoteState = PROMOTE_STATE.FINISHED;
-                            mTaskProcessCallback.get().onTaskFinished(shouldEndSession);
-                        }
-                    }
-                });
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-
-    private void checkStateValid() {
-        if (isStateInvalid()) {
-            actionFinished();
-        } else {
-            Logger.d(" app is executing , don't close app !");
-        }
-    }
-
-    private void actionFinished() {
-
-        if (mTaskProcessCallback == null || mTaskProcessCallback.get() == null) {
+        if (!isStateInvalid()) {
+            Logger.d("promoteErrorInfo app is running , don't finish app !");
             return;
         }
-        Logger.d("checkStateValid form: " + getFormType() + " voice stop , checkAllTaskIsFinished ! finish app !");
-        mTaskProcessCallback.get().onTaskFinished(shouldEndSession);
 
+        try {
+            ErrorPromoter.getInstance().speakErrorPromote(errorType, new ErrorPromoter.ErrorPromoteCallback() {
+                @Override
+                public void onPromoteStarted() {
+                    Logger.d(" onPromoteStarted!");
+                    promoteState = PROMOTE_STATE.STARTED;
+                }
+
+                @Override
+                public void onPromoteFinished() {
+                    if (mTaskProcessCallback != null && mTaskProcessCallback.get() != null) {
+                        Logger.d(" onPromoteFinished !");
+                        promoteState = PROMOTE_STATE.FINISHED;
+                        mTaskProcessCallback.get().onTaskFinished();
+                        if (shouldEndSession){
+                            mTaskProcessCallback.get().exitSessionToAppEngine();
+                        }
+                    }
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private void checkRunningState() {
+
+        if (!isStateInvalid()) {
+            Logger.d("onVoiceFinished app is running , don't finish app !");
+            return;
+        }
+
+        Logger.d(" actionFinished reporterCount : " + reporterCount);
+
+        if (reporterCount != 0) {
+            Logger.d(" reporter sending , don't finish app !");
+            return;
+        }
+
+        Logger.d("checkStateValid form: " + getFormType() + " action finished  ! finish app !");
+
+        mTaskProcessCallback.get().onTaskFinished();
+        if (shouldEndSession){
+            mTaskProcessCallback.get().exitSessionToAppEngine();
+        }
+
+        openSiren();
+    }
+
+
+    private void openSiren() {
         if (mActionNode != null && mActionNode.getConfirmBean() != null) {
             //confirm 打开拾音，默认6秒
             Logger.d("confirm : " + mActionNode.getConfirmBean());
@@ -530,6 +569,7 @@ public abstract class BaseCloudStateMonitor implements CloudStateCallback, Media
         if (mTaskProcessCallback != null && mTaskProcessCallback.get() != null) {
             Logger.d("form: " + getFormType() + " onExitCallback finishActivity");
             mTaskProcessCallback.get().onExitCallback();
+            mTaskProcessCallback.get().exitSessionToAppEngine();
         }
     }
 
@@ -543,7 +583,9 @@ public abstract class BaseCloudStateMonitor implements CloudStateCallback, Media
 
         void openSiren(String type, boolean pickupEnable, int durationInMilliseconds);
 
-        void onTaskFinished(boolean shouldEndSession);
+        void exitSessionToAppEngine();
+
+        void onTaskFinished( );
 
         void onExitCallback();
     }
