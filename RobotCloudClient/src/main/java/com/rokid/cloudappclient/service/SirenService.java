@@ -1,4 +1,4 @@
-package com.rokid.cloudappclient;
+package com.rokid.cloudappclient.service;
 
 import android.app.Service;
 import android.content.BroadcastReceiver;
