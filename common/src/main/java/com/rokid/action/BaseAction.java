@@ -60,6 +60,9 @@ public abstract class BaseAction<T extends CommonActionBean> {
             case CommonActionBean.ACTION_BACKWARD:
                 backward();
                 break;
+            case CommonActionBean.ACTION_STATE:
+                getStatus();
+                break;
             default:
                 Logger.d(" invalidate action ! " + action);
         }
@@ -82,6 +85,8 @@ public abstract class BaseAction<T extends CommonActionBean> {
     public abstract void forward();
 
     public abstract void backward();
+
+    public abstract void getStatus();
 
     public abstract ACTION_TYPE getActionType();
 

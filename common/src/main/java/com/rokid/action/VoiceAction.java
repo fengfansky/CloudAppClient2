@@ -67,6 +67,11 @@ public class VoiceAction extends BaseAction<VoiceBean> {
     }
 
     @Override
+    public void getStatus() {
+
+    }
+
+    @Override
     public void forward() {
 
     }

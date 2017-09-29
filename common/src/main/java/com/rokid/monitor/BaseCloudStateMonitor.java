@@ -320,6 +320,16 @@ public abstract class BaseCloudStateMonitor implements CloudStateCallback, Media
 
     public String getCloudStatus() {
 
+        final ExtraBean extraBean = getStateExtraBean();
+        if (extraBean == null) return null;
+
+        setCloudStatus("\"" + mAppId + "\":" +
+                extraBean.toString());
+
+        return mCloudStatus;
+    }
+
+    private ExtraBean getStateExtraBean() {
         if (isDestroy) {
             Logger.d(getFormType() + " app not exit !");
             return null;
@@ -376,18 +386,14 @@ public abstract class BaseCloudStateMonitor implements CloudStateCallback, Media
         } else {
             extraBean.setVoice(voiceExtraBean = new ExtraBean.VoiceExtraBean(voiceState));
         }
-
-        setCloudStatus("\"" + mAppId + "\":" +
-                extraBean.toString());
-
-        return mCloudStatus;
+        return extraBean;
     }
 
     public void setCloudStatus(String mCloudStatus) {
         this.mCloudStatus = mCloudStatus;
     }
 
-    private void sendVoiceReporter(String action) {
+    public void sendVoiceReporter(String action) {
 
         /*if (shouldEndSession) {
             Logger.d("shouldEndSession true don't sendVoiceReporter");
@@ -438,7 +444,7 @@ public abstract class BaseCloudStateMonitor implements CloudStateCallback, Media
 
     private volatile int reporterCount;
 
-    private void sendMediaReporter(String action) {
+    public void sendMediaReporter(String action) {
 
         /*if (shouldEndSession) {
             Logger.d("shouldEndSession true don't sendMediaReporter");
@@ -487,7 +493,8 @@ public abstract class BaseCloudStateMonitor implements CloudStateCallback, Media
         Logger.d(" sendMediaReporter action " + action +  " reporterCount : " + reporterCount);
     }
 
-    private void promoteErrorInfo(ErrorPromoter.ERROR_TYPE errorType) {
+
+    public void promoteErrorInfo(ErrorPromoter.ERROR_TYPE errorType) {
         Logger.d(" promoteErrorInfo isStateInvalid : " + isStateInvalid() + " errorType : " + errorType);
 
         if (!isStateInvalid()) {

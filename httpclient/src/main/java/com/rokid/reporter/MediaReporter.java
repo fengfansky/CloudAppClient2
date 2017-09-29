@@ -11,6 +11,7 @@ public class MediaReporter extends BaseReporter {
     public static final String FINISHED = "Media.FINISHED";
     public static final String FAILED = "Media.FAILED";
     public static final String TIMEOUT = "Media.TIMEOUT";
+    public static final String STATE = "Media.STATUS";
 
     public MediaReporter(String appId, String event,ReporterResponseCallback reporterResponseCallback){
         super(appId, event, reporterResponseCallback);

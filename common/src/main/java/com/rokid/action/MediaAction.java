@@ -9,6 +9,7 @@ import com.rokid.bean.response.responseinfo.action.media.MediaItemBean;
 import com.rokid.light.LightUtils;
 import com.rokid.monitor.BaseCloudStateMonitor;
 import com.rokid.logger.Logger;
+import com.rokid.reporter.MediaReporter;
 
 import java.lang.ref.WeakReference;
 
@@ -233,6 +234,11 @@ public class MediaAction extends BaseAction<MediaBean> {
             }
             rkAudioPlayer.seekTo(seekTime);
         }
+    }
+
+    @Override
+    public void getStatus() {
+        cloudStateMonitor.sendMediaReporter(MediaReporter.STATE);
     }
 
     public int getMediaDuration() {

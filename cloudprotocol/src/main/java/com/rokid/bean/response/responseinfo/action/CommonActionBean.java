@@ -17,6 +17,7 @@ public abstract class CommonActionBean extends BaseActionBean {
     public static final String ACTION_STOP = "STOP";
     public static final String ACTION_FORWARD = "FORWARD";
     public static final String ACTION_BACKWARD = "BACKWARD";
+    public static final String ACTION_STATE = "GETSTATUS";
 
     public String action;
     /**
