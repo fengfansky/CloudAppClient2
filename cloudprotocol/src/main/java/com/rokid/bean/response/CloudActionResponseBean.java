@@ -167,7 +167,7 @@ public class CloudActionResponseBean extends BaseBean{
 
         String formLow = form.toLowerCase();
 
-        if (!formLow.equals(ActionBean.FORM_SCENE) && !formLow.equals(ActionBean.FORM_CUT)) {
+        if (!formLow.equals(ActionBean.FORM_SCENE) && !formLow.equals(ActionBean.FORM_CUT) && !formLow.equals(ActionBean.FORM_SERVICE)) {
             setErrorLog(FORM_ERROR_ILLEGAL);
             return false;
         }

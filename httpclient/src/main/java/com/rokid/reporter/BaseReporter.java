@@ -49,6 +49,11 @@ public abstract class BaseReporter implements Runnable {
                 SendEventCreator.generateSendEventRequest(appId, event, extra);
         Logger.d(" eventRequest : " + eventRequest.toString());
 
+        if (EventParamUtils.getEventParamCreator() == null){
+            Logger.d("error !  EventParamCreator is null !");
+            return;
+        }
+
         Map<String,String> paramMap = EventParamUtils.getEventParamCreator().getEnvParam();
 
         BaseUrlConfig.initEventReqParams(paramMap);

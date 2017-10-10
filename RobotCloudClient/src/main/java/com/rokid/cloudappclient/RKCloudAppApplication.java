@@ -2,8 +2,6 @@ package com.rokid.cloudappclient;
 
 import android.app.Application;
 
-import com.rokid.reporter.EventParamUtils;
-
 /**
  * Modified by fanfeng on 2017/7/20.
  */

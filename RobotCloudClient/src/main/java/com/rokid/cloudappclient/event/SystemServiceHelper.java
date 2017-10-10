@@ -1,4 +1,4 @@
-package com.rokid.cloudappclient;
+package com.rokid.cloudappclient.event;
 
 import android.os.IBinder;
 
@@ -7,9 +7,6 @@ import com.rokid.reporter.BaseRuntimeCreator;
 
 import java.lang.reflect.Method;
 import java.util.Map;
-
-import rokid.os.IRKLight;
-import rokid.services.util.RemoteServiceHelper;
 
 /**
  * Created by fanfeng on 2017/9/17.

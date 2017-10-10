@@ -9,7 +9,7 @@ import android.os.Bundle;
 import com.rokid.bean.ActionNode;
 import com.rokid.cloudappclient.AppTypeRecorder;
 import com.rokid.cloudappclient.service.SirenService;
-import com.rokid.cloudappclient.SystemServiceHelper;
+import com.rokid.cloudappclient.event.SystemServiceHelper;
 import com.rokid.cloudappclient.light.LightHelper;
 import com.rokid.cloudappclient.tts.TTSHelper;
 import com.rokid.light.LightUtils;
