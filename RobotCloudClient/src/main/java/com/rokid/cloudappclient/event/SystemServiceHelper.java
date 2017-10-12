@@ -32,7 +32,7 @@ public class SystemServiceHelper extends BaseRuntimeCreator {
             e.printStackTrace();
         }
         if (deviceMap == null || deviceMap.isEmpty()) {
-            Logger.d(" deviceMap is null ");
+            Logger.d(" deviceMap is null !");
             return null;
         }
 

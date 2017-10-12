@@ -11,6 +11,7 @@ import com.rokid.http.HttpClientWrapper;
 import com.rokid.logger.Logger;
 import com.rokid.parser.ResponseParser;
 import com.rokid.reporter.BaseReporter;
+import com.rokid.reporter.DialogReporter;
 import com.rokid.reporter.ExtraBean;
 import com.rokid.reporter.MediaReporter;
 import com.rokid.reporter.ReporterManager;
@@ -598,6 +599,13 @@ public abstract class BaseCloudStateMonitor implements CloudStateCallback, Media
     }
 
     public abstract String getFormType();
+
+    public abstract void onSirenOpened();
+
+    public void onSirenClosed(){
+        ReporterManager.getInstance().executeReporter(new DialogReporter("", DialogReporter.DIALOG_DISMISS, this));
+
+    }
 
     public enum PROMOTE_STATE {
         STARTED,

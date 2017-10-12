@@ -7,10 +7,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.IBinder;
 
+import com.rokid.cloudappclient.AppTypeRecorder;
 import com.rokid.logger.Logger;
 import com.rokid.reporter.BaseReporter;
-import com.rokid.reporter.DialogReporter;
-import com.rokid.reporter.ReporterManager;
 import com.squareup.okhttp.Response;
 
 public class SirenService extends Service {
@@ -46,11 +45,14 @@ public class SirenService extends Service {
             int state = intent.getIntExtra(PARAM_STATE, 0);
             switch (state){
                 case 1:
+                    //唤醒打断Cut应用的TTS播放
+                    AppTypeRecorder.getInstance().onSirenOpened();
                     Logger.d("onReceive siren state awake !");
                     break;
                 case 2:
+                    //拾音休眠上报
                     Logger.d("onReceive siren state sleep !");
-                    ReporterManager.getInstance().executeReporter(new DialogReporter("", DialogReporter.DIALOG_DISMISS, reporterResponseCallback));
+                    AppTypeRecorder.getInstance().onSirenClosed();
                     break;
                 default:
                     Logger.d("onReceive siren unknow state : " + state);

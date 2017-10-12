@@ -1,17 +1,11 @@
 package com.rokid.http;
 
-import android.os.Environment;
 import android.text.TextUtils;
 
-import com.google.gson.Gson;
 import com.rokid.bean.DeviceConfig;
 import com.rokid.logger.Logger;
 import com.rokid.md5.MD5Utils;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -53,8 +47,6 @@ public class BaseUrlConfig {
     }
 
     public static void initEventReqParams(Map<String,String> deviceMap){
-
-        Logger.d(" deviceMap is " + deviceMap.toString());
 
         params = new LinkedHashMap<>();
 
@@ -117,7 +109,6 @@ public class BaseUrlConfig {
             Logger.d("param is null !");
             return null;
         }
-        Logger.d(" params : " + params.toString());
 
         String authorization = params.toString()
                 .replace("{", "").replace("}", "").replace(",", ";").replace(" ", "");

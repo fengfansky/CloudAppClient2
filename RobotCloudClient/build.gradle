@@ -20,9 +20,18 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled true
-            shrinkResources true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            applicationVariants.all { variant ->
+                variant.outputs.each { output ->
+                    output.outputFile = new File(output.outputFile.parent,
+                            output.outputFile.name.replace("app-release", defaultConfig.applicationId + "_pebble_" + defaultConfig.versionName)
+                            //output.outputFile.name.replace("app-release", defaultConfig.applicationId + "_alien_" + defaultConfig.versionName)
+                            //for Debug use output.outputFile = new File(output.outputFile.parent,
+                            //                             output.outputFile.name.replace("-debug", "-" + formattedDate)
+                    )
+                }
+            }
         }
     }
     sourceSets {
@@ -34,7 +43,6 @@ android {
     }
     dexOptions {
     }
-    buildToolsVersion '26'
 }
 
 

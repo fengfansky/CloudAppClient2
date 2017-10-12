@@ -1,7 +1,6 @@
 package com.rokid.monitor;
 
 import com.rokid.bean.response.responseinfo.action.ActionBean;
-import com.rokid.http.HttpClientWrapper;
 import com.rokid.logger.Logger;
 
 /**
@@ -29,5 +28,18 @@ public class CloudCutStateMonitor extends BaseCloudStateMonitor {
     @Override
     public String getFormType() {
         return ActionBean.FORM_CUT;
+    }
+
+    // Cut应用拾音打开：TTS停止播放，Media暂停播放
+    @Override
+    public void onSirenOpened() {
+        voiceAction.stopPlay();
+        mediaAction.pausePlay();
+    }
+
+    // Cut应用拾音关闭：TTS不变，Media恢复播放
+    @Override
+    public void onSirenClosed() {
+        mediaAction.resumePlay();
     }
 }

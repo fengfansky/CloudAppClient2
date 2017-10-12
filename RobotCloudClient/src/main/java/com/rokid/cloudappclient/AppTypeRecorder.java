@@ -26,6 +26,14 @@ public class AppTypeRecorder {
         return appStateManager;
     }
 
+    public void onSirenOpened(){
+        appStateManager.onSirenOpened();
+    }
+
+    public void onSirenClosed(){
+        appStateManager.onSirenClosed();
+    }
+
     public String getCloudAppStatus(){
         if (appStateManager != null ) {
             return appStateManager.getCloudStatus();

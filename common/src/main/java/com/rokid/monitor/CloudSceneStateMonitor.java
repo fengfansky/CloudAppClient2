@@ -1,7 +1,6 @@
 package com.rokid.monitor;
 
 import com.rokid.bean.response.responseinfo.action.ActionBean;
-import com.rokid.http.HttpClientWrapper;
 import com.rokid.logger.Logger;
 
 /**
@@ -53,4 +52,10 @@ public class CloudSceneStateMonitor extends BaseCloudStateMonitor {
     public String getFormType() {
         return ActionBean.FORM_SCENE;
     }
+
+    @Override
+    public void onSirenOpened() {
+
+    }
+
 }
